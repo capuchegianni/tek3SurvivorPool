@@ -1,11 +1,11 @@
 from flask import Flask
-from Routes.clothes import clothes_blueprint
-from Routes.customers import customers_blueprint
-from Routes.employees import employees_blueprint
-from Routes.encounters import encounters_blueprint
-from Routes.events import events_blueprint
-from Routes.tips import tips_blueprint
-from .dbConnection import dbConnection, db
+from .Routes.clothes import clothes_blueprint
+from .Routes.customers import customers_blueprint
+from .Routes.employees import employees_blueprint
+from .Routes.encounters import encounters_blueprint
+from .Routes.events import events_blueprint
+from .Routes.tips import tips_blueprint
+from .dbConnection import dbConnection
 
 def createAPI():
     app = Flask(__name__)
