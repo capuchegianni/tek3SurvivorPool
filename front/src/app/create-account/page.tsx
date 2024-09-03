@@ -32,6 +32,10 @@ export default function CreateAccount() {
 
     return (
         <form>
+            <div className="container-account">
+                <img className="image" src="women_catch.png" />
+                <img className="image" src="men_catch.png" />
+            </div>
             <Card className="custom-card">
                 <div className="">
                     <h2 className="personal-text">Create account</h2>

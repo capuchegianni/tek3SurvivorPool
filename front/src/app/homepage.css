@@ -6,7 +6,7 @@
 }
 
 .bg-white {
-    background-color: white;
+    background-color: #F5EFFF;
 }
 
 .title-signup {
@@ -14,7 +14,7 @@
     font-weight: 700;
     display: flex;
     justify-content: center;
-    color: #3C6E71;
+    color: #615FF2;
 }
 
 .container {
@@ -33,7 +33,7 @@
     font-weight: 700;
     display: flex;
     justify-content: center;
-    color: #353535;
+    color: #2A27D2;
     padding-top: 20px;
 }
 
