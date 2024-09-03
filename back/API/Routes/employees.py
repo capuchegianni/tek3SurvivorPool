@@ -13,6 +13,7 @@ def getEmployees():
 
 @employees_blueprint.route('/api/employees/login', methods=['POST'])
 def login():
+    #might change the get of email and password
     data = request.get_json()
     email = data['email']
     password = data['password']
