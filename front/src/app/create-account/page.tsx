@@ -3,68 +3,79 @@
 import React, { useState } from "react";
 import './account.css';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
+import { FloatLabel } from 'primereact/floatlabel';
+import { InputText } from "primereact/inputtext";
+import { Card } from 'primereact/card';
 
 interface Gender {
     type: string;
     code: string;
-}
+};
+
+interface Work {
+    type: string;
+    code: string;
+};
 
 export default function CreateAccount() {
     return (
         <form>
-            <div>
-                <div className="border-b border-gray-900/10 pb-12">
-                    <h2 className="profile-text">Profile</h2>
-                </div>
+            <Card className="custom-card">
                 <div className="">
                     <h2 className="personal-text">Create account</h2>
                     <div className="form-box">
                         <FirstName />
                         <LastName />
                         <EmailAddress />
-                        <p className="info-mail">Use a permanent address where you can receive mail.</p>
+                        <small className="info-mail">Use a permanent address where you can receive mail.</small>
                         <Gender />
                         <Work />
                     </div>
                 </div>
-            </div>
-            <div className="form-button">
-                <button className="button-save">Save</button>
-                <button type="button" className="button-cancel"> Cancel </button>
-            </div>
+                <div className="form-button">
+                    <button className="button-save">Save</button>
+                    <button type="button" className="button-cancel"> Cancel </button>
+                </div>
+            </Card>
         </form>
     )
 }
 
 function EmailAddress() {
+    const [value, setValue] = useState('');
+
     return (
-        <div className="">
-            <label htmlFor="email" className="title-category"> Email address </label>
-            <div className="">
-                <input id="email" name="email" type="email" className="" />
-            </div>
+        <div className="card flex justify-content-center title-category">
+            <FloatLabel>
+                <InputText required id="email" value={value} onChange={(e) => setValue(e.target.value)} />
+                <label htmlFor="email">Email</label>
+            </FloatLabel>
         </div>
     )
 }
 
 function LastName() {
+    const [value, setValue] = useState('');
+
     return (
-        <div className="">
-            <label htmlFor="last-name" className="title-category"> Last name </label>
-            <div className="">
-                <input id="last-name" name="last-name" type="text" className="" required />
-            </div>
+        <div className="card flex justify-content-center title-category">
+            <FloatLabel>
+                <InputText required id="lastname" value={value} onChange={(e) => setValue(e.target.value)} />
+                <label htmlFor="lastname">Last name</label>
+            </FloatLabel>
         </div>
     )
 }
 
 function FirstName() {
+    const [value, setValue] = useState('');
+
     return (
-        <div className="">
-            <label htmlFor="first-name" className="title-category"> First name </label>
-            <div className="">
-                <input id="first-name" name="first-name" type="text" className="" />
-            </div>
+        <div className="card flex justify-content-center title-category">
+            <FloatLabel>
+                <InputText required id="firstname" value={value} onChange={(e) => setValue(e.target.value)} />
+                <label htmlFor="firstname">First name</label>
+            </FloatLabel>
         </div>
     )
 }
@@ -79,21 +90,23 @@ function Gender() {
 
     return (
         <div className="card flex justify-content-left">
-            <Dropdown value={selectedGender} onChange={(e: DropdownChangeEvent) => setSelectedGender(e.value)} options={genders} optionLabel="type" placeholder="Select a gender" className="w-full md:w-14rem" />
+            <label htmlFor="work" className="title-category"> Gender </label>
+            <Dropdown required value={selectedGender} onChange={(e: DropdownChangeEvent) => setSelectedGender(e.value)} options={genders} optionLabel="type" placeholder="Select a gender" className="w-full md:w-14rem" />
         </div>
     )
 }
 
 function Work() {
+    const [selectedWork, setSelectedWork] = useState<Work | null>(null);
+    const works: Work[] = [
+        {type: 'Agency Manager', code: 'M'},
+        {type: 'Coach (Employee)', code: 'C'},
+    ];
+
     return (
-        <div>
-            <label htmlFor="work" className="title-category"> Work </label>
-            <div className="input">
-                <input required id="manager" type="radio" value="manager" name="work" className="marging-bottom" />
-                <label htmlFor="manager" className="padding-left"> Agency Manager </label>
-                <input required id="coach" type="radio" value="coach" name="work" className="marging-bottom" />
-                <label htmlFor="coach" className="padding-left"> Coach (Employee) </label>
-            </div>
+        <div className="card flex justify-content-left">
+            <label htmlFor="work" className="title-category"> Activity </label>
+            <Dropdown required value={selectedWork} onChange={(e: DropdownChangeEvent) => setSelectedWork(e.value)} options={works} optionLabel="type" placeholder="Select your job" className="w-full md:w-14rem" />
         </div>
     )
 }

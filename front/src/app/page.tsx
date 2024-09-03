@@ -57,7 +57,7 @@ function ButtonSign() {
 function CreateAccount() {
   return (
     <div className="create-account">
-      <div className="create-account-text"> Don't have an account?&thinsp;</div>
+      <div className="create-account-text"> Don&apos;t have an account?&thinsp;</div>
       <a href="create-account">
         <div className="create-account-text"> Create an account </div>
       </a>
