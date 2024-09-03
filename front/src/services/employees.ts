@@ -1,8 +1,14 @@
-import { EmployeeDTO, isEmployees, Employee, isEmployee } from '@/types/Employee'
+import { Credentials } from '@/types/credentials'
+import {
+    EmployeeDTO,
+    isEmployees,
+    Employee,
+    isEmployee
+} from '@/types/employee'
 import fetch from 'node-fetch'
 
 export default class EmployeesService {
-    private _route: string = 'https://localhost:5000/api/employees'
+    private _route = 'https://localhost:5000/api/employees'
     private _headers = {
         'Content-Type': 'application/json'
     }
@@ -13,22 +19,22 @@ export default class EmployeesService {
             headers: this._headers
         })
         if (!res.ok)
-            throw Error()
+            throw Error(`code: ${res.status}\nerror: ${res.statusText}`)
 
         const object = await res.json()
         if (!isEmployees(object))
-            throw Error()
+            throw new Error('An error happened when fetching employees.', { cause: `Returned objects don't correspond to the associated type.\n${JSON.stringify(object)}` })
 
         return object
     }
 
-    public async login(data: { email: string, password: string }): Promise<{ access_token: string }> {
+    public async login(data: Credentials): Promise<{ access_token: string }> {
         const res = await fetch(`${this._route}/login`, {
             method: 'POST',
             body: JSON.stringify(data)
         })
         if (!res.ok)
-            throw Error()
+            throw Error(`code: ${res.status}\nerror: ${res.statusText}`)
 
         return await res.json()
     }
@@ -39,11 +45,11 @@ export default class EmployeesService {
             headers: this._headers
         })
         if (!res.ok)
-            throw Error()
+            throw Error(`code: ${res.status}\nerror: ${res.statusText}`)
 
         const object = await res.json()
         if (!isEmployee(object))
-            throw Error()
+            throw new Error(`An error happened when fetching employee ${data.id}.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
         return object
     }
@@ -54,11 +60,11 @@ export default class EmployeesService {
             headers: this._headers
         })
         if (!res.ok)
-            throw Error()
+            throw Error(`code: ${res.status}\nerror: ${res.statusText}`)
 
         const object = await res.json()
         if (!isEmployee(object))
-            throw Error()
+            throw new Error('An error happened when fetching your account.', { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
         return object
     }
@@ -69,7 +75,7 @@ export default class EmployeesService {
             headers: this._headers
         })
         if (!res.ok)
-            throw Error()
+            throw Error(`code: ${res.status}\nerror: ${res.statusText}`)
 
         return await res.json()
     }

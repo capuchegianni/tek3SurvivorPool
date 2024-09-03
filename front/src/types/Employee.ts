@@ -16,13 +16,24 @@ export type EmployeeDTO = {
 }
 
 export function isEmployee(data: unknown): data is Employee {
-    return data !== null && data !== undefined &&
+    return !!data &&
         typeof (data as Employee).id === 'number' &&
         typeof (data as Employee).email === 'string' &&
         typeof (data as Employee).name === 'string' &&
-        typeof (data as Employee).surname === 'string'
+        typeof (data as Employee).surname === 'string' &&
+        typeof (data as Employee).birth_date === 'string' &&
+        typeof (data as Employee).gender === 'string' &&
+        typeof (data as Employee).work === 'string'
 }
 
-export function isEmployees(datas: unknown[]): datas is Employee[] {
-    return Array.isArray(datas) && datas.every(data => isEmployee(data))
+export function isEmployeeDTO(data: unknown): data is EmployeeDTO {
+    return !!data &&
+        typeof (data as EmployeeDTO).id === 'number' &&
+        typeof (data as EmployeeDTO).email === 'string' &&
+        typeof (data as EmployeeDTO).name === 'string' &&
+        typeof (data as EmployeeDTO).surname === 'string'
+}
+
+export function isEmployees(datas: unknown[]): datas is EmployeeDTO[] {
+    return Array.isArray(datas) && datas.every(data => isEmployeeDTO(data))
 }
