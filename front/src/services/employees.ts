@@ -1,10 +1,10 @@
-import { Credentials } from '@/types/credentials'
+import { Credentials } from '@/types/Credentials'
 import {
     EmployeeDTO,
     isEmployees,
     Employee,
     isEmployee
-} from '@/types/employee'
+} from '@/types/Employee'
 import fetch from 'node-fetch'
 
 export default class EmployeesService {

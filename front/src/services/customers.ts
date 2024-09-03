@@ -1,11 +1,11 @@
-import { Clothe, isClothes } from "@/types/clothe"
+import { Clothe, isClothes } from "@/types/Clothe"
 import {
     Customer,
     CustomerDTO,
     isCustomer,
     isCustomers
-} from "@/types/customer"
-import { Payment, isPaymentHistory } from "@/types/paymentHistory"
+} from "@/types/Customer"
+import { Payment, isPaymentHistory } from "@/types/PaymentHistory"
 
 export default class CustomersService {
     private _route = 'https://localhost:5000/api/customers'

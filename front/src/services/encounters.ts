@@ -3,7 +3,7 @@ import {
     EncounterDTO,
     isCustomer,
     isCustomers
-} from "@/types/encounter"
+} from "@/types/Encounter"
 
 export default class EncountersService {
     private _route = 'https://localhost:5000/api/encounters'
