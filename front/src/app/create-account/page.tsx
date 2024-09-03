@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './account.css';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from "primereact/inputtext";
 import { Card } from 'primereact/card';
+import Link from 'next/link';
 
 interface Gender {
     type: string;
@@ -18,6 +19,17 @@ interface Work {
 };
 
 export default function CreateAccount() {
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, []);
+    if (isLoading)
+        return <div>Loading...</div>;
+
     return (
         <form>
             <Card className="custom-card">
@@ -34,7 +46,9 @@ export default function CreateAccount() {
                 </div>
                 <div className="form-button">
                     <button className="button-save">Save</button>
-                    <button type="button" className="button-cancel"> Cancel </button>
+                    <Link href="/">
+                        <button type="button" className="button-cancel"> Cancel </button>
+                    </Link>
                 </div>
             </Card>
         </form>
