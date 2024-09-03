@@ -1,4 +1,4 @@
-import { Credentials } from '@/types/Credentials'
+import { Credentials, Token } from '@/types/Credentials'
 import {
     EmployeeDTO,
     isEmployees,
@@ -28,7 +28,7 @@ export default class EmployeesService {
         return object
     }
 
-    public async login(data: Credentials): Promise<{ access_token: string }> {
+    public async login(data: Credentials): Promise<Token> {
         const res = await fetch(`${this._route}/login`, {
             method: 'POST',
             body: JSON.stringify(data)
