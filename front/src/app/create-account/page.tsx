@@ -39,7 +39,7 @@ export default function CreateAccount() {
                         <FirstName />
                         <LastName />
                         <EmailAddress />
-                        <small className="info-mail">Use a permanent address where you can receive mail.</small>
+                        <small className="info-mail">You must use a work related email address.</small>
                         <Gender />
                         <Work />
                     </div>
