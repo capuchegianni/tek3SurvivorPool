@@ -1,13 +1,14 @@
 from flask import Blueprint, jsonify
 from ..dbConnection import db
 from bson.objectid import ObjectId
+from ..serialize import serialize_mongo_id
 
 customers_blueprint = Blueprint('customers', __name__)
 
 @customers_blueprint.route('/api/customers', methods=['GET'])
 def getCustomers():
     customers = db.Customers.find()
-    return jsonify(list(customers))
+    return jsonify([serialize_mongo_id(customer) for customer in customers])
 
 
 @customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
@@ -15,7 +16,7 @@ def getCustomerId(customer_id):
     customer = db.Customers.find_one({'_id': ObjectId(customer_id)})
     if customer is None:
         return jsonify({'error': 'Customer not found'}), 404
-    return jsonify(customer)
+    return jsonify(serialize_mongo_id(customer))
 
 
 @customers_blueprint.route('/api/customers/<customer_id>/image', methods=['GET'])

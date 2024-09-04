@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv
 import requests
+from ..serialize import serialize_mongo_id
 
 employees_blueprint = Blueprint('employees', __name__)
 
@@ -45,7 +46,7 @@ def getAccessToken():
 @employees_blueprint.route('/api/employees', methods=['GET'])
 def getEmployees():
     employees = db.Employees.find()
-    return jsonify(list(employees))
+    return jsonify([serialize_mongo_id(employee) for employee in employees])
 
 
 @employees_blueprint.route('/api/employees/login', methods=['POST'])
@@ -66,7 +67,7 @@ def login():
 @employees_blueprint.route('/api/employees/me', methods=['GET'])
 def getMe():
     employee = db.Employees.find_one({'_id': ObjectId(session['employee_id'])})
-    return jsonify(employee)
+    return jsonify(serialize_mongo_id(employee))
 
 
 @employees_blueprint.route('/api/employees/<employee_id>', methods=['GET'])
@@ -74,7 +75,7 @@ def getEmployeeId(employee_id):
     employee = db.Employees.find_one({'_id': ObjectId(employee_id)})
     if employee is None:
         return jsonify({'error': 'Employee not found'}), 404
-    return jsonify(employee)
+    return jsonify(serialize_mongo_id(employee))
 
 
 @employees_blueprint.route('/api/employees/<employee_id>/image', methods=['GET'])
