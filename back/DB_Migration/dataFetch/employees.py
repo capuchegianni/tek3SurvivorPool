@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import requests
 from dbConnection import db
 from gridfs import GridFS
+from bson.objectid import ObjectId
 
 load_dotenv()
 
@@ -34,15 +35,28 @@ def fetchEmployee(employee_id, headers):
     if response.status_code == 200:
         data = response.json()
         if data:
-            if employee_image:
-                image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
-                data["image"] = image_id
-            if db.employees.find_one({"id": employee_id}):
+            existing_employee = db.employees.find_one({"id": employee_id})
+            if existing_employee:
+                if employee_image:
+                    existing_image_id = existing_employee.get("image")
+                    if existing_image_id:
+                        existing_image = GridFS(db).get(ObjectId(existing_image_id)).read()
+                        if existing_image != employee_image:
+                            image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
+                            data["image"] = image_id
+                        else:
+                            data["image"] = existing_image_id
+                    else:
+                        image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
+                        data["image"] = image_id
                 db.employees.update_one(
                     {"id": employee_id}, {"$set": data}
                 )
                 print(f"Employee {employee_id} updated successfully.")
             else:
+                if employee_image:
+                    image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
+                    data["image"] = image_id
                 db.employees.insert_one(data)
                 print(f"Employee {employee_id} inserted successfully.")
 
