@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request, session
 from dbConnection import db
-from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv
 import requests
-from ..serialize import serialize_mongo_id
+from gridfs import GridFS
+import base64
 
 employees_blueprint = Blueprint('employees', __name__)
 
@@ -40,13 +40,18 @@ def getAccessToken():
     else:
         print(f"Failed to login: {response.status_code}\n")
 
-    return access_token
+    return jsonify({ 'token': access_token })
 
 
 @employees_blueprint.route('/api/employees', methods=['GET'])
 def getEmployees():
-    employees = db.Employees.find()
-    return jsonify([serialize_mongo_id(employee) for employee in employees])
+    employees = db.employees.find()
+    return jsonify([{
+        'id': employee['id'],
+        'email': employee['email'],
+        'name': employee['name'],
+        'surname': employee['surname']
+    } for employee in employees])
 
 
 @employees_blueprint.route('/api/employees/login', methods=['POST'])
@@ -55,9 +60,9 @@ def login():
     email = data['email']
     password = data['password']
 
-    employee = db.Employees.find_one({'email': email})
+    employee = db.employees.find_one({ 'email': email })
     if employee and employee['password'] == password:
-        session['employee_id'] = str(employee['_id'])
+        session['employee_id'] = employee['id']
         request.headers.get()
         return getAccessToken(), 200
     else:
@@ -66,21 +71,42 @@ def login():
 
 @employees_blueprint.route('/api/employees/me', methods=['GET'])
 def getMe():
-    employee = db.Employees.find_one({'_id': ObjectId(session['employee_id'])})
-    return jsonify(serialize_mongo_id(employee))
+    if 'employee_id' not in session:
+        return jsonify({ 'details': 'User not connected' }), 401
+    employee = db.employees.find_one({ 'id': session['employee_id'] })
+    return jsonify({
+        'id': employee['id'],
+        'email': employee['email'],
+        'name': employee['name'],
+        'surname': employee['surname'],
+        'birth_date': employee['birth_date'],
+        'gender': employee['gender'],
+        'work': employee['work']
+    })
 
 
 @employees_blueprint.route('/api/employees/<employee_id>', methods=['GET'])
 def getEmployeeId(employee_id):
-    employee = db.Employees.find_one({'_id': ObjectId(employee_id)})
+    print(employee_id)
+    employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
         return jsonify({'error': 'Employee not found'}), 404
-    return jsonify(serialize_mongo_id(employee))
+    return jsonify({
+        'id': employee['id'],
+        'email': employee['email'],
+        'name': employee['name'],
+        'surname': employee['surname'],
+        'birth_date': employee['birth_date'],
+        'gender': employee['gender'],
+        'work': employee['work']
+    })
 
 
 @employees_blueprint.route('/api/employees/<employee_id>/image', methods=['GET'])
 def getEmployeeImage(employee_id):
-    employee = db.Employees.find_one({'_id': ObjectId(employee_id)})
+    employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
         return jsonify({'error': 'Employee not found'}), 404
-    return employee['image']
+    image_data = GridFS(db).get(employee['image']).read()
+    base64_image = base64.b64encode(image_data).decode('utf-8')
+    return jsonify({ 'image': base64_image })

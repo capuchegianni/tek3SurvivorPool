@@ -6,7 +6,7 @@ from dbConnection import db
 load_dotenv()
 
 def fetchEmployees(access_token):
-    employees_collection = db["Employees"]
+    employees_collection = db["employees"]
     url = "https://soul-connection.fr/api/employees"
     headers = {
         "Authorization": f"Bearer {access_token}",
