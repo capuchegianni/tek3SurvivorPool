@@ -28,7 +28,7 @@ export default function CreateAccount() {
         return () => clearTimeout(timer);
     }, []);
     if (isLoading)
-        return <div>Loading...</div>;
+        return <div className="loading-screen">Loading...</div>;
 
     return (
         <form>
