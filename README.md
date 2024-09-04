@@ -26,12 +26,12 @@ We decided to use the following technologies for this project:
 
 ## Installation
 
-To install the project, you need to have Docker and Docker Compose installed on your machine.
+To install the project, you need to have Docker and Docker Compose plugin installed on your machine.
 
 1. Clone the repository
 2. Run the following command to start the project:
 ```bash
-docker-compose up
+docker compose up
 ```
 3. The project should be available at `http://localhost:3000`
 
