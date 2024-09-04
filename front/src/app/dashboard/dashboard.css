@@ -90,3 +90,22 @@
 .move-bot {
     padding-top: 30px;
 }
+
+.justifyOption {
+    font-size: 13px;
+}
+
+.number {
+    font-size: 20px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.negative {
+    color: red;
+}
+
+.positive {
+    color: green;
+}
