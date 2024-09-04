@@ -6,19 +6,18 @@ import {
   isCustomers
 } from "@/app/types/Customer"
 import { Payment, isPaymentHistory } from "@/app/types/PaymentHistory"
-import { getAuthHeader } from "./authToken"
 
 export default class CustomersService {
   private _route = 'http://localhost:5000/api/customers'
   private _headers = {
-    'Content-Type': 'application/json',
-    'Authorization': getAuthHeader()
+    'Content-Type': 'application/json'
   }
 
   public async getCustomers(): Promise<CustomerDTO[]> {
     const res = await fetch(this._route, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -37,7 +36,8 @@ export default class CustomersService {
   public async getCustomer(data: { id: number }): Promise<Customer> {
     const res = await fetch(`${this._route}/${data.id}`, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -56,7 +56,8 @@ export default class CustomersService {
   public async getCustomerImage(data: { id: number }): Promise<string> {
     const res = await fetch(`${this._route}/${data.id}/image`, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -75,7 +76,8 @@ export default class CustomersService {
   public async getCustomerPaymentsHistory(data: { id: number }): Promise<Payment[]> {
     const res = await fetch(`${this._route}/${data.id}/payments_history`, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -94,7 +96,8 @@ export default class CustomersService {
   public async getCustomerClothes(data: { id: number }): Promise<Clothe[]> {
     const res = await fetch(`${this._route}/${data.id}/clothes`, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({

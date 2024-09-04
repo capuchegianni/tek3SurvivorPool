@@ -2,6 +2,7 @@ export type Event = {
   id: number
   name: string
   date: string
+  duration: number
   max_participants: number
   location_x: string
   location_y: string
@@ -22,6 +23,7 @@ export function isEvent(data: unknown): data is Event {
     typeof (data as Event).id === 'number' &&
     typeof (data as Event).name === 'string' &&
     typeof (data as Event).date === 'string' &&
+    typeof (data as Event).duration == 'number' &&
     typeof (data as Event).max_participants === 'number' &&
     typeof (data as Event).location_x === 'string' &&
     typeof (data as Event).location_y === 'string' &&

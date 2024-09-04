@@ -1,17 +1,16 @@
 import { Tip, isTips } from "@/app/types/Tip"
-import { getAuthHeader } from "./authToken"
 
 export default class TipsService {
   private _route = 'http://localhost:5000/api/tips'
   private _headers = {
-      'Content-Type': 'application/json',
-      'Authorization': getAuthHeader()
+      'Content-Type': 'application/json'
   }
 
   public async getTips(): Promise<Tip[]> {
     const res = await fetch(this._route, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
