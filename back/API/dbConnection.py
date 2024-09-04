@@ -9,4 +9,4 @@ db = None
 def dbConnection():
     global db
     client = MongoClient(os.getenv("MONGODB_URI"))
-    db = client.get_database()
+    db = client[os.getenv("MONGODB_DB_NAME")]

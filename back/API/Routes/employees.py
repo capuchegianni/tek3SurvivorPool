@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from dbConnection import db
+from ..dbConnection import db
 from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv
