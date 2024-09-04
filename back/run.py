@@ -1,7 +1,10 @@
 from API.API import createAPI
+from dbConnection import dbConnection
 from DB_Migration.dbMigration import migrationLoop, signalHandler, stop_event
 import threading
 import signal
+
+dbConnection()
 
 api = createAPI()
 

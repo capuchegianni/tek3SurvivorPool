@@ -2,6 +2,7 @@ import time
 import sys
 import threading
 from .accessToken import getAccessToken
+from .dataFetch.employees import fetchEmployees
 
 stop_event = threading.Event()
 
@@ -28,6 +29,8 @@ def retrieveData():
     if not access_token:
         print("Failed to retrieve access token. Exiting...")
         sys.exit(0)
+
+    fetchEmployees(access_token)
 
     return True
 

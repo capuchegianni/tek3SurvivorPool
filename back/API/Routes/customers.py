@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from ..dbConnection import db
+from dbConnection import db
 from bson.objectid import ObjectId
 from ..serialize import serialize_mongo_id
 
