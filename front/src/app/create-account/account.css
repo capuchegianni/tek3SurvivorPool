@@ -87,7 +87,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     margin: 0;
 }
 
@@ -98,11 +97,12 @@ body {
     margin: auto;
     background-color: #e2e6e6;
     border-radius: 15px;
-    margin-top: -100px;
+    margin-top: 150px;
 }
 
 .image {
     width: 25%;
+    height: 25%;
 }
 
 .container-account {
@@ -110,5 +110,4 @@ body {
     flex-direction: row;
     justify-content: center;
     justify-content: space-between;
-    margin-top: -100px;
 }

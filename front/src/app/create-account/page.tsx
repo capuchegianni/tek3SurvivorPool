@@ -34,27 +34,27 @@ export default function CreateAccount() {
         <form>
             <div className="container-account">
                 <img className="image" src="women_catch.png" />
+                <Card className="custom-card">
+                    <div className="">
+                        <h2 className="personal-text">Create account</h2>
+                        <div className="form-box">
+                            <FirstName />
+                            <LastName />
+                            <EmailAddress />
+                            <small className="info-mail">You must use a work related email address.</small>
+                            <Gender />
+                            <Work />
+                        </div>
+                    </div>
+                    <div className="form-button">
+                        <button className="button-save">Save</button>
+                        <Link href="/">
+                            <button type="button" className="button-cancel"> Cancel </button>
+                        </Link>
+                    </div>
+                </Card>
                 <img className="image" src="men_catch.png" />
             </div>
-            <Card className="custom-card">
-                <div className="">
-                    <h2 className="personal-text">Create account</h2>
-                    <div className="form-box">
-                        <FirstName />
-                        <LastName />
-                        <EmailAddress />
-                        <small className="info-mail">You must use a work related email address.</small>
-                        <Gender />
-                        <Work />
-                    </div>
-                </div>
-                <div className="form-button">
-                    <button className="button-save">Save</button>
-                    <Link href="/">
-                        <button type="button" className="button-cancel"> Cancel </button>
-                    </Link>
-                </div>
-            </Card>
         </form>
     )
 }
