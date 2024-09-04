@@ -1,8 +1,10 @@
+import { getAuthHeader } from "./authToken"
+
 export default class ClothesService {
-  private _route = 'https://localhost:5000/api/clothes'
+  private _route = 'http://localhost:5000/api/clothes'
   private _headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
+    'Authorization': getAuthHeader()
   }
 
   public async getClotheImage(data: { id: string }): Promise<string> {

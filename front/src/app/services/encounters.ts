@@ -3,13 +3,14 @@ import {
   EncounterDTO,
   isCustomer,
   isCustomers
-} from "@/types/Encounter"
+} from "@/app/types/Encounter"
+import { getAuthHeader } from "./authToken"
 
 export default class EncountersService {
-  private _route = 'https://localhost:5000/api/encounters'
+  private _route = 'http://localhost:5000/api/encounters'
   private _headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
+    'Authorization': getAuthHeader()
   }
 
   public async getEncounters(): Promise<EncounterDTO[]> {

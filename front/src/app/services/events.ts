@@ -3,13 +3,14 @@ import {
   EventDTO,
   isEvent,
   isEvents
-} from "@/types/Event"
+} from "@/app/types/Event"
+import { getAuthHeader } from "./authToken"
 
 export default class EventsService {
-  private _route = 'https://localhost:5000/api/events'
+  private _route = 'http://localhost:5000/api/events'
   private _headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
+    'Authorization': getAuthHeader()
   }
 
   public async getEvents(): Promise<EventDTO[]> {

@@ -1,17 +1,18 @@
-import { Credentials, isToken } from '@/types/Credentials'
+import { Credentials, isToken } from '@/app/types/Credentials'
 import {
   EmployeeDTO,
   isEmployees,
   Employee,
   isEmployee
-} from '@/types/Employee'
+} from '@/app/types/Employee'
 import fetch from 'node-fetch'
+import { setAuthHeader, getAuthHeader } from './authToken'
 
 export default class EmployeesService {
-  private _route = 'https://localhost:5000/api/employees'
+  private _route = 'http://localhost:5000/api/employees'
   private _headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': getAuthHeader()
   }
 
   public async getEmployees(): Promise<EmployeeDTO[]> {
@@ -50,7 +51,7 @@ export default class EmployeesService {
     if (!isToken(object))
       throw Error('Couldn\'t login.', { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
-    localStorage.setItem('token', object.token)
+    setAuthHeader(object.token)
     this._headers['Authorization'] = `Bearer ${object.token}`
     return true
   }

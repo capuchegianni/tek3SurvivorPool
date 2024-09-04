@@ -1,17 +1,18 @@
-import { Clothe, isClothes } from "@/types/Clothe"
+import { Clothe, isClothes } from "@/app/types/Clothe"
 import {
   Customer,
   CustomerDTO,
   isCustomer,
   isCustomers
-} from "@/types/Customer"
-import { Payment, isPaymentHistory } from "@/types/PaymentHistory"
+} from "@/app/types/Customer"
+import { Payment, isPaymentHistory } from "@/app/types/PaymentHistory"
+import { getAuthHeader } from "./authToken"
 
 export default class CustomersService {
-  private _route = 'https://localhost:5000/api/customers'
+  private _route = 'http://localhost:5000/api/customers'
   private _headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
+    'Authorization': getAuthHeader()
   }
 
   public async getCustomers(): Promise<CustomerDTO[]> {

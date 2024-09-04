@@ -1,10 +1,11 @@
-import { Tip, isTips } from "@/types/Tip"
+import { Tip, isTips } from "@/app/types/Tip"
+import { getAuthHeader } from "./authToken"
 
 export default class TipsService {
-  private _route = 'https://localhost:5000/api/tips'
+  private _route = 'http://localhost:5000/api/tips'
   private _headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': getAuthHeader()
   }
 
   public async getTips(): Promise<Tip[]> {
