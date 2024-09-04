@@ -2,7 +2,11 @@ import time
 import sys
 import threading
 from .accessToken import getAccessToken
+from .dataFetch.customers import fetchCustomers
 from .dataFetch.employees import fetchEmployees
+from .dataFetch.encounters import fetchEncounters
+from .dataFetch.events import fetchEvents
+from .dataFetch.tips import fetchTips
 
 stop_event = threading.Event()
 
@@ -30,7 +34,11 @@ def retrieveData():
         print("Failed to retrieve access token. Exiting...")
         sys.exit(0)
 
+    fetchCustomers(access_token)
     fetchEmployees(access_token)
+    fetchEncounters(access_token)
+    fetchEvents(access_token)
+    fetchTips(access_token)
 
     return True
 
