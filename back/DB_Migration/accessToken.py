@@ -4,10 +4,7 @@ import requests
 
 load_dotenv()
 
-access_token = None
-
 def getAccessToken():
-    global access_token
     api_key = os.getenv("API_KEY")
     api_email = os.getenv("API_EMAIL")
     api_password = os.getenv("API_PASSWORD")

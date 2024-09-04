@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from ..dbConnection import db
+from dbConnection import db
 
 tips_blueprint = Blueprint('tips', __name__)
 

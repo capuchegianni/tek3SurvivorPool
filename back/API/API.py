@@ -5,12 +5,9 @@ from .Routes.employees import employees_blueprint
 from .Routes.encounters import encounters_blueprint
 from .Routes.events import events_blueprint
 from .Routes.tips import tips_blueprint
-from .dbConnection import dbConnection
 
 def createAPI():
     app = Flask(__name__)
-
-    dbConnection()
 
     app.register_blueprint(clothes_blueprint)
     app.register_blueprint(customers_blueprint)
