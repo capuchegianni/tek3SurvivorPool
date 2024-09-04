@@ -1,23 +1,22 @@
-import { Credentials, isToken } from '@/app/types/Credentials'
+import { Credentials } from '@/app/types/Credentials'
 import {
   EmployeeDTO,
   isEmployees,
   Employee,
   isEmployee
 } from '@/app/types/Employee'
-import { setAuthHeader, getAuthHeader } from './authToken'
 
 export default class EmployeesService {
   private _route = 'http://localhost:5000/api/employees'
   private _headers = {
-      'Content-Type': 'application/json',
-      'Authorization': getAuthHeader()
+      'Content-Type': 'application/json'
   }
 
   public async getEmployees(): Promise<EmployeeDTO[]> {
     const res = await fetch(this._route, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -34,10 +33,14 @@ export default class EmployeesService {
   }
 
   public async login(data: Credentials): Promise<boolean> {
+    if (!data.email || !data.password)
+      throw Error('Please provide an email and a password.')
+
     const res = await fetch(`${this._route}/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      headers: this._headers,
+      body: JSON.stringify(data),
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -45,20 +48,14 @@ export default class EmployeesService {
         message: res.statusText
       }))
     }
-
-    const object = await res.json()
-    if (!isToken(object))
-      throw Error('Couldn\'t login.', { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
-
-    setAuthHeader(object.token)
-    this._headers['Authorization'] = `Bearer ${object.token}`
     return true
   }
 
-  public async getEmployee(data: { id: number }): Promise<Employee> {
-    const res = await fetch(`${this._route}/${data.id}`, {
-      method: 'GET',
-      headers: this._headers
+  public async logout(): Promise<boolean> {
+    const res = await fetch(`${this._route}/logout`, {
+      method: 'POST',
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -66,18 +63,14 @@ export default class EmployeesService {
         message: res.statusText
       }))
     }
-
-    const object = await res.json()
-    if (!isEmployee(object))
-      throw new Error(`An error happened when fetching employee ${data.id}.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
-
-    return object
+    return true
   }
 
   public async getEmployeeMe(): Promise<Employee> {
     const res = await fetch(`${this._route}/me`, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
@@ -93,10 +86,31 @@ export default class EmployeesService {
     return object
   }
 
+  public async getEmployee(data: { id: number }): Promise<Employee> {
+    const res = await fetch(`${this._route}/${data.id}`, {
+      method: 'GET',
+      headers: this._headers,
+      credentials: 'include'
+    })
+    if (!res.ok) {
+      throw Error(JSON.stringify({
+        code: res.status,
+        message: res.statusText
+      }))
+    }
+
+    const object = await res.json()
+    if (!isEmployee(object))
+      throw new Error(`An error happened when fetching employee ${data.id}.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
+
+    return object
+  }
+
   public async getEmployeeImage(data: { id: number }): Promise<string> {
     const res = await fetch(`${this._route}/${data.id}/image`, {
       method: 'GET',
-      headers: this._headers
+      headers: this._headers,
+      credentials: 'include'
     })
     if (!res.ok) {
       throw Error(JSON.stringify({
