@@ -5,7 +5,6 @@ import {
   Employee,
   isEmployee
 } from '@/app/types/Employee'
-import fetch from 'node-fetch'
 import { setAuthHeader, getAuthHeader } from './authToken'
 
 export default class EmployeesService {
@@ -56,7 +55,7 @@ export default class EmployeesService {
     return true
   }
 
-  public async getEmployee(data: { id: string }): Promise<Employee> {
+  public async getEmployee(data: { id: number }): Promise<Employee> {
     const res = await fetch(`${this._route}/${data.id}`, {
       method: 'GET',
       headers: this._headers
@@ -94,8 +93,8 @@ export default class EmployeesService {
     return object
   }
 
-  public async getEmployeeImage(data: { id: string }): Promise<string> {
-    const res = await fetch(`${this._route}${data.id}/image`, {
+  public async getEmployeeImage(data: { id: number }): Promise<string> {
+    const res = await fetch(`${this._route}/${data.id}/image`, {
       method: 'GET',
       headers: this._headers
     })
@@ -106,6 +105,10 @@ export default class EmployeesService {
       }))
     }
 
-    return await res.json()
+    const object = await res.json() as { image: string }
+    if (!object || typeof object.image !== 'string')
+      throw Error(`An error happened when fetching the employee ${data.id} image.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
+
+    return object.image
   }
 }
