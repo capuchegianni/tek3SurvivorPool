@@ -1,3 +1,5 @@
+import { Event } from "./Event"
+
 export type Employee = {
   id: number
   email: string
@@ -6,6 +8,8 @@ export type Employee = {
   birth_date: string
   gender: string
   work: string
+  events: Event
+  image: string
 }
 
 export type EmployeeDTO = {
@@ -34,6 +38,6 @@ export function isEmployeeDTO(data: unknown): data is EmployeeDTO {
     typeof (data as EmployeeDTO).surname === 'string'
 }
 
-export function isEmployees(datas: unknown[]): datas is EmployeeDTO[] {
+export function isEmployees(datas: unknown): datas is EmployeeDTO[] {
   return Array.isArray(datas) && datas.every(data => isEmployeeDTO(data))
 }

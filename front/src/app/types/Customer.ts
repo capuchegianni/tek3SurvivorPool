@@ -1,3 +1,7 @@
+import { Clothe } from "./Clothe"
+import { Encounter } from "./Encounter"
+import { Payment } from "./PaymentHistory"
+
 export type Customer = {
   id: number
   email: string
@@ -6,7 +10,13 @@ export type Customer = {
   birth_date: string
   gender: string
   description: string
-  astroligical_sign: string
+  astrological_sign: string
+  phone_number: string
+  address: string
+  paymentHistory: Payment[]
+  clothes: Clothe[]
+  encounters: Encounter[]
+  image: string
 }
 
 export type CustomerDTO = {
@@ -25,7 +35,9 @@ export function isCustomer(data: unknown): data is Customer {
     typeof (data as Customer).birth_date === 'string' &&
     typeof (data as Customer).gender === 'string' &&
     typeof (data as Customer).description === 'string' &&
-    typeof (data as Customer).astroligical_sign === 'string'
+    typeof (data as Customer).astrological_sign === 'string' &&
+    typeof (data as Customer).phone_number === 'string' &&
+    typeof (data as Customer).address === 'string'
 }
 
 export function isCustomerDTO(data: unknown): data is CustomerDTO {
