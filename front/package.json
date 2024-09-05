@@ -13,7 +13,8 @@
     "primeicons": "^7.0.0",
     "primereact": "^10.8.2",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "sweetalert2": "^11.13.2"
   },
   "devDependencies": {
     "@types/next": "^8.0.7",
