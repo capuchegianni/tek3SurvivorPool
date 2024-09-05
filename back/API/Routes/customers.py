@@ -2,10 +2,14 @@ from flask import Blueprint, jsonify
 from dbConnection import db
 from gridfs import GridFS
 import base64
+from ..JWT_manager import jwt
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..decorators import role_required
 
 customers_blueprint = Blueprint('customers', __name__)
 
 @customers_blueprint.route('/api/customers', methods=['GET'])
+@jwt_required(locations='cookies')
 def getCustomers():
     customers = db.customers.find()
     return jsonify([{
@@ -17,10 +21,11 @@ def getCustomers():
 
 
 @customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
+@jwt_required(locations='cookies')
 def getCustomerId(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     return jsonify({
         'id': customer['id'],
         'email': customer['email'],
@@ -36,20 +41,22 @@ def getCustomerId(customer_id):
 
 
 @customers_blueprint.route('/api/customers/<customer_id>/image', methods=['GET'])
+@jwt_required(locations='cookies')
 def getCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     image_data = GridFS(db).get(customer['image']).read()
     base64_image = base64.b64encode(image_data).decode('utf-8')
     return jsonify({ 'image': base64_image })
 
 
 @customers_blueprint.route('/api/customers/<customer_id>/payments_history', methods=['GET'])
+@jwt_required(locations='cookies')
 def getCustomerPaymentsHistory(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     return jsonify([{
         'id': payment['id'],
         'date': payment['date'],
@@ -60,10 +67,11 @@ def getCustomerPaymentsHistory(customer_id):
 
 
 @customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
+@jwt_required(locations='cookies')
 def getCustomerClothes(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     return jsonify([{
         'id': clothes['id'],
         'type': clothes['type']

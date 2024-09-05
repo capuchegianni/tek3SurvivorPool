@@ -1,7 +1,58 @@
-import React from "react";
+'use client'
+import React, { useEffect, useState } from "react";
 import './homepage.css';
+import Swal from 'sweetalert2'
+import { useRouter } from "next/navigation";
+
+import EmployeesService from '@/app/services/employees'
+
+const employeesService = new EmployeesService()
 
 export default function Home() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const isConnected = await employeesService.isConnected()
+      if (isConnected)
+        router.push('/dashboard')
+    }
+    checkConnection()
+  }, [router])
+
+  const handleLogIn = async () => {
+    try {
+      const res = await employeesService.login({ email, password });
+      Swal.fire({
+        title: res,
+        icon: 'success',
+        timer: 5000,
+        timerProgressBar: true,
+        position: 'top-right',
+        toast: true,
+        showConfirmButton: false
+      })
+      router.push('/dashboard')
+    } catch (error: any) {
+      Swal.fire({
+        title: error.message,
+        text: error.details,
+        icon: 'error',
+        timer: 5000,
+        timerProgressBar: true,
+        position: 'top-right',
+        toast: true,
+        showConfirmButton: false
+      })
+    }
+    setEmail('')
+    setPassword('')
+  };
+
+  const isFormValid = email !== '' && password !== '';
+
   return (
     <div className="bg-color">
       <div className="container">
@@ -13,9 +64,9 @@ export default function Home() {
         <div className="title-signup"> Sign in to your account </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form action="#" method="POST" className="box">
-            <Email />
-            <Password />
-            <ButtonSign />
+            <Email value={email} onChange={setEmail} />
+            <Password value={password} onChange={setPassword} />
+            <ButtonSign onClick={handleLogIn} disabled={!isFormValid} />
             <CreateAccount />
           </form>
         </div>
@@ -24,33 +75,35 @@ export default function Home() {
   );
 }
 
-function Email() {
+const Email: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
   return (
     <div>
       <label htmlFor="email" className="email-text"> Email address </label>
       <div>
-        <input id="email" name="email" type="email" required autoComplete="email" className="input" />
+        <input id="email" name="email" type="email" required autoComplete="email" className="input" value={value} onChange={e => onChange(e.target.value)} />
       </div>
     </div>
   )
 }
 
-function Password() {
+const Password: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
   return (
     <div>
       <label htmlFor="password" className="password-text"> Password </label>
       <div className="mt-2">
-        <input id="password" name="password" type="password" required autoComplete="current-password" className="input" />
+        <input id="password" name="password" type="password" required autoComplete="current-password" className="input" value={value} onChange={e => onChange(e.target.value)} />
       </div>
     </div>
   )
 }
 
-function ButtonSign() {
+const ButtonSign: React.FC<{ onClick: () => void, disabled: boolean }> = ({ onClick, disabled }) => {
   return (
-    <button type="submit" className="button-signin" >
-        <div className="button-signin-text"> Sign in </div>
-    </button>
+    <>
+      <button type="button" className="button-signin" onClick={onClick} disabled={disabled}>
+        <div className="button-signin-text"> Log in </div>
+      </button>
+    </>
   );
 }
 
