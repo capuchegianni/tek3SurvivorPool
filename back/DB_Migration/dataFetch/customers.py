@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import requests
 from dbConnection import db
 from gridfs import GridFS
+from bson.objectid import ObjectId
 
 load_dotenv()
 
@@ -54,19 +55,36 @@ def fetchCustomer(customer_id, headers):
     if response.status_code == 200:
         data = response.json()
         if data:
-            if customer_image:
-                image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
-                data["image"] = image_id
-            if customer_payments_history:
-                data["payments_history"] = customer_payments_history
-            if customer_clothes:
-                data["clothes"] = customer_clothes
-            if db.customers.find_one({"id": customer_id}):
+            existing_customer = db.customers.find_one({"id": customer_id})
+            if existing_customer:
+                if customer_image:
+                    existing_image_id = existing_customer.get("image")
+                    if existing_image_id:
+                        existing_image = GridFS(db).get(ObjectId(existing_image_id)).read()
+                        if existing_image != customer_image:
+                            image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
+                            data["image"] = image_id
+                        else:
+                            data["image"] = existing_image_id
+                    else:
+                        image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
+                        data["image"] = image_id
+                if customer_payments_history:
+                    data["payments_history"] = customer_payments_history
+                if customer_clothes:
+                    data["clothes"] = customer_clothes
                 db.customers.update_one(
                     {"id": customer_id}, {"$set": data}
                 )
                 print(f"Customer {customer_id} updated successfully.")
             else:
+                if customer_image:
+                    image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
+                    data["image"] = image_id
+                if customer_payments_history:
+                    data["payments_history"] = customer_payments_history
+                if customer_clothes:
+                    data["clothes"] = customer_clothes
                 db.customers.insert_one(data)
                 print(f"Customer {customer_id} inserted successfully.")
 
