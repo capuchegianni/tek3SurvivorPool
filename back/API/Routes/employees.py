@@ -12,6 +12,7 @@ from ..JWT_manager import jwt
 from datetime import timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..decorators import role_required
+from ..decorators import ADMIN_ROLES
 
 employees_blueprint = Blueprint('employees', __name__)
 
@@ -174,3 +175,18 @@ def getEmployeeImage(employee_id):
     image_data = GridFS(db).get(employee['image']).read()
     base64_image = base64.b64encode(image_data).decode('utf-8')
     return jsonify({ 'image': base64_image })
+
+@employees_blueprint.route('/api/employees/has_permissions/<role>', methods=['GET'])
+@jwt_required(locations='cookies')
+def hasPermissions(role):
+    user_email = get_jwt_identity()
+    user = db.employees.find_one({ 'email': user_email })
+
+    if not user:
+        return jsonify({'details': 'User not found'}), 404
+
+    user_role = user.get('work')
+    if user_role in ADMIN_ROLES or user_role == role:
+        return jsonify({ 'details': 'Access granted' }), 200
+    else:
+        return jsonify({ 'details': 'Access forbidden: insufficient permissions' }), 403
