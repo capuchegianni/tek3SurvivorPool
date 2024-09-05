@@ -114,4 +114,15 @@
     .card-space {
         padding-top: 40px;
     }
+
+    .chart {
+        display: flex;
+        justify-content: center;
+        padding-top: 30px;
+    }
+
+    .chart-size {
+        width: 50%;
+        height: 50%;
+    }
 }

@@ -48,7 +48,7 @@ function EventsInfo({ selectedTime }: any) {
                 <Statistics title="Weekly" number={20} percentage={-1.92} />
                 <Statistics title="Daily (avg)" number={3} percentage={3.45} />
             </div>
-            <StatisticsEvent timelapsed={value.code} clientNbr={[520, 250, 120, 574, 978, 854, 750]}/>
+            <StatisticsEvent timelapsed={value ? value.code : ''} clientNbr={[520, 250, 120, 574, 978, 854, 750]}/>
         </div>
     )
 }

@@ -61,7 +61,7 @@ function CustomersInfo({ selectedTime }: any) {
                 <Statistics title="Doing meetings" number={28.49} percentage={-12.37} />
                 <Statistics title="Customers by coach" number={34} />
             </div>
-            <StatisticsGraph timelapsed={value.code} clientNbr={[520, 250, 120, 574, 978, 854, 750]}/>
+            <StatisticsGraph timelapsed={value ? value.code : ''} clientNbr={[520, 250, 120, 574, 978, 854, 750]}/>
         </div>
     )
 }

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { SelectButton } from 'primereact/selectbutton';
-import { Chart } from 'primereact/chart';
 
 interface JustifyOption {
     date: string;
@@ -74,8 +73,7 @@ function MapInfo({ selectedTime }: any) {
                 Customers by Country
                 <SelectButton className="" value={value} onChange={(e) => setValue(e.value)} itemTemplate={justifyTemplate} optionLabel="value" options={justifyOptions} />
             </div>
-            <GeoChart selectedTime={value.code} />
-            {value.code}
+            <GeoChart selectedTime={value ? value.code : '7D'} />
         </div>
     )
 }
@@ -110,7 +108,6 @@ class GeoChart extends React.Component<{selectedTime: string}> {
     }
 
     componentDidUpdate(prevProps: {selectedTime: string}) {
-        // Si selectedTime a changé, redessinez la carte
         if (prevProps.selectedTime !== this.props.selectedTime) {
             this.drawRegionsMap();
         }
