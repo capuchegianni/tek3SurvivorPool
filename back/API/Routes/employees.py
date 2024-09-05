@@ -10,12 +10,16 @@ from flask_jwt_extended.exceptions import NoAuthorizationError
 import bcrypt
 from ..JWT_manager import jwt
 from datetime import timedelta
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..decorators import role_required
 
 employees_blueprint = Blueprint('employees', __name__)
 
 load_dotenv()
 
 @employees_blueprint.route('/api/employees', methods=['GET'])
+@jwt_required(locations='cookies')
+@role_required('Admin')
 def getEmployees():
     employees = db.employees.find()
     return jsonify([{
@@ -90,6 +94,8 @@ def login():
 
 
 @employees_blueprint.route('/api/employees/logout', methods=['POST'])
+@jwt_required(locations='cookies')
+@role_required('Coach')
 def logout():
     token = request.cookies.get('access_token_cookie')
 
@@ -106,6 +112,8 @@ def logout():
 
 
 @employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
+@jwt_required(locations='cookies')
+@role_required('Coach')
 def isConnected():
     token = request.cookies.get('access_token_cookie')
     if not token:
@@ -120,6 +128,7 @@ def isConnected():
 
 @employees_blueprint.route('/api/employees/me', methods=['GET'])
 @jwt_required(locations='cookies')
+@role_required('Coach')
 def getMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })
@@ -138,6 +147,8 @@ def getMe():
 
 
 @employees_blueprint.route('/api/employees/<employee_id>', methods=['GET'])
+@jwt_required(locations='cookies')
+@role_required('Admin')
 def getEmployeeId(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
@@ -154,6 +165,8 @@ def getEmployeeId(employee_id):
 
 
 @employees_blueprint.route('/api/employees/<employee_id>/image', methods=['GET'])
+@jwt_required(locations='cookies')
+@role_required('Admin')
 def getEmployeeImage(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
