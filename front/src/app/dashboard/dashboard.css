@@ -39,7 +39,7 @@
     }
 
     .card-customers {
-        width: 55%;
+        width: 50%;
         height: auto;
         background-color: white;
         margin-left: 25px;
@@ -55,7 +55,7 @@
     }
 
     .event-recap {
-        width: 40%;
+        width: 46%;
         height: auto;
         background-color: white;
         margin-left: 25px;
@@ -109,5 +109,9 @@
 
     .positive {
         color: green;
+    }
+
+    .card-space {
+        padding-top: 40px;
     }
 }
