@@ -4,6 +4,7 @@ import requests
 from dbConnection import db
 from gridfs import GridFS
 from bson.objectid import ObjectId
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 
@@ -11,28 +12,27 @@ def fetchEmployeesIDs(headers):
     url = "https://soul-connection.fr/api/employees"
     response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         data = response.json()
         if data:
             return [employee["id"] for employee in data]
-    else:
-        return []
+    return []
 
 def fetchEmployeeImage(employee_id, headers):
     url = f"https://soul-connection.fr/api/employees/{employee_id}/image"
     response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         return response.content
-    else:
-        return None
+    return None
 
 def fetchEmployee(employee_id, headers):
     employee_image = fetchEmployeeImage(employee_id, headers)
+
     url = f"https://soul-connection.fr/api/employees/{employee_id}"
     response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         data = response.json()
         if data:
             existing_employee = db.employees.find_one({"id": employee_id})
@@ -52,13 +52,11 @@ def fetchEmployee(employee_id, headers):
                 db.employees.update_one(
                     {"id": employee_id}, {"$set": data}
                 )
-                print(f"Employee {employee_id} updated successfully.")
             else:
                 if employee_image:
                     image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
                     data["image"] = image_id
                 db.employees.insert_one(data)
-                print(f"Employee {employee_id} inserted successfully.")
 
 def fetchEmployees(access_token):
     headers = {
@@ -67,5 +65,12 @@ def fetchEmployees(access_token):
     }
     employees_ids = fetchEmployeesIDs(headers)
 
-    for employee_id in employees_ids:
-        fetchEmployee(employee_id, headers)
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(fetchEmployee, employee_id, headers) for employee_id in employees_ids]
+        for future in futures:
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Error occurred (employees): {e}")
+
+    print("\033[92m - Fetching employees completed ✔\033[0m")

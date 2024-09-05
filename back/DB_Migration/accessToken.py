@@ -24,9 +24,13 @@ def getAccessToken():
     }
     response = requests.post(url, headers=headers, json=payload)
 
-    if response.status_code == 200:
-        access_token = response.json().get("access_token")
-    else:
-        print(f"Failed to login: {response.status_code}\n")
+    try:
+        if response.status_code == 200:
+            access_token = response.json().get("access_token")
+        else:
+            print(f"Failed to login: {response.status_code}")
+            access_token = None
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
     return access_token
