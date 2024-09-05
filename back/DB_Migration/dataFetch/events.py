@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import requests
 from dbConnection import db
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 
@@ -9,18 +10,17 @@ def fetchEventsIDs(headers):
     url = "https://soul-connection.fr/api/events"
     response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         data = response.json()
         if data:
             return [event["id"] for event in data]
-    else:
-        return []
+    return []
 
 def fetchEvent(event_id, headers):
     url = f"https://soul-connection.fr/api/events/{event_id}"
     response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         data = response.json()
         if data:
             employee_id = data["employee_id"]
@@ -29,13 +29,11 @@ def fetchEvent(event_id, headers):
                     {"id": employee_id, "events.id": event_id},
                     {"$set": {"events.$": data}}
                 )
-                print(f"Event {event_id} updated for employee {employee_id}.")
             else:
                 db.employees.update_one(
                     {"id": employee_id},
                     {"$push": {"events": data}}
                 )
-                print(f"Event {event_id} added to employee {employee_id}.")
 
 def fetchEvents(access_token):
     headers = {
@@ -44,5 +42,12 @@ def fetchEvents(access_token):
     }
     events_ids = fetchEventsIDs(headers)
 
-    for event_id in events_ids:
-        fetchEvent(event_id, headers)
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(fetchEvent, event_id, headers) for event_id in events_ids]
+        for future in futures:
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Error occurred (events): {e}")
+
+    print("\033[92m - Fetching events completed ✔\033[0m")
