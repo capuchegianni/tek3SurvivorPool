@@ -1,111 +1,113 @@
-.title-dashboard {
-    font-size: 1.9rem;
-    font-weight: 400;
-    margin-top: 45px;
-    margin-left: 25px;
-}
+@media (min-width: 49px) {
+    .title-dashboard {
+        font-size: 1.9rem;
+        font-weight: 400;
+        margin-top: 45px;
+        margin-left: 25px;
+    }
 
-.title-dashboard2 {
-    font-size: 0.9rem;
-    font-weight: 400;
-    margin-right: 25px;
-    display: flex;
-    justify-content: end;
-}
+    .title-dashboard2 {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin-right: 25px;
+        display: flex;
+        justify-content: end;
+    }
 
-.welcome-text {
-    font-size: 0.9rem;
-    font-weight: 400;
-    margin-left: 25px;
-}
+    .welcome-text {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin-left: 25px;
+    }
 
-.pick-date {
-    margin-right: 25px;
-    background-color: #FFFFFF;
-    border-color: #FFFFFF;
-    border-radius: 5px;
-    color: black;
-}
+    .pick-date {
+        margin-right: 25px;
+        background-color: #FFFFFF;
+        border-color: #FFFFFF;
+        border-radius: 5px;
+        color: black;
+    }
 
-.reports {
-    background-color: #2622E8;
-    border-radius: 5px;
-    border-color: #2622E8;
-}
+    .reports {
+        background-color: #2622E8;
+        border-radius: 5px;
+        border-color: #2622E8;
+    }
 
-.card-line {
-    display: flex;
-}
+    .card-line {
+        display: flex;
+    }
 
-.card-customers {
-    width: 55%;
-    height: auto;
-    background-color: white;
-    margin-left: 25px;
-    margin-top: 50px;
-    border-radius: 5px;
-}
+    .card-customers {
+        width: 55%;
+        height: auto;
+        background-color: white;
+        margin-left: 25px;
+        margin-top: 50px;
+        border-radius: 5px;
+    }
 
-.customers {
-    width: 95%;
-    height: 95%;
-    margin: 25px;
-    border-radius: 5px;
-}
+    .customers {
+        width: 95%;
+        height: 95%;
+        margin: 25px;
+        border-radius: 5px;
+    }
 
-.event-recap {
-    width: 40%;
-    height: auto;
-    background-color: white;
-    margin-left: 25px;
-    margin-top: 50px;
-    border-radius: 5px;
-}
+    .event-recap {
+        width: 40%;
+        height: auto;
+        background-color: white;
+        margin-left: 25px;
+        margin-top: 50px;
+        border-radius: 5px;
+    }
 
-.events {
-    width: 94%;
-    height: 94%;
-    margin: 25px;
-    border-radius: 5px;
-}
+    .events {
+        width: 94%;
+        height: 94%;
+        margin: 25px;
+        border-radius: 5px;
+    }
 
-.title-info {
-    font-size: 25px;
-}
+    .title-info {
+        font-size: 25px;
+    }
 
-.subtitle-info {
-    color: grey;
-    font-size: 15px;
-}
+    .subtitle-info {
+        color: grey;
+        font-size: 15px;
+    }
 
-.second-line {
-    display: flex;
-    justify-content: space-between;
-}
+    .second-line {
+        display: flex;
+        justify-content: space-between;
+    }
 
-.time-select {
-    font-size: 10px;
-}
+    .time-select {
+        font-size: 10px;
+    }
 
-.move-bot {
-    padding-top: 30px;
-}
+    .move-bot {
+        padding-top: 30px;
+    }
 
-.justifyOption {
-    font-size: 13px;
-}
+    .justifyOption {
+        font-size: 13px;
+    }
 
-.number {
-    font-size: 20px;
-    padding-top: 10px;
-    display: flex;
-    justify-content: center;
-}
+    .number {
+        font-size: 20px;
+        padding-top: 10px;
+        display: flex;
+        justify-content: center;
+    }
 
-.negative {
-    color: red;
-}
+    .negative {
+        color: red;
+    }
 
-.positive {
-    color: green;
+    .positive {
+        color: green;
+    }
 }

@@ -32,6 +32,12 @@ export default function Navbar({ activePage }: { activePage: string }) {
             <Link href="/events" className={`nav-link ${activePage === 'events' ? 'active-link' : ''}`}>
                 <Button className="p-button-text p-button-plain">Events</Button>
             </Link>
+            <Link href="/compatibility" className={`nav-link ${activePage === 'compatibility' ? 'active-link' : ''}`}>
+                <Button className="p-button-text p-button-plain">Compatibility</Button>
+            </Link>
+            <Link href="/wardrobe" className={`nav-link ${activePage === 'wardrobe' ? 'active-link' : ''}`}>
+                <Button className="p-button-text p-button-plain">Wardrobe</Button>
+            </Link>
         </div>
     );
 
