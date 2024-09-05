@@ -160,4 +160,15 @@ export default class EmployeesService {
 
     return object.image
   }
+
+  public async getEmployeePermissions(): Promise<{ details: string, code: number }> {
+    const res = await fetch(`${this._route}/has_permissions/Admin`, {
+      method: 'GET',
+      headers: this._headers,
+      credentials: 'include'
+    })
+    const jsonObject = await res.json()
+
+    return { details: jsonObject.details, code: res.status }
+  }
 }
