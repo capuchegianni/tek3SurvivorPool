@@ -7,6 +7,7 @@ import './dashboard.css';
 import { Dropdown } from 'primereact/dropdown';
 import EventsRecap from "./events";
 import CustomersOverview from "./customersOverview";
+import WorldMap from "./worldMap";
 
 export default function Dashboard() {
     const time = [
@@ -31,6 +32,9 @@ export default function Dashboard() {
             <div className="card-line">
                 <CustomersOverview selectedTime={selectedTime}/>
                 <EventsRecap selectedTime={selectedTime} />
+            </div>
+            <div className="card-line">
+                <WorldMap selectedTime={selectedTime}/>
             </div>
         </LoadingComponent>
     )

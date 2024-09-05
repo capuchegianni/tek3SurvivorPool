@@ -85,7 +85,7 @@ function StatisticsEvent({timelapsed, clientNbr}: StatisticsGraphProps) {
             datasets: [
                 {
                     type: 'bar',
-                    label: 'Dataset 1',
+                    label: 'Number of client',
                     backgroundColor: '#9CA5FF',
                     data: clientNbr
                 }
