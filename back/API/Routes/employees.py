@@ -141,7 +141,7 @@ def getMe():
 def getEmployeeId(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
-        return jsonify({'error': 'Employee not found'}), 404
+        return jsonify({'details': 'Employee not found'}), 404
     return jsonify({
         'id': employee['id'],
         'email': employee['email'],
@@ -157,7 +157,7 @@ def getEmployeeId(employee_id):
 def getEmployeeImage(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
-        return jsonify({'error': 'Employee not found'}), 404
+        return jsonify({'details': 'Employee not found'}), 404
     image_data = GridFS(db).get(employee['image']).read()
     base64_image = base64.b64encode(image_data).decode('utf-8')
     return jsonify({ 'image': base64_image })

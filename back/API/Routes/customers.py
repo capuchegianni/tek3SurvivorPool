@@ -20,7 +20,7 @@ def getCustomers():
 def getCustomerId(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     return jsonify({
         'id': customer['id'],
         'email': customer['email'],
@@ -39,7 +39,7 @@ def getCustomerId(customer_id):
 def getCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     image_data = GridFS(db).get(customer['image']).read()
     base64_image = base64.b64encode(image_data).decode('utf-8')
     return jsonify({ 'image': base64_image })
@@ -49,7 +49,7 @@ def getCustomerImage(customer_id):
 def getCustomerPaymentsHistory(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     return jsonify([{
         'id': payment['id'],
         'date': payment['date'],
@@ -63,7 +63,7 @@ def getCustomerPaymentsHistory(customer_id):
 def getCustomerClothes(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'details': 'Customer not found'}), 404
     return jsonify([{
         'id': clothes['id'],
         'type': clothes['type']

@@ -6,6 +6,20 @@ import {
   isEmployee
 } from '@/app/types/Employee'
 
+class FetchError extends Error {
+  status: number
+  statusText: string
+  details: string | null
+
+  constructor(data: { message: string, status: number, statusText: string, details: string | null }) {
+    super(data.message)
+    this.status = data.status
+    this.statusText = data.statusText
+    this.details = data.details
+    this.name = 'FetchError'
+  }
+}
+
 export default class EmployeesService {
   private _route = 'http://localhost:5000/api/employees'
   private _headers = {
@@ -18,21 +32,23 @@ export default class EmployeesService {
       headers: this._headers,
       credentials: 'include'
     })
+    const object = (await res.json())
     if (!res.ok) {
-      throw Error(JSON.stringify({
-        code: res.status,
-        message: res.statusText
-      }))
+      throw new FetchError({
+        message: 'An error occured when fetching employees.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
     }
 
-    const object = await res.json()
     if (!isEmployees(object))
       throw new Error('An error happened when fetching employees.', { cause: `Returned objects don't correspond to the associated type.\n${JSON.stringify(object)}` })
 
     return object
   }
 
-  public async login(data: Credentials): Promise<boolean> {
+  public async login(data: Credentials): Promise<string> {
     if (!data.email || !data.password)
       throw Error('Please provide an email and a password.')
 
@@ -42,13 +58,16 @@ export default class EmployeesService {
       body: JSON.stringify(data),
       credentials: 'include'
     })
+    const object = await res.json()
     if (!res.ok) {
-      throw Error(JSON.stringify({
-        code: res.status,
-        message: res.statusText
-      }))
+      throw new FetchError({
+        message: 'An error occured during login.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
     }
-    return true
+    return object.details
   }
 
   public async logout(): Promise<boolean> {
@@ -82,14 +101,16 @@ export default class EmployeesService {
       headers: this._headers,
       credentials: 'include'
     })
+    const object = await res.json()
     if (!res.ok) {
-      throw Error(JSON.stringify({
-        code: res.status,
-        message: res.statusText
-      }))
+      throw new FetchError({
+        message: 'An error occured when fetching an employee.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
     }
 
-    const object = await res.json()
     if (!isEmployee(object))
       throw new Error('An error happened when fetching your account.', { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
@@ -102,14 +123,16 @@ export default class EmployeesService {
       headers: this._headers,
       credentials: 'include'
     })
+    const object = await res.json()
     if (!res.ok) {
-      throw Error(JSON.stringify({
-        code: res.status,
-        message: res.statusText
-      }))
+      throw new FetchError({
+        message: 'An error occured when fetching an employee.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
     }
 
-    const object = await res.json()
     if (!isEmployee(object))
       throw new Error(`An error happened when fetching employee ${data.id}.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
@@ -122,14 +145,16 @@ export default class EmployeesService {
       headers: this._headers,
       credentials: 'include'
     })
+    const object = await res.json() as { image: string } & { details: string }
     if (!res.ok) {
-      throw Error(JSON.stringify({
-        code: res.status,
-        message: res.statusText
-      }))
+      throw new FetchError({
+        message: 'An error occured when fetching an employee image.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
     }
 
-    const object = await res.json() as { image: string }
     if (!object || typeof object.image !== 'string')
       throw Error(`An error happened when fetching the employee ${data.id} image.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
