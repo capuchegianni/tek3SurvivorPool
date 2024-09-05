@@ -66,6 +66,16 @@ export default class EmployeesService {
     return true
   }
 
+  public async isConnected(): Promise<boolean> {
+    const res = await fetch(`${this._route}/is_connected`, {
+      method: 'GET',
+      headers: this._headers,
+      credentials: 'include'
+    })
+
+    return res.ok
+  }
+
   public async getEmployeeMe(): Promise<Employee> {
     const res = await fetch(`${this._route}/me`, {
       method: 'GET',

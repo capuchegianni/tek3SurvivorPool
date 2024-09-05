@@ -84,7 +84,7 @@ def login():
         return jsonify({ 'details': 'Wrong password or email.' }), 401
 
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
-    response = make_response(jsonify({ 'details': 'Login successfull' }))
+    response = make_response(jsonify({ 'details': 'Login successful' }))
     set_access_cookies(response, access_token, timedelta(days=1))
     return response
 
@@ -103,6 +103,19 @@ def logout():
     response = make_response(jsonify({ 'details': 'Logout successful' }))
     unset_jwt_cookies(response)
     return response
+
+
+@employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
+def isConnected():
+    token = request.cookies.get('access_token_cookie')
+    if not token:
+        return jsonify({ 'details': 'Not connected' }), 401
+
+    try:
+        decode_token(token)
+        return jsonify({ 'details': 'Connected' }), 200
+    except NoAuthorizationError:
+        return jsonify({ 'details': 'Not connected' }), 401
 
 
 @employees_blueprint.route('/api/employees/me', methods=['GET'])
