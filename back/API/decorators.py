@@ -23,7 +23,7 @@ def role_required(required_role):
         def decorated_function(*args, **kwargs):
             current_employee_email = get_jwt_identity()
             user_role = db.employees.find_one({'email': current_employee_email })
-            if user_role not in ADMIN_ROLES or user_role is not "Coach":
+            if user_role not in ADMIN_ROLES or user_role != "Coach":
                 return jsonify({'details': 'Access forbidden: insufficient permissions'}), 403
             return f(*args, **kwargs)
         return decorated_function
