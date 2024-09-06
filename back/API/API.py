@@ -14,6 +14,7 @@ def createAPI():
     app.config['JWT_COOKIE_SECURE'] = False
     app.config['JWT_SESSION_COOKIE'] = True
     app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+    app.config['SAMESITE'] = 'Lax'
     jwt.init_app(app)
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
 
