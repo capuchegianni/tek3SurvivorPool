@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from "react";
-import Navbar from "../navbar";
-import LoadingComponent from "../loadingScreen";
+import Navbar from "../navbar/navbar";
+import LoadingComponent from "../loading";
 import './dashboard.css';
 import { Dropdown } from 'primereact/dropdown';
 import EventsRecap from "./events";

@@ -1,13 +1,22 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import './navbar.css';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
+import { OverlayPanel } from 'primereact/overlaypanel';
+import { useRouter } from "next/navigation";
 import Link from 'next/link';
+
+import EmployeesService from "../services/employees";
+import Swal from "sweetalert2";
+
+const employeesService = new EmployeesService()
 
 export default function Navbar({ activePage }: { activePage: string }) {
     const [imgSrc, setImgSrc] = useState("france.png");
+    const op = useRef<OverlayPanel>(null);
+    const router = useRouter()
 
     const startContent = (
         <React.Fragment>
@@ -45,11 +54,58 @@ export default function Navbar({ activePage }: { activePage: string }) {
         setImgSrc(prevSrc => prevSrc === "france.png" ? "usa.png" : "france.png");
     };
 
+    const handleAccountClick = () => {
+        router.push('/account')
+    }
+
+    const handleLogoutClick = async () => {
+        try {
+            const res = await employeesService.logout()
+            Swal.fire({
+                title: res,
+                icon: 'success',
+                timer: 5000,
+                timerProgressBar: true,
+                position: 'top-right',
+                toast: true,
+                showConfirmButton: false
+              })
+              router.push('/login')
+        } catch (error: any) {
+            Swal.fire({
+                title: error.message,
+                text: error.details,
+                icon: 'error',
+                timer: 5000,
+                timerProgressBar: true,
+                position: 'top-right',
+                toast: true,
+                showConfirmButton: false
+              })
+        }
+    }
+
     const endContent = (
         <React.Fragment>
             <Button icon="pi pi-comments" className="p-button-rounded p-mr-2 icons-color" />
             <img className="language-flag p-button-rounded p-mr-2" src={imgSrc} onClick={handleClick} />
-            <Button icon="pi pi-user" className="p-button-rounded p-mr-2 icons-color" />
+            <Button icon="pi pi-user" className="p-button-rounded p-mr-2 icons-color" onClick={e => op.current?.toggle(e)} />
+            <OverlayPanel ref={op} className="p-overlaypanel">
+                <div className="p-d-flex p-flex-column">
+                    <Button
+                        label="Account"
+                        icon="pi pi-user"
+                        className="p-button-text p-mb-2 p-overlay-button-text"
+                        onClick={handleAccountClick}
+                    />
+                    <Button
+                        label="Logout"
+                        icon="pi pi-sign-out"
+                        className="p-button-text p-mb-2 p-overlay-button-text"
+                        onClick={handleLogoutClick}
+                    />
+                </div>
+            </OverlayPanel>
         </React.Fragment>
     );
 

@@ -1,8 +1,8 @@
 'use client';
 
 import React from "react";
-import Navbar from "../navbar";
-import LoadingComponent from "../loadingScreen";
+import Navbar from "../navbar/navbar";
+import LoadingComponent from "../loading";
 
 export default function Coaches() {
     return (
