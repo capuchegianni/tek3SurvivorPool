@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Blueprint, jsonify, request, make_response
 from dbConnection import db
 import os
@@ -8,8 +9,6 @@ import base64
 from flask_jwt_extended import create_access_token, decode_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 from flask_jwt_extended.exceptions import NoAuthorizationError
 import bcrypt
-from ..JWT_manager import jwt
-from datetime import timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..decorators import role_required
 from ..decorators import ADMIN_ROLES
@@ -90,16 +89,14 @@ def login():
 
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
     response = make_response(jsonify({ 'details': 'Login successful' }))
-    set_access_cookies(response, access_token, timedelta(days=1))
+    set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
     return response
 
 
 @employees_blueprint.route('/api/employees/logout', methods=['POST'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
 def logout():
     token = request.cookies.get('access_token_cookie')
-
     if not token:
         return jsonify({ 'details': 'You are not connected.' }), 401
 
@@ -113,18 +110,16 @@ def logout():
 
 
 @employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
-@jwt_required(locations='cookies')
-@role_required('Coach')
+@jwt_required(locations=['headers', 'cookies'], optional=True)
 def isConnected():
-    token = request.cookies.get('access_token_cookie')
-    if not token:
-        return jsonify({ 'details': 'Not connected' }), 401
-
     try:
-        decode_token(token)
-        return jsonify({ 'details': 'Connected' }), 200
+        identity = get_jwt_identity()
+        if identity:
+            return jsonify({'details': 'Connected'}), 200
+        else:
+            return jsonify({'details': 'Not connected'}), 401
     except NoAuthorizationError:
-        return jsonify({ 'details': 'Not connected' }), 401
+        return jsonify({'details': 'Not connected'}), 401
 
 
 @employees_blueprint.route('/api/employees/me', methods=['GET'])
