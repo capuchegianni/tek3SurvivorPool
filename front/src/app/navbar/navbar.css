@@ -62,4 +62,9 @@
         border-bottom: 2px solid blue;
         border-radius: 5px;
     }
+
+    .p-overlay-button-text {
+        width: 100%;
+        justify-content: flex-start;
+    }
 }

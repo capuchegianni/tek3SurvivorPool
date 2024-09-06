@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import './homepage.css';
 import Swal from 'sweetalert2'
 import { useRouter } from "next/navigation";
@@ -12,15 +12,6 @@ export default function Home() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-
-  useEffect(() => {
-    const checkConnection = async () => {
-      const isConnected = await employeesService.isConnected()
-      if (isConnected)
-        router.push('/dashboard')
-    }
-    checkConnection()
-  }, [router])
 
   const handleLogIn = async () => {
     try {
@@ -67,7 +58,6 @@ export default function Home() {
             <Email value={email} onChange={setEmail} />
             <Password value={password} onChange={setPassword} />
             <ButtonSign onClick={handleLogIn} disabled={!isFormValid} />
-            <CreateAccount />
           </form>
         </div>
       </div>
@@ -104,16 +94,5 @@ const ButtonSign: React.FC<{ onClick: () => void, disabled: boolean }> = ({ onCl
         <div className="button-signin-text"> Log in </div>
       </button>
     </>
-  );
-}
-
-function CreateAccount() {
-  return (
-    <div className="create-account">
-      <div className="create-account-text"> Don&apos;t have an account?&thinsp;</div>
-      <a href="create-account">
-        <div className="create-account-text"> Create an account </div>
-      </a>
-    </div>
   );
 }

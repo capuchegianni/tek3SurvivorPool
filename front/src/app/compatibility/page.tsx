@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { AutoComplete } from "primereact/autocomplete";
-import Navbar from "../navbar";
-import LoadingComponent from "../loadingScreen";
+import Navbar from "../navbar/navbar";
+import LoadingComponent from "../loading";
 import { Knob } from 'primereact/knob';
 import './compatibility.css';
 import { Button } from 'primereact/button';
