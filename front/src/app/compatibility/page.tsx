@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AutoComplete } from "primereact/autocomplete";
 import Navbar from "../navbar/navbar";
 import LoadingComponent from "../loading";
@@ -8,14 +8,10 @@ import { Knob } from 'primereact/knob';
 import './compatibility.css';
 import { Button } from 'primereact/button';
 
-type FakeDBType = { name: string; sign: string; code: string; };
+import CustomersService from '../services/customers';
+import { Customer, CustomerDTO } from '../types/Customer'
 
-const fakeDB = [
-    { name: 'Sacha', sign: 'Gemini', code: 'gemini' },
-    { name: 'Gianni', sign: 'Leo', code: 'leo' },
-    { name: 'Augustin', sign: 'Sagitarus', code: 'sagitarus' },
-    { name: 'Elouan', sign: 'Pisces', code: 'pisces' },
-];
+const customerService = new CustomersService()
 
 const compatibility = [
     { name: 'pisces', value: 35 },
@@ -35,6 +31,16 @@ const compatibility = [
 export default function Compatibility() {
     const [selectedSigns, setSelectedSigns] = useState<{ sign1?: string, sign2?: string }>({});
     const [totalValue, setTotalValue] = useState<number>(0);
+    const [customers, setCustomers] = useState<CustomerDTO[]>([])
+
+    useEffect(() => {
+        const getCustomers = async () => {
+            try {
+                setCustomers(await customerService.getCustomers())
+            } catch (error) { }
+        }
+        getCustomers()
+    }, [])
 
     const calculateTotalValue = () => {
         let total = 0;
@@ -59,8 +65,8 @@ export default function Compatibility() {
                 <Button label="Calculate" className="p-button-raised p-button-rounded" onClick={() => {calculateTotalValue(); CalculationAnimation();}} disabled={!selectedSigns.sign1 || !selectedSigns.sign2} />
             </div>
             <div className="caroussel">
-                <ClientAstrological index={1} onSignSelected={(sign, index) => setSelectedSigns(prev => ({...prev, [`sign${index}`]: sign}))} />
-                <ClientAstrological index={2} onSignSelected={(sign, index) => setSelectedSigns(prev => ({...prev, [`sign${index}`]: sign}))} />
+                <ClientAstrological index={1} onSignSelected={(sign, index) => setSelectedSigns(prev => ({...prev, [`sign${index}`]: sign.toLowerCase()}))} customers={customers} />
+                <ClientAstrological index={2} onSignSelected={(sign, index) => setSelectedSigns(prev => ({...prev, [`sign${index}`]: sign.toLowerCase()}))} customers={customers} />
             </div>
         </LoadingComponent>
     )
@@ -71,41 +77,62 @@ function CalculationAnimation() {
     setTimeout(() => document.body.classList.remove("shake"), 500);
 }
 
-function ClientAstrological({ onSignSelected, index }: { onSignSelected: (sign: string, index: number) => void, index: number }) {
-    const [selectedName, setSelectedName] = useState(null);
-    const [filteredName, setFilteredName] = useState<FakeDBType[]>([]);
+function ClientAstrological({ onSignSelected, index, customers }: { onSignSelected: (sign: string, index: number) => void, index: number, customers: CustomerDTO[] }) {
+    const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null);
+    const [selectedFullCustomer, setSelectedFullCustomer] = useState<Customer | null>(null)
+    const [filteredCustomers, setFilteredCustomers] = useState<CustomerDTO[]>([]);
+    const hasFetched = useRef<boolean>(false)
+    const [oldSelectedCustomer, setOldSelectedCustomer] = useState<CustomerDTO | null>(null)
 
     useEffect(() => {
-        if (selectedName) {
-            onSignSelected((selectedName as FakeDBType).code, index);
-        }
-    }, [selectedName]);
+        const getCustomer = async () => {
+            if (selectedCustomer?.id) {
+                if (hasFetched.current)
+                    return
+                try {
+                    const customer = await customerService.getCustomer({ id: selectedCustomer.id })
 
-    const searchItems = (event: { query: any; }) => {
-        let query = event.query;
-        let _filteredItems = [];
-
-        for (let i = 0; i < fakeDB.length; i++) {
-            let item = fakeDB[i];
-            if (item.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-                _filteredItems.push(item);
+                    onSignSelected(customer.astrological_sign, index);
+                    setSelectedFullCustomer(customer)
+                    hasFetched.current = true
+                } catch (error: any) { }
             }
         }
-        setFilteredName(_filteredItems);
+
+        if (selectedCustomer?.id) {
+            getCustomer()
+            if (selectedCustomer !== oldSelectedCustomer) {
+                setOldSelectedCustomer(selectedCustomer)
+                hasFetched.current = false
+            }
+        } else {
+            setOldSelectedCustomer(selectedCustomer)
+            setSelectedFullCustomer(null)
+            hasFetched.current = false
+        }
+    }, [selectedCustomer, onSignSelected, index, oldSelectedCustomer]);
+
+
+
+    const searchItems = (event: { query: any; }) => {
+        const query = event.query as string;
+        const correspondingCustomers = customers.filter(customer => customer.name.toLowerCase().includes(query.toLowerCase()));
+
+        setFilteredCustomers(correspondingCustomers);
     }
 
-    const itemTemplate = (item: { name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; code: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }) => {
+    const itemTemplate = (item: CustomerDTO) => {
         return (
             <div>
-                {item.name} - {item.code}
+                {item.id} - {item.name} {item.surname}
             </div>
         );
     }
 
     return (
         <div>
-            <AutoComplete value={selectedName} suggestions={filteredName} completeMethod={searchItems} itemTemplate={itemTemplate} virtualScrollerOptions={{ itemSize: 38 }} field="name" dropdown onChange={(e) => setSelectedName(e.value)} />
-            {selectedName && <div className='astrological-title'>{(selectedName as FakeDBType).code}</div>}
+            <AutoComplete value={selectedCustomer} suggestions={filteredCustomers} completeMethod={searchItems} itemTemplate={itemTemplate} virtualScrollerOptions={{ itemSize: 38 }} field="name" dropdown onChange={(e) => setSelectedCustomer(e.value)} />
+            {selectedCustomer && <div className='astrological-title'>{selectedFullCustomer?.astrological_sign}</div>}
         </div>
     )
 }
