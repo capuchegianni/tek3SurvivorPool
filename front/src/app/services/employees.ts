@@ -67,32 +67,41 @@ export default class EmployeesService {
         details: object.details
       })
     }
+
     return object.details
   }
 
-  public async logout(): Promise<boolean> {
+  public async logout(): Promise<string> {
     const res = await fetch(`${this._route}/logout`, {
       method: 'POST',
       headers: this._headers,
       credentials: 'include'
     })
+    const object = await res.json()
     if (!res.ok) {
-      throw Error(JSON.stringify({
-        code: res.status,
-        message: res.statusText
-      }))
+      throw new FetchError({
+        message: 'An error occured during logout.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
     }
-    return true
+
+    return object.details
   }
 
-  public async isConnected(): Promise<boolean> {
+  public async isConnected(data: { token: string } | null): Promise<{ details: string, isConnected: boolean}> {
     const res = await fetch(`${this._route}/is_connected`, {
       method: 'GET',
-      headers: this._headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': data ? `Bearer ${data.token}` : ''
+      },
       credentials: 'include'
     })
+    const object = await res.json()
 
-    return res.ok
+    return { details: object.details, isConnected: res.ok }
   }
 
   public async getEmployeeMe(): Promise<Employee> {
