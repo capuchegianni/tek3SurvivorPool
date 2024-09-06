@@ -20,15 +20,20 @@ export default async function middleware(req: NextRequest) {
     }
     const cookies = parse(cookieHeader)
     const token = cookies.access_token_cookie
-    const isConnected = await employeesService.isConnected({ token });
+    try {
+        const isConnected = await employeesService.isConnected({ token });
 
-    if (pathname === '/login') {
-        if (isConnected.isConnected)
-            return NextResponse.redirect(new URL('/dashboard', origin));
-        return NextResponse.next()
+        if (pathname === '/login') {
+            if (isConnected.isConnected)
+                return NextResponse.redirect(new URL('/dashboard', origin));
+            return NextResponse.next()
+        }
+        if (!isConnected.isConnected)
+            return NextResponse.redirect(new URL('/login', origin));
+    } catch (error) {
+        console.log(error)
     }
-    if (!isConnected.isConnected)
-        return NextResponse.redirect(new URL('/login', origin));
+
 
     return NextResponse.next();
 }
