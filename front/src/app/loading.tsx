@@ -11,7 +11,7 @@ export default function LoadingComponent({ children }: { children: React.ReactNo
         }, 200);
 
         return () => clearTimeout(timer);
-    }, [200]);
+    });
 
     if (isLoading) {
         return <div className="loading-screen">Loading...</div>;
