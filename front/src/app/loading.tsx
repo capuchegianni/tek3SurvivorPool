@@ -1,21 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import './globals.css'
+import { ProgressSpinner } from 'primereact/progressspinner';
 
-export default function LoadingComponent({ children }: { children: React.ReactNode }) {
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 200);
-
-        return () => clearTimeout(timer);
-    });
-
-    if (isLoading) {
-        return <div className="loading-screen">Loading...</div>;
-    }
-
-    return children;
+export default function LoadingComponent() {
+    return (
+        <div className="flex flex-col items-center justify-center h-screen">
+            <ProgressSpinner strokeWidth='5' />
+            <div className="ml-4 text-xl font-bold">Loading...</div>
+        </div>
+    );
 }
