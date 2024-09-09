@@ -8,7 +8,7 @@ tips_blueprint = Blueprint('tips', __name__)
 
 @tips_blueprint.route('/api/tips', methods=['GET'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def getTips():
     tips = db.tips.find()
     return jsonify([{
