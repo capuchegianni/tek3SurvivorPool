@@ -7,8 +7,6 @@ import { Chart } from 'primereact/chart';
 import CustomersService from '../../services/customers';
 import { CustomerDTO } from '../../types/Customer'
 
-import './test.css'
-
 const customerService = new CustomersService()
 
 interface StatisticsProps {
