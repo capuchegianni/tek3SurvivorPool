@@ -3,38 +3,86 @@ from dotenv import load_dotenv
 import requests
 from dbConnection import db
 from gridfs import GridFS
+from bson.objectid import ObjectId
 from concurrent.futures import ThreadPoolExecutor
+from utils import debugPrint
+from requests.exceptions import RequestException
+from http.client import IncompleteRead
+import time
 
 load_dotenv()
 
 def fetchClothesIDsFromCustomer(customer_id):
-    customers_collection = db['customers']
-    customer_clothes = customers_collection.find_one({"id": customer_id}, {"clothes": 1})
-    clothes_ids = []
+    customer_clothes_ids = db.customers.find_one(
+        {"id": customer_id},
+        {"_id": 0, "clothes.id": 1}
+    )
 
-    for clothe in customer_clothes['clothes']:
-        clothes_ids.append(clothe['id'])
+    if not customer_clothes_ids:
+        return []
 
-    return clothes_ids
+    customer_clothes_ids = customer_clothes_ids.get("clothes")
+
+    return [clothe["id"] for clothe in customer_clothes_ids]
+
 
 def fetchCustomersIDs():
-    customers_collection = db['customers']
-    customer_ids = customers_collection.find({}, {"id": 1})
+    customers_ids = db.customers.find(
+        {},
+        {"_id": 0, "id": 1}
+    )
 
-    return [customer['id'] for customer in customer_ids]
+    if not customers_ids:
+        return []
 
-def fetchClotheImage(clothe_id, customer_id, headers):
+    return [customer["id"] for customer in customers_ids]
+
+
+def fetchClotheImage(clothe_id, headers, retries=3, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/clothes/{clothe_id}/image"
 
-    if not db.customers.find_one({"id": customer_id, "clothes.id": clothe_id}, {"clothes.$": 1})["clothes"][0].get("image"):
-        response = requests.get(url, headers=headers)
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                return response.content
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch image for clothe {clothe_id} after {retries} attempts: {e}")
+                return None
+    return None
 
-        if response and response.status_code == 200:
-            image_id = GridFS(db).put(response.content, filename=f"clothe_{clothe_id}.jpg")
-            db.customers.update_one(
-                {"id": customer_id, "clothes.id": clothe_id},
-                {"$set": {"clothes.$.image": image_id}}
-            )
+
+def updateClotheImage(clothe_id, customer_id, headers):
+    customer_clothe = db.customers.find_one(
+        {"id": customer_id, "clothes.id": clothe_id},
+        {"_id": 0, "clothes.$": 1}
+    )
+    if not customer_clothe or not customer_clothe["clothes"]:
+        return
+    old_image = customer_clothe["clothes"][0].get("image")
+    clothe_image = fetchClotheImage(clothe_id, headers)
+
+    if not clothe_image:
+        return
+
+    fs = GridFS(db)
+
+    if old_image:
+        existing_image = fs.get(ObjectId(old_image)).read()
+        if existing_image == clothe_image:
+            return
+        fs.delete(ObjectId(old_image))
+
+    image_id = fs.put(clothe_image, filename=f"clothe_{clothe_id}.jpg")
+    db.customers.update_one(
+        {"id": customer_id, "clothes.id": clothe_id},
+        {"$set": {"clothes.$.image": image_id}}
+    )
+    debugPrint(f"Updated image for clothe {clothe_id}")
+
 
 def fetchClothes(access_token):
     headers = {
@@ -44,16 +92,13 @@ def fetchClothes(access_token):
     customers_ids = fetchCustomersIDs()
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = []
         for customer_id in customers_ids:
-            clothes_ids = fetchClothesIDsFromCustomer(customer_id)
-            for clothe_id in clothes_ids:
-                futures.append(executor.submit(fetchClotheImage, clothe_id, customer_id, headers))
-
-        for future in futures:
-            try:
-                future.result()
-            except Exception as e:
-                print(f"Error occurred (clothes): {e}")
+            customer_clothes_ids = fetchClothesIDsFromCustomer(customer_id)
+            futures = [executor.submit(updateClotheImage, clothe_id, customer_id, headers) for clothe_id in customer_clothes_ids]
+            for future in futures:
+                try:
+                    future.result()
+                except Exception as e:
+                    print(f"Error occurred (clothes): {e}")
 
     print("\033[92m - Fetching clothes completed ✔\033[0m")
