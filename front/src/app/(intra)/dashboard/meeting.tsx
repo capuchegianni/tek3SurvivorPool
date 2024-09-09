@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import './dashboard.css';
+
 import { Chart } from 'primereact/chart';
 import { SelectButton } from 'primereact/selectbutton';
-import { subDays, format } from 'date-fns';
 
 interface JustifyOption {
     date: string;
@@ -37,8 +36,8 @@ let days90db = [
 
 export default function MeetingSources({ selectedTime }: any) {
     return (
-        <div className="event-recap">
-            <div className="title-info customers">
+        <div className="w-full bg-white ml-6 mt-12 rounded-md">
+            <div className="text-2xl m-12">
                 <MeetingInfo selectedTime={selectedTime} />
             </div>
         </div>
@@ -54,7 +53,7 @@ function MeetingInfo({ selectedTime }: any) {
     ];
 
     const justifyTemplate = (option: JustifyOption) => {
-        return <span className="justifyOption">{option.date}</span>;
+        return <span className="text-xs">{option.date}</span>;
     }
 
     useEffect(() => {
@@ -63,7 +62,7 @@ function MeetingInfo({ selectedTime }: any) {
 
     return (
         <div>
-            <div className="title-info second-line">
+            <div className="text-2xl flex justify-between">
                 Meetings top sources
                 <SelectButton className="" value={value} onChange={(e) => setValue(e.value)} itemTemplate={justifyTemplate} optionLabel="value" options={justifyOptions} />
             </div>
@@ -120,9 +119,14 @@ function MeetingChart({selectedTime}: {selectedTime: string}) {
         setChartData(chartData);
     }, [selectedTime]);
 
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+    };
+
     return (
-        <div className="chart">
-            <Chart type="doughnut" data={chartData} className="chart-size"/>
+        <div className="pt-7 flex justify-center">
+            <Chart type="doughnut" data={chartData} options={chartOptions} style={{ height: 440 }}/>
         </div>
     )
 }

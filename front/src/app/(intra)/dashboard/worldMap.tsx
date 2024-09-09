@@ -43,8 +43,8 @@ let days90db = [
 
 export default function WorldMap({ selectedTime }: any) {
     return (
-        <div className="card-customers">
-            <div className="customers">
+        <div className="bg-white ml-6 mt-12 rounded w-full">
+            <div className="m-12">
                 <MapInfo selectedTime={selectedTime} />
             </div>
         </div>
@@ -60,7 +60,7 @@ function MapInfo({ selectedTime }: any) {
     ];
 
     const justifyTemplate = (option: JustifyOption) => {
-        return <span className="justifyOption">{option.date}</span>;
+        return <span className="text-xs">{option.date}</span>;
     }
 
     useEffect(() => {
@@ -69,7 +69,7 @@ function MapInfo({ selectedTime }: any) {
 
     return (
         <div>
-            <div className="title-info second-line">
+            <div className="text-2xl flex justify-between">
                 Customers by Country
                 <SelectButton className="" value={value} onChange={(e) => setValue(e.value)} itemTemplate={justifyTemplate} optionLabel="value" options={justifyOptions} />
             </div>
@@ -132,6 +132,6 @@ class GeoChart extends React.Component<{selectedTime: string}> {
     };
 
     render() {
-        return <div id="regions_div" style={{ width: '900px', height: '500px' }}></div>;
+        return <div id="regions_div" style={{ width: 'full', height: 'full' }}></div>;
     }
 }

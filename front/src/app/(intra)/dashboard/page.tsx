@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import './dashboard.css';
+
 import { Dropdown } from 'primereact/dropdown';
 import EventsRecap from "./events";
 import CustomersOverview from "./customersOverview";
@@ -18,18 +18,21 @@ export default function Dashboard() {
 
     return (
         <div>
-            <div className="title-dashboard"> Dashboard </div>
-            <div className="second-line">
-                <div className="welcome-text"> Welcome!</div>
-                <div className="title-dashboard2">
-                    <Dropdown value={selectedTime} onChange={(e) => setSelectedTime(e.value)} options={time} optionLabel="date" placeholder="🗓 Select a timelapse" className="pick-date" />
-                </div>
+            <div className="text-4xl font-light mt-6 ml-6"> Dashboard </div>
+            <div className="flex justify-between">
+                <div className="text-l font-light ml-6"> Welcome!</div>
+                <Dropdown
+                    value={selectedTime}
+                    onChange={(e) => setSelectedTime(e.value)}
+                    options={time}
+                    optionLabel="date"
+                    className="pick-date mr-6 border-white rounded-md" />
             </div>
-            <div className="card-line">
+            <div className="flex lg:flex-row flex-col">
                 <CustomersOverview selectedTime={selectedTime}/>
                 <EventsRecap selectedTime={selectedTime} />
             </div>
-            <div className="card-line">
+            <div className="flex lg:flex-row flex-col">
                 <WorldMap selectedTime={selectedTime}/>
                 <MeetingSources selectedTime={selectedTime}/>
             </div>
