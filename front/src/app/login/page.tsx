@@ -1,21 +1,32 @@
 'use client'
 import React, { useState } from "react";
-import './homepage.css';
 import Swal from 'sweetalert2'
 import { useRouter } from "next/navigation";
 
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import { Button } from 'primereact/button';
+
 import EmployeesService from '@/app/services/employees'
+import Image from "next/image";
 
 const employeesService = new EmployeesService()
 
 export default function Home() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isEmailValid, setIsEmailValid] = useState(false)
   const router = useRouter()
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleLogIn = async () => {
     try {
       const res = await employeesService.login({ email, password });
+
       Swal.fire({
         title: res,
         icon: 'success',
@@ -42,57 +53,40 @@ export default function Home() {
     setPassword('')
   };
 
-  const isFormValid = email !== '' && password !== '';
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value
+    setEmail(email)
+    setIsEmailValid(validateEmail(email))
+  }
+
+  const isFormValid = email !== '' && password !== '' && isEmailValid;
 
   return (
-    <div className="bg-color">
-      <div className="container">
-        <img className="image" src="women_catch.png" />
-        <div className="title"> Soul Connection </div>
-        <img className="image" src="men_catch.png" />
+    <div className="m-4 justify-center">
+      <div className="flex justify-between items-center md:flex-row flex-col">
+        <Image className="w-1/4 hidden md:block" alt='women_catch' src={'/women_catch_no_bg.png'} width={500} height={200} />
+        <div className="flex flex-col items-center w-full md:w-auto">
+          <p className="text-5xl font-bold flex justify-center text-[#2A27D2] pt-5">Soul Connection</p>
+          <div className="w-full h-1 bg-[#2A27D2] mt-2"></div>
+        </div>
+        <Image className="w-1/4 hidden md:block" alt='men_catch' src={'/men_catch_no_bg.png'} width={500} height={200} />
       </div>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="title-signup"> Sign in to your account </div>
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="#" method="POST" className="box">
-            <Email value={email} onChange={setEmail} />
-            <Password value={password} onChange={setPassword} />
-            <ButtonSign onClick={handleLogIn} disabled={!isFormValid} />
-          </form>
+      <div className="flex flex-1 flex-col lg:px-8">
+        <div className="mt-10 mx-auto w-full md:max-w-md bg-gray-300 rounded-lg text-center p-8">
+          <p className="text-3xl font-bold text-center mb-12">Log in to your account</p>
+          <div className="mt-1 mb-4">
+            <label htmlFor="email" className="text-left block font-medium">Email address</label>
+            <InputText id="email" type="email" value={email} onChange={handleEmailChange} className="w-full" />
+          </div>
+          <div className="mt-1 mb-4">
+            <label htmlFor="password" className="text-left block font-medium">Password</label>
+            <Password id="password" value={password} onChange={(e) => setPassword(e.target.value)} feedback={false} inputClassName="w-full" style={{ width: '100%' }} />
+          </div>
+          <div className="mb-4">
+            <Button label="Log in" onClick={handleLogIn} disabled={!isFormValid} className="rounded-full w-full h-12 text-lg mt-12" />
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-const Email: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
-  return (
-    <div>
-      <label htmlFor="email" className="email-text"> Email address </label>
-      <div>
-        <input id="email" name="email" type="email" required autoComplete="email" className="input" value={value} onChange={e => onChange(e.target.value)} />
-      </div>
-    </div>
-  )
-}
-
-const Password: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
-  return (
-    <div>
-      <label htmlFor="password" className="password-text"> Password </label>
-      <div className="mt-2">
-        <input id="password" name="password" type="password" required autoComplete="current-password" className="input" value={value} onChange={e => onChange(e.target.value)} />
-      </div>
-    </div>
-  )
-}
-
-const ButtonSign: React.FC<{ onClick: () => void, disabled: boolean }> = ({ onClick, disabled }) => {
-  return (
-    <>
-      <button type="button" className="button-signin" onClick={onClick} disabled={disabled}>
-        <div className="button-signin-text"> Log in </div>
-      </button>
-    </>
   );
 }

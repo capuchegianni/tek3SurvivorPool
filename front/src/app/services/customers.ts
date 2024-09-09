@@ -6,20 +6,7 @@ import {
   isCustomers
 } from "@/app/types/Customer"
 import { Payment, isPaymentHistory } from "@/app/types/PaymentHistory"
-
-class FetchError extends Error {
-  status: number
-  statusText: string
-  details: string | null
-
-  constructor(data: { message: string, status: number, statusText: string, details: string | null }) {
-    super(data.message)
-    this.status = data.status
-    this.statusText = data.statusText
-    this.details = data.details
-    this.name = 'FetchError'
-  }
-}
+import FetchError from '@/app/types/FetchErrors'
 
 export default class CustomersService {
   private _route = 'http://localhost:5000/api/customers'

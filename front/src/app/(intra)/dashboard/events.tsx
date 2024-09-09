@@ -109,9 +109,9 @@ function Statistics({ title, number, percentage = 0 }: StatisticsProps) {
     return (
         <div>
             <div className="subtitle-info">{title}</div>
-            <div className="number">{number}</div>
+            <div className="event-nbr">{number}</div>
             {percentage !== 0 && (
-                <div className={`number ${percentageClass}`}>
+                <div className={`event-nbr ${percentageClass}`}>
                     {percentage < 0 ? <FaArrowDown /> : <FaArrowUp />}
                     {' '}
                     {`${absolutePercentage}%`}
