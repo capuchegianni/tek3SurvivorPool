@@ -20,8 +20,8 @@ const astroSigns = [
     { name: 'cancer', value: 49, image: '/cancer-astro.png' },
     { name: 'virgo', value: 12, image: '/vierge-astro.png' },
     { name: 'libra', value: 19, image: '/belier-astro.png' },
-    { name: 'scorpio', value: 8, image: '/scorpion-astrop.png' },
-    { name: 'capricorn', value: 23, image: '/capricorne-astrop.png' },
+    { name: 'scorpio', value: 8, image: '/scorpion-astro.png' },
+    { name: 'capricorn', value: 23, image: '/capricorne-astro.png' },
     { name: 'aquarius', value: 11, image: '/verseau-astro.png' },
     { name: 'aries', value: 29, image: '/balance-astro.png' },
     { name: 'taurus', value: 38, image: '/taureau-astro.png' },
@@ -66,8 +66,7 @@ export default function Compatibility() {
 
     return (
         <div>
-            <CompatibilityWheel percentage={totalValue}/>
-            <div className='calculation'>
+            <div className='flex justify-center pt-5 gap-10'>
                 <Button
                     label="Calculate"
                     className="button-raised button-rounded"
@@ -75,7 +74,7 @@ export default function Compatibility() {
                     disabled={!selectedSigns.sign1 || !selectedSigns.sign2}
                 />
             </div>
-            <div className='flex justify-center flex-wrap gap-10'>
+            <div className='flex justify-around flex-wrap p-5'>
                 <ClientAstrological
                     index={1}
                     onSignSelected={(sign, index) => setSelectedSigns(prev => ({...prev, [`sign${index}`]: sign.toLowerCase()}))}
@@ -83,6 +82,9 @@ export default function Compatibility() {
                     selectedCustomers={selectedCustomers}
                     onCustomerSelect={handleCustomerSelect}
                 />
+                <div className='pt-8%'>
+                    <CompatibilityWheel percentage={totalValue}/>
+                </div>
                 <ClientAstrological
                     index={2}
                     onSignSelected={(sign, index) => setSelectedSigns(prev => ({...prev, [`sign${index}`]: sign.toLowerCase()}))}
@@ -178,7 +180,7 @@ function ClientAstrological({
                     onCustomerSelect(e.value, index)
                 }}
             />
-            <div className='astrological-title-sign'>
+            <div className='text-4xl flex items-center space-x-2.5 pt-2.5 justify-around p-10%'>
                 {selectedFullCustomer?.astrological_sign}
                 { image && (
                         <Image src={image} alt='sign' width={50} height={50} />
@@ -186,7 +188,7 @@ function ClientAstrological({
                 )}
             </div>
                 { customerImage && (
-                    <div className='image-container'>
+                    <div className="image-container">
                         <Image src={customerImage} alt='Customer' fill />
                     </div>
                 )}
@@ -202,7 +204,7 @@ function CompatibilityWheel({ percentage }: { percentage: number }) {
     }, [percentage]);
 
     return (
-        <div className="compatibility-wheel">
+        <div className="flex justify-center pt-3.5">
             <Knob value={value} onChange={(e) => setValue(e.value)} valueTemplate={'{value}%'} readOnly />
         </div>
     )

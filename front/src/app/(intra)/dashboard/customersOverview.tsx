@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import './dashboard.css';
+
 import { Chart } from 'primereact/chart';
 
 import CustomersService from '../../services/customers';
@@ -16,8 +16,8 @@ interface StatisticsProps {
 
 export default function CustomersOverview({ selectedTime }: any) {
     return (
-        <div className="card-customers">
-            <div className="customers">
+        <div className="bg-white ml-6 mt-12 rounded w-full">
+            <div className="m-12">
                 <CustomersInfo />
             </div>
         </div>
@@ -38,11 +38,11 @@ function CustomersInfo() {
 
     return (
         <div>
-            <div className="title-info second-line">
+            <div className="text-2xl flex justify-between">
                 Customers Overview
             </div>
-            <div className="subtitle-info"> Statistics about all the clients. </div>
-            <div className="second-line move-bot stat-middle">
+            <div className="text-gray-500 text-sm"> Statistics about all the clients. </div>
+            <div className="flex justify-center pt-12">
                 <Statistics title="Total customers" number={customers.length} />
             </div>
             <StatisticsGraph customers={customers}/>
@@ -96,18 +96,23 @@ function StatisticsGraph({ customers }: { customers: CustomerDTO[] }) {
         fetchCustomers();
     }, [customers]);
 
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+    };
+
     return (
-        <div className="card">
-            <Chart type="bar" data={chartData} />
+        <div>
+            <Chart type="bar" data={chartData} options={chartOptions} style={{ height: 440 }} />
         </div>
-    )
+    );
 }
 
 function Statistics({ title, number }: StatisticsProps) {
     return (
         <div>
-            <div className="subtitle-info">{title}</div>
-            <div className="number">{number}</div>
+            <div className="text-gray-500 text-sm">{title}</div>
+            <div className="flex justify-center text-4xl pt-2 pb-6">{number}</div>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import './dashboard.css';
+
 import { Chart } from 'primereact/chart';
 import { subDays, format } from 'date-fns';
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
@@ -24,8 +24,8 @@ interface StatisticsGraphProps {
 
 export default function EventsRecap({ selectedTime }: any) {
     return (
-        <div className="event-recap">
-            <div className="title-info customers">
+        <div className="w-full bg-white ml-6 mt-12 rounded-md">
+            <div className="text-2xl m-12">
                 <EventsInfo selectedTime={selectedTime} />
             </div>
         </div>
@@ -41,9 +41,9 @@ function EventsInfo({ selectedTime }: any) {
 
     return (
         <div>
-            <div className="title-info"> Events </div>
-            <div className="subtitle-info"> Our events and their status. </div>
-            <div className="second-line move-bot">
+            <div className="text-2xl"> Events </div>
+            <div className="text-gray-500 text-sm"> Our events and their status. </div>
+            <div className="flex justify-between pt-12">
                 <Statistics title="Monthly" number={83} percentage={4.63} />
                 <Statistics title="Weekly" number={20} percentage={-1.92} />
                 <Statistics title="Daily (avg)" number={3} percentage={3.45} />
@@ -95,23 +95,28 @@ function StatisticsEvent({timelapsed, clientNbr}: StatisticsGraphProps) {
         setChartData(data);
     }, [timelapsed]);
 
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+    };
+
     return (
-        <div className="card card-space">
-            <Chart type="bar" data={chartData} />
+        <div>
+            <Chart type="bar" data={chartData} options={chartOptions} style={{ height: 420 }} />
         </div>
     )
 }
 
 function Statistics({ title, number, percentage = 0 }: StatisticsProps) {
-    const percentageClass = percentage < 0 ? 'negative' : 'positive';
+    const percentageClass = percentage < 0 ? 'text-red-600' : 'text-green-600';
     const absolutePercentage = Math.abs(percentage);
 
     return (
         <div>
-            <div className="subtitle-info">{title}</div>
-            <div className="event-nbr">{number}</div>
+            <div className="text-gray-500 text-sm flex justify-center">{title}</div>
+            <div className="flex justify-center text-l pt-2">{number}</div>
             {percentage !== 0 && (
-                <div className={`event-nbr ${percentageClass}`}>
+                <div className={`flex justify-center text-l pt-2 ${percentageClass}`}>
                     {percentage < 0 ? <FaArrowDown /> : <FaArrowUp />}
                     {' '}
                     {`${absolutePercentage}%`}
