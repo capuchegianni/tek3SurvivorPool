@@ -5,20 +5,7 @@ import {
   Employee,
   isEmployee
 } from '@/app/types/Employee'
-
-class FetchError extends Error {
-  status: number
-  statusText: string
-  details: string | null
-
-  constructor(data: { message: string, status: number, statusText: string, details: string | null }) {
-    super(data.message)
-    this.status = data.status
-    this.statusText = data.statusText
-    this.details = data.details
-    this.name = 'FetchError'
-  }
-}
+import FetchError from '@/app/types/FetchErrors'
 
 export default class EmployeesService {
   private _route = 'http://localhost:5000/api/employees'

@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from "react";
-import Navbar from "../navbar/navbar";
-import LoadingComponent from "../loading";
 import './dashboard.css';
 import { Dropdown } from 'primereact/dropdown';
 import EventsRecap from "./events";
@@ -19,10 +17,7 @@ export default function Dashboard() {
     const [selectedTime, setSelectedTime] = useState(time[0]);
 
     return (
-        <LoadingComponent>
-            <div className="card">
-                <Navbar activePage="dashboard"/>
-            </div>
+        <div>
             <div className="title-dashboard"> Dashboard </div>
             <div className="second-line">
                 <div className="welcome-text"> Welcome!</div>
@@ -38,6 +33,6 @@ export default function Dashboard() {
                 <WorldMap selectedTime={selectedTime}/>
                 <MeetingSources selectedTime={selectedTime}/>
             </div>
-        </LoadingComponent>
+        </div>
     )
 }
