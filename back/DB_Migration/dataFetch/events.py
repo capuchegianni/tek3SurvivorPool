@@ -10,10 +10,11 @@ import time
 
 load_dotenv()
 
-def fetchEventsIDs(headers, retries=3, backoff_factor=0.3):
+def fetchEventsIDs(headers, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/events"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
@@ -21,29 +22,24 @@ def fetchEventsIDs(headers, retries=3, backoff_factor=0.3):
                 if data:
                     return [event["id"] for event in data]
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch event IDs after {retries} attempts: {e}")
-                return []
-    return []
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch event IDs (attempt {attempt}): {e}")
 
 
-def fetchEvent(event_id, headers, retries=3, backoff_factor=0.3):
+def fetchEvent(event_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/events/{event_id}"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch event {event_id} after {retries} attempts: {e}")
-                return None
-    return None
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch event {event_id} (attempt {attempt}): {e}")
 
 
 def updateEvent(event_id, headers):

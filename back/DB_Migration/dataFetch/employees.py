@@ -12,10 +12,11 @@ import time
 
 load_dotenv()
 
-def fetchEmployeesIDs(headers, retries=3, backoff_factor=0.3):
+def fetchEmployeesIDs(headers, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/employees"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
@@ -23,29 +24,24 @@ def fetchEmployeesIDs(headers, retries=3, backoff_factor=0.3):
                 if data:
                     return [employee["id"] for employee in data]
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch employee IDs after {retries} attempts: {e}")
-                return []
-    return []
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch employee IDs (attempt {attempt}): {e}")
 
 
-def fetchEmployeeImage(employee_id, headers, retries=3, backoff_factor=0.3):
+def fetchEmployeeImage(employee_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/employees/{employee_id}/image"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.content
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch image for employee {employee_id} after {retries} attempts: {e}")
-                return None
-    return None
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch image for employee {employee_id} (attempt {attempt}): {e}")
 
 
 def updateEmployeeImage(employee_id, headers):
@@ -77,8 +73,9 @@ def updateEmployeeImage(employee_id, headers):
 
 def updateEmployee(employee_id, headers):
     url = f"https://soul-connection.fr/api/employees/{employee_id}"
+    attempt = 0
 
-    for attempt in range(3):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
@@ -105,10 +102,9 @@ def updateEmployee(employee_id, headers):
                 updateEmployeeImage(employee_id, headers)
                 return
         except (RequestException, IncompleteRead) as e:
-            if attempt < 2:
-                time.sleep(0.3 * (2 ** attempt))
-            else:
-                print(f"Failed to update employee {employee_id} after 3 attempts: {e}")
+            attempt += 1
+            time.sleep(0.3 * (2 ** attempt))
+            print(f"Retrying to update employee {employee_id} (attempt {attempt}): {e}")
 
 
 def fetchEmployees(access_token):
