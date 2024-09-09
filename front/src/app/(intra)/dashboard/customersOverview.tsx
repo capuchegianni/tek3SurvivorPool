@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import './dashboard.css';
 import { Chart } from 'primereact/chart';
 
-import CustomersService from '../services/customers';
-import { CustomerDTO, Customer } from '../types/Customer'
+import CustomersService from '../../services/customers';
+import { CustomerDTO } from '../../types/Customer'
 
 const customerService = new CustomersService()
 
