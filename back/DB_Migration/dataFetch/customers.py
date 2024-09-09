@@ -5,94 +5,215 @@ from dbConnection import db
 from gridfs import GridFS
 from bson.objectid import ObjectId
 from concurrent.futures import ThreadPoolExecutor
+from utils import debugPrint
+from requests.exceptions import RequestException
+from http.client import IncompleteRead
+import time
 
 load_dotenv()
 
-def fetchCustomersIDs(headers):
+def fetchCustomersIDs(headers, retries=3, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/customers"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        data = response.json()
-        if data:
-            return [customer["id"] for customer in data]
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                data = response.json()
+                if data:
+                    return [customer["id"] for customer in data]
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch customer IDs after {retries} attempts: {e}")
+                return []
     return []
 
-def fetchCustomerImage(customer_id, headers):
-    url = f"https://soul-connection.fr/api/customers/{customer_id}/image"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        return response.content
+def fetchCustomerImage(customer_id, headers, retries=3, backoff_factor=0.3):
+    url = f"https://soul-connection.fr/api/customers/{customer_id}/image"
+
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                return response.content
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch image for customer {customer_id} after {retries} attempts: {e}")
+                return None
     return None
 
-def fetchCustomerPaymentsHistory(customer_id, headers):
+
+def fetchCustomerPaymentsHistory(customer_id, headers, retries=3, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/customers/{customer_id}/payments_history"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        return response.json()
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                return response.json()
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch payments history for customer {customer_id} after {retries} attempts: {e}")
+                return []
     return []
 
-def fetchCustomerClothes(customer_id, headers):
+
+def fetchCustomerClothes(customer_id, headers, retries=3, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/customers/{customer_id}/clothes"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        return response.json()
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                return response.json()
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch clothes for customer {customer_id} after {retries} attempts: {e}")
+                return []
     return []
 
-def fetchCustomer(customer_id, headers):
+
+def updateCustomerImage(customer_id, headers):
+    old_image = db.customers.find_one(
+        {"id": customer_id},
+        {"_id": 0, "image": 1}
+    )
     customer_image = fetchCustomerImage(customer_id, headers)
 
-    customer_payments_history = fetchCustomerPaymentsHistory(customer_id, headers)
-    customer_clothes = fetchCustomerClothes(customer_id, headers)
-    url = f"https://soul-connection.fr/api/customers/{customer_id}"
-    response = requests.get(url, headers=headers)
+    if not customer_image:
+        return
 
-    if response and response.status_code == 200:
-        data = response.json()
-        if data:
-            existing_customer = db.customers.find_one({"id": customer_id})
-            update_data = {}
-            add_to_set_data = {}
+    fs = GridFS(db)
 
-            if customer_image:
-                existing_image_id = existing_customer.get("image") if existing_customer else None
-                if existing_image_id:
-                    existing_image = GridFS(db).get(ObjectId(existing_image_id)).read()
-                    if existing_image != customer_image:
-                        image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
-                        update_data["image"] = image_id
-                else:
-                    image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
-                    update_data["image"] = image_id
+    if old_image:
+        old_image = old_image.get("image")
+        existing_image = fs.get(ObjectId(old_image)).read()
+        if existing_image == customer_image:
+            return
+        fs.delete(ObjectId(old_image))
 
-            if customer_payments_history:
-                add_to_set_data["payments_history"] = {"$each": customer_payments_history}
+    image_id = fs.put(customer_image, filename=f"customer_{customer_id}.jpg")
+    db.customers.update_one(
+        {"id": customer_id},
+        {"$set": {"image": image_id}}
+    )
+    debugPrint(f"Updated image for customer {customer_id}")
 
-            if customer_clothes:
-                add_to_set_data["clothes"] = {"$each": customer_clothes}
 
-            if existing_customer:
-                update_operations = {}
-                if update_data:
-                    update_operations["$set"] = update_data
-                if add_to_set_data:
-                    update_operations["$addToSet"] = add_to_set_data
+def updateCustomerPaymentsHistory(customer_id, headers):
+    old_ph = db.customers.find_one(
+        {"id": customer_id},
+        {"_id": 0, "payments_history": 1}
+    )
+    customer_ph = fetchCustomerPaymentsHistory(customer_id, headers)
+    find_ph_by_id = lambda id: next((ph for ph in old_ph if ph.get('id') == id), None)
 
-                db.customers.update_one(
-                    {"id": customer_id}, update_operations
-                )
+    if old_ph:
+        old_ph = old_ph.get("payments_history")
+        for payment in customer_ph:
+            existing_payment = find_ph_by_id(payment["id"])
+            if existing_payment:
+                if existing_payment != payment:
+                    db.customers.update_one(
+                        {"id": customer_id, "payments_history.id": payment["id"]},
+                        {"$set": {"payments_history.$": payment}}
+                    )
+                    debugPrint(f"Updated payment {payment.get('id')} for customer {customer_id}")
             else:
-                if customer_image:
-                    image_id = GridFS(db).put(customer_image, filename=f"customer_{customer_id}.jpg")
-                    data["image"] = image_id
-                if customer_payments_history:
-                    data["payments_history"] = customer_payments_history
-                if customer_clothes:
-                    data["clothes"] = customer_clothes
-                db.customers.insert_one(data)
+                db.customers.update_one(
+                    {"id": customer_id},
+                    {"$push": {"payments_history": payment}}
+                )
+                debugPrint(f"Inserted payment {payment.get('id')} for customer {customer_id}")
+    else:
+        db.customers.update_one(
+            {"id": customer_id},
+            {"$set": {"payments_history": customer_ph}}
+        )
+        debugPrint(f"Inserted payments for customer {customer_id}")
+
+
+def updateCustomerClothes(customer_id, headers):
+    old_clothes = db.customers.find_one(
+        {"id": customer_id},
+        {"_id": 0, "clothes": 1}
+    )
+    customer_clothes = fetchCustomerClothes(customer_id, headers)
+    find_cloth_by_id = lambda id: next((clothe for clothe in old_clothes if clothe.get('id') == id), None)
+
+    if old_clothes:
+        old_clothes = old_clothes.get("clothes")
+        for clothe in customer_clothes:
+            existing_clothe = find_cloth_by_id(clothe["id"])
+            image = existing_clothe.pop("image", None)
+            if existing_clothe:
+                if existing_clothe != clothe:
+                    clothe = {**clothe, "image": image}
+                    db.customers.update_one(
+                        {"id": customer_id, "clothes.id": clothe["id"]},
+                        {"$set": {"clothes.$": clothe}}
+                    )
+                    debugPrint(f"Updated clothe {clothe.get('id')} for customer {customer_id}")
+            else:
+                db.customers.update_one(
+                    {"id": customer_id},
+                    {"$push": {"clothes": clothe}}
+                )
+                debugPrint(f"Inserted clothe {clothe.get('id')} for customer {customer_id}")
+    else:
+        db.customers.update_one(
+            {"id": customer_id},
+            {"$set": {"clothes": customer_clothes}}
+        )
+        debugPrint(f"Inserted clothes for customer {customer_id}")
+
+
+def updateCustomer(customer_id, headers):
+    url = f"https://soul-connection.fr/api/customers/{customer_id}"
+
+    for attempt in range(3):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                data = response.json()
+                old_data = db.customers.find_one(
+                    {"id": customer_id},
+                    {"_id": 0, "image": 0, "payments_history": 0, "clothes": 0, "encounters": 0}
+                )
+
+                if old_data:
+                    for key in data:
+                        if key in old_data:
+                            if old_data[key] == data[key]:
+                                continue
+                        db.customers.update_one(
+                            {"id": customer_id},
+                            {"$set": {key: data[key]}}
+                        )
+                        debugPrint(f"Updated {key} for customer {customer_id}")
+                else:
+                    db.customers.insert_one(data)
+                    debugPrint(f"Inserted customer {customer_id}")
+
+                updateCustomerImage(customer_id, headers)
+                updateCustomerPaymentsHistory(customer_id, headers)
+                updateCustomerClothes(customer_id, headers)
+                return
+        except (RequestException, IncompleteRead) as e:
+            if attempt < 2:
+                time.sleep(0.3 * (2 ** attempt))
+            else:
+                print(f"Failed to update customer {customer_id} after 3 attempts: {e}")
+
 
 def fetchCustomers(access_token):
     headers = {
@@ -102,7 +223,7 @@ def fetchCustomers(access_token):
     customers_ids = fetchCustomersIDs(headers)
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(fetchCustomer, customer_id, headers) for customer_id in customers_ids]
+        futures = [executor.submit(updateCustomer, customer_id, headers) for customer_id in customers_ids]
         for future in futures:
             try:
                 future.result()

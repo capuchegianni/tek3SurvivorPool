@@ -3,37 +3,75 @@ from dotenv import load_dotenv
 import requests
 from dbConnection import db
 from concurrent.futures import ThreadPoolExecutor
+from utils import debugPrint
+from requests.exceptions import RequestException
+from http.client import IncompleteRead
+import time
 
 load_dotenv()
 
-def fetchEventsIDs(headers):
+def fetchEventsIDs(headers, retries=3, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/events"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        data = response.json()
-        if data:
-            return [event["id"] for event in data]
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                data = response.json()
+                if data:
+                    return [event["id"] for event in data]
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch event IDs after {retries} attempts: {e}")
+                return []
     return []
 
-def fetchEvent(event_id, headers):
-    url = f"https://soul-connection.fr/api/events/{event_id}"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        data = response.json()
-        if data:
-            employee_id = data["employee_id"]
-            if db.employees.find_one({"id": employee_id, "events.id": event_id}):
-                db.employees.update_one(
-                    {"id": employee_id, "events.id": event_id},
-                    {"$set": {"events.$": data}}
-                )
+def fetchEvent(event_id, headers, retries=3, backoff_factor=0.3):
+    url = f"https://soul-connection.fr/api/events/{event_id}"
+
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                return response.json()
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
             else:
-                db.employees.update_one(
-                    {"id": employee_id},
-                    {"$push": {"events": data}}
-                )
+                print(f"Failed to fetch event {event_id} after {retries} attempts: {e}")
+                return None
+    return None
+
+
+def updateEvent(event_id, headers):
+    event = fetchEvent(event_id, headers)
+    if not event:
+        return
+
+    employee_id = event["employee_id"]
+    old_event = db.employees.find_one(
+        {"id": employee_id},
+        {"_id": 0, "events": {"$elemMatch": {"id": event_id}}}
+    )
+
+    if old_event:
+        old_event = old_event.get("events")[0]
+        if old_event != event:
+            db.employees.update_one(
+                {"id": employee_id, "events.id": event_id},
+                {"$set": {"events.$": event}}
+            )
+            debugPrint(f"Updated event {event_id}")
+    else:
+        db.employees.update_one(
+            {"id": employee_id},
+            {"$push": {"events": event}}
+        )
+        debugPrint(f"Inserted event {event_id}")
+
 
 def fetchEvents(access_token):
     headers = {
@@ -43,7 +81,7 @@ def fetchEvents(access_token):
     events_ids = fetchEventsIDs(headers)
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(fetchEvent, event_id, headers) for event_id in events_ids]
+        futures = [executor.submit(updateEvent, event_id, headers) for event_id in events_ids]
         for future in futures:
             try:
                 future.result()

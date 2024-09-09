@@ -5,58 +5,111 @@ from dbConnection import db
 from gridfs import GridFS
 from bson.objectid import ObjectId
 from concurrent.futures import ThreadPoolExecutor
+from utils import debugPrint
+from requests.exceptions import RequestException
+from http.client import IncompleteRead
+import time
 
 load_dotenv()
 
-def fetchEmployeesIDs(headers):
+def fetchEmployeesIDs(headers, retries=3, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/employees"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        data = response.json()
-        if data:
-            return [employee["id"] for employee in data]
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                data = response.json()
+                if data:
+                    return [employee["id"] for employee in data]
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch employee IDs after {retries} attempts: {e}")
+                return []
     return []
 
-def fetchEmployeeImage(employee_id, headers):
-    url = f"https://soul-connection.fr/api/employees/{employee_id}/image"
-    response = requests.get(url, headers=headers)
 
-    if response and response.status_code == 200:
-        return response.content
+def fetchEmployeeImage(employee_id, headers, retries=3, backoff_factor=0.3):
+    url = f"https://soul-connection.fr/api/employees/{employee_id}/image"
+
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                return response.content
+        except (RequestException, IncompleteRead) as e:
+            if attempt < retries - 1:
+                time.sleep(backoff_factor * (2 ** attempt))
+            else:
+                print(f"Failed to fetch image for employee {employee_id} after {retries} attempts: {e}")
+                return None
     return None
 
-def fetchEmployee(employee_id, headers):
+
+def updateEmployeeImage(employee_id, headers):
+    old_image = db.employees.find_one(
+        {"id": employee_id},
+        {"_id": 0, "image": 1}
+    )
     employee_image = fetchEmployeeImage(employee_id, headers)
 
-    url = f"https://soul-connection.fr/api/employees/{employee_id}"
-    response = requests.get(url, headers=headers)
+    if not employee_image:
+        return
 
-    if response and response.status_code == 200:
-        data = response.json()
-        if data:
-            existing_employee = db.employees.find_one({"id": employee_id})
-            if existing_employee:
-                if employee_image:
-                    existing_image_id = existing_employee.get("image")
-                    if existing_image_id:
-                        existing_image = GridFS(db).get(ObjectId(existing_image_id)).read()
-                        if existing_image != employee_image:
-                            image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
-                            data["image"] = image_id
-                        else:
-                            data["image"] = existing_image_id
-                    else:
-                        image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
-                        data["image"] = image_id
-                db.employees.update_one(
-                    {"id": employee_id}, {"$set": data}
+    fs = GridFS(db)
+
+    if old_image:
+        old_image = old_image.get("image")
+        existing_image = fs.get(ObjectId(old_image)).read()
+        if existing_image == employee_image:
+            return
+        fs.delete(ObjectId(old_image))
+
+    image_id = fs.put(employee_image, filename=f"employee_{employee_id}.jpg")
+    db.employees.update_one(
+        {"id": employee_id},
+        {"$set": {"image": image_id}}
+    )
+    debugPrint(f"Updated image for employee {employee_id}")
+
+
+def updateEmployee(employee_id, headers):
+    url = f"https://soul-connection.fr/api/employees/{employee_id}"
+
+    for attempt in range(3):
+        try:
+            response = requests.get(url, headers=headers)
+            if response and response.status_code == 200:
+                data = response.json()
+                old_data = db.employees.find_one(
+                    {"id": employee_id},
+                    {"_id": 0, "events": 0}
                 )
+
+                if old_data:
+                    for key in data:
+                        if key in old_data:
+                            if old_data[key] == data[key]:
+                                continue
+                        db.employees.update_one(
+                            {"id": employee_id},
+                            {"$set": {key: data[key]}}
+                        )
+                        debugPrint(f"Updated {key} for employee {employee_id}")
+                else:
+                    db.employees.insert_one(data)
+                    debugPrint(f"Inserted employee {employee_id}")
+
+                updateEmployeeImage(employee_id, headers)
+                return
+        except (RequestException, IncompleteRead) as e:
+            if attempt < 2:
+                time.sleep(0.3 * (2 ** attempt))
             else:
-                if employee_image:
-                    image_id = GridFS(db).put(employee_image, filename=f"employee_{employee_id}.jpg")
-                    data["image"] = image_id
-                db.employees.insert_one(data)
+                print(f"Failed to update employee {employee_id} after 3 attempts: {e}")
+
 
 def fetchEmployees(access_token):
     headers = {
@@ -66,7 +119,7 @@ def fetchEmployees(access_token):
     employees_ids = fetchEmployeesIDs(headers)
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(fetchEmployee, employee_id, headers) for employee_id in employees_ids]
+        futures = [executor.submit(updateEmployee, employee_id, headers) for employee_id in employees_ids]
         for future in futures:
             try:
                 future.result()
