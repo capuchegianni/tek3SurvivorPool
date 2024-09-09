@@ -75,11 +75,12 @@ def getCustomerClothes(customer_id):
 
     clothes_with_images = []
     for clothe in customer['clothes']:
-        image_data = GridFS(db).get(clothe['image']).read()
-        base64_image = base64.b64encode(image_data).decode('utf-8')
-        clothes_with_images.append({
-            'id': clothe['id'],
-            'type': clothe['type'],
-            'image': base64_image
-        })
+        if 'image' in clothe:
+            image_data = GridFS(db).get(clothe['image']).read()
+            base64_image = base64.b64encode(image_data).decode('utf-8')
+            clothes_with_images.append({
+                'id': clothe['id'],
+                'type': clothe['type'],
+                'image': base64_image
+            })
     return jsonify(clothes_with_images)

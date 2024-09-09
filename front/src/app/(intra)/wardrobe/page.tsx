@@ -1,11 +1,168 @@
 'use client';
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Image from 'next/image'
+
+import { Carousel } from "primereact/carousel";
+import { Dropdown } from "primereact/dropdown";
+import { Button } from "primereact/button";
+
+import { Clothe } from "@/app/types/Clothe";
+import CustomersService from "@/app/services/customers";
+import { CustomerDTO } from "@/app/types/Customer";
+import FetchError from "@/app/types/FetchErrors";
+
+const customersService = new CustomersService()
 
 export default function Wardrobe() {
+    const [customers, setCustomers] = useState<CustomerDTO[]>([])
+    const [saveState, setSaveState] = useState(true)
+    const [clothes, setClothes] = useState<Clothe[]>([])
+    const [selectedClothes, setSelectedClothes] = useState<Clothe[]>([])
+
+    useEffect(() => {
+        const getCustomers = async () => {
+            try {
+                setCustomers(await customersService.getCustomers())
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
+        }
+        getCustomers()
+    }, [])
+
+    const getRightImages = (type: 'hat/cap' | 'top' | 'bottom' | 'shoes'): Clothe[] => {
+        return clothes.filter(clothe => clothe.type === type)
+    }
+
+    const onClick = () => {
+        console.log(selectedClothes)
+    }
+
     return (
         <div>
-            Hello wardrobe
+            <div className="flex flex-col p-4 items-center">
+                <h3 className="text-4xl font-bold mb-4">Customer Clothes</h3>
+                <div className="flex items-center space-x-4 mb-4">
+                    <GetCustomerClothes
+                        customers={customers}
+                        setSaveState={setSaveState}
+                        setClothes={setClothes}
+                    />
+                    <Button
+                        className="flex-row"
+                        label="Save"
+                        disabled={saveState}
+                        onClick={onClick}
+                    />
+                </div>
+                <SelectedClothe clothes={getRightImages('hat/cap')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Hat/Cap' typeAsNum={0} />
+                <SelectedClothe clothes={getRightImages('top')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Top' typeAsNum={1} />
+                <SelectedClothe clothes={getRightImages('bottom')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Bottom' typeAsNum={2} />
+                <SelectedClothe clothes={getRightImages('shoes')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Shoes' typeAsNum={3} />
+            </div>
+        </div>
+    )
+}
+
+const GetCustomerClothes = ({ customers, setSaveState, setClothes }: { customers: CustomerDTO[], setSaveState: (value: boolean) => void, setClothes: (value: Clothe[]) => void }) => {
+    const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null)
+
+    useEffect(() => {
+        const getCustomerClothes = async () => {
+            if (!selectedCustomer || !selectedCustomer.id) {
+                setSaveState(true)
+                return
+            }
+            try {
+                setClothes(await customersService.getCustomerClothes({ id: selectedCustomer.id }))
+                setSaveState(false)
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+                setSaveState(true)
+            }
+        }
+        getCustomerClothes()
+    }, [selectedCustomer, setSaveState, setClothes])
+
+    const itemTemplate = (item: CustomerDTO) => (
+        <div>
+            {item.id} - {item.name} {item.surname}
+        </div>
+    )
+
+    const valueTemplate = (item: CustomerDTO | null | undefined) => {
+        if (item)
+            return (
+                <div>
+                    {item.id} - {item.name} {item.surname}
+                </div>
+            )
+        return <span>Choose a customer</span>
+    }
+
+    return (
+        <div>
+            <Dropdown
+                inputId='customer'
+                placeholder='Choose a customer'
+                options={customers}
+                value={selectedCustomer}
+                itemTemplate={itemTemplate}
+                valueTemplate={valueTemplate}
+                onChange={(e) => setSelectedCustomer(e.value)}
+                showClear={true}
+            />
+        </div>
+    )
+}
+
+const SelectedClothe = ({ clothes, selectedClothes, setSelectedClothes, type, typeAsNum }: { clothes: Clothe[], selectedClothes: Clothe[], setSelectedClothes: (value: Clothe[]) => void, type: string, typeAsNum: number }) => {
+    const [currentPage, setCurrentPage] = useState<number>(0)
+
+    const clothesWithRightLink: Clothe[] = clothes.map(clothe => ({
+        id: clothe.id,
+        type: clothe.type,
+        image: `data:image/jpeg;base64,${clothe.image}`
+    }))
+
+    const clotheTemplate = (clothe: Clothe) => {
+        return (
+            <div className={`flex justify-center items-center relative`}>
+                <Image
+                    src={clothesWithRightLink.find(clotheTemp => clotheTemp.id === clothe.id)!.image}
+                    alt={clothe.type}
+                    width={100}
+                    height={100}
+                />
+            </div>
+        );
+    }
+
+    const onPageChange = (e: { page: number }) => {
+        const updatedSelectedClothes = [...selectedClothes];
+        updatedSelectedClothes[typeAsNum] = clothes[e.page];
+        setSelectedClothes(updatedSelectedClothes);
+        setCurrentPage(e.page);
+    }
+
+    return (
+        <div>
+            <div className={`${clothes.length ? '' : 'hidden'} mb-4`}>
+                <p className="text-xl flex justify-center text-center mb-2">{type}</p>
+                <Carousel
+                    value={clothes}
+                    numVisible={1}
+                    numScroll={1}
+                    itemTemplate={clotheTemplate}
+                    className="max-w-3xl mx-auto"
+                    showIndicators={false}
+                    page={currentPage}
+                    onPageChange={onPageChange}
+                />
+            </div>
         </div>
     )
 }
