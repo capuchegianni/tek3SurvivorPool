@@ -38,21 +38,19 @@ def fetchCustomersIDs():
     return [customer["id"] for customer in customers_ids]
 
 
-def fetchClotheImage(clothe_id, headers, retries=3, backoff_factor=0.3):
+def fetchClotheImage(clothe_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/clothes/{clothe_id}/image"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.content
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch image for clothe {clothe_id} after {retries} attempts: {e}")
-                return None
-    return None
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch image for clothe {clothe_id} (attempt {attempt}): {e}")
 
 
 def updateClotheImage(clothe_id, customer_id, headers):

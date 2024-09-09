@@ -12,10 +12,11 @@ import time
 
 load_dotenv()
 
-def fetchCustomersIDs(headers, retries=3, backoff_factor=0.3):
+def fetchCustomersIDs(headers, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/customers"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
@@ -23,63 +24,54 @@ def fetchCustomersIDs(headers, retries=3, backoff_factor=0.3):
                 if data:
                     return [customer["id"] for customer in data]
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch customer IDs after {retries} attempts: {e}")
-                return []
-    return []
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch customer IDs (attempt {attempt}): {e}")
 
 
-def fetchCustomerImage(customer_id, headers, retries=3, backoff_factor=0.3):
+def fetchCustomerImage(customer_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/customers/{customer_id}/image"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.content
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch image for customer {customer_id} after {retries} attempts: {e}")
-                return None
-    return None
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch image for customer {customer_id} (attempt {attempt}): {e}")
 
 
-def fetchCustomerPaymentsHistory(customer_id, headers, retries=3, backoff_factor=0.3):
+def fetchCustomerPaymentsHistory(customer_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/customers/{customer_id}/payments_history"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch payments history for customer {customer_id} after {retries} attempts: {e}")
-                return []
-    return []
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch payments history for customer {customer_id} (attempt {attempt}): {e}")
 
 
-def fetchCustomerClothes(customer_id, headers, retries=3, backoff_factor=0.3):
+def fetchCustomerClothes(customer_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/customers/{customer_id}/clothes"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch clothes for customer {customer_id} after {retries} attempts: {e}")
-                return []
-    return []
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch clothes for customer {customer_id} (attempt {attempt}): {e}")
 
 
 def updateCustomerImage(customer_id, headers):
@@ -179,8 +171,9 @@ def updateCustomerClothes(customer_id, headers):
 
 def updateCustomer(customer_id, headers):
     url = f"https://soul-connection.fr/api/customers/{customer_id}"
+    attempt = 0
 
-    for attempt in range(3):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
@@ -209,10 +202,9 @@ def updateCustomer(customer_id, headers):
                 updateCustomerClothes(customer_id, headers)
                 return
         except (RequestException, IncompleteRead) as e:
-            if attempt < 2:
-                time.sleep(0.3 * (2 ** attempt))
-            else:
-                print(f"Failed to update customer {customer_id} after 3 attempts: {e}")
+            attempt += 1
+            time.sleep(0.3 * (2 ** attempt))
+            print(f"Retrying to update customer {customer_id} (attempt {attempt}): {e}")
 
 
 def fetchCustomers(access_token):
