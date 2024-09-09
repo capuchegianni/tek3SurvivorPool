@@ -25,7 +25,7 @@ export default async function middleware(req: NextRequest) {
 
         if (pathname === '/login') {
             if (isConnected.isConnected)
-                return NextResponse.redirect(new URL('/intra/dashboard', origin));
+                return NextResponse.redirect(new URL('/dashboard', origin));
             return NextResponse.next()
         }
         if (!isConnected.isConnected)

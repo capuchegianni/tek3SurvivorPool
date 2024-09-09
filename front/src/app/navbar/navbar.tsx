@@ -39,25 +39,25 @@ export default function Navbar() {
 
     const centerContent = (
         <div className="flex flex-wrap align-items-center gap-3">
-            <Link href="/intra/dashboard" className={`no-underline text-inherit ${pathName === '/intra/dashboard' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/dashboard" className={`no-underline text-inherit ${pathName === '/dashboard' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Dashboard</Button>
             </Link>
-            <Link href="/intra/coaches" className={`no-underline text-inherit ${pathName === '/intra/coaches' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/coaches" className={`no-underline text-inherit ${pathName === '/coaches' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Coaches</Button>
             </Link>
-            <Link href="/intra/customers" className={`no-underline text-inherit ${pathName === '/intra/customers' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/customers" className={`no-underline text-inherit ${pathName === '/customers' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Customers</Button>
             </Link>
-            <Link href="/intra/tips" className={`no-underline text-inherit ${pathName === '/intra/tips' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/tips" className={`no-underline text-inherit ${pathName === '/tips' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Tips</Button>
             </Link>
-            <Link href="/intra/events" className={`no-underline text-inherit ${pathName === '/intra/events' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/events" className={`no-underline text-inherit ${pathName === '/events' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Events</Button>
             </Link>
-            <Link href="/intra/compatibility" className={`no-underline text-inherit ${pathName === '/intra/compatibility' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/compatibility" className={`no-underline text-inherit ${pathName === '/compatibility' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Compatibility</Button>
             </Link>
-            <Link href="/intra/wardrobe" className={`no-underline text-inherit ${pathName === '/intra/wardrobe' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/wardrobe" className={`no-underline text-inherit ${pathName === '/wardrobe' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Wardrobe</Button>
             </Link>
         </div>

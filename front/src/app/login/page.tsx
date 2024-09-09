@@ -36,7 +36,7 @@ export default function Home() {
         toast: true,
         showConfirmButton: false
       })
-      router.push('/intra/dashboard')
+      router.push('/dashboard')
     } catch (error: any) {
       Swal.fire({
         title: error.message,
