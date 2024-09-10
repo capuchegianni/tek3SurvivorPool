@@ -22,11 +22,9 @@ export default function Customers() {
     }, []);
 
     return (
-        <div>
+        <div className="scrollbar-hide">
             <div className="text-4xl font-light mt-6 ml-6"> Customers List </div>
-            <div className="flex justify-between">
-                <div className="text-gray-500 text-l font-light ml-6"> You have total {customers.length} customers </div>
-            </div>
+            <div className="text-gray-500 text-l font-light ml-6"> You have total {customers.length} customers </div>
             <CustomersTable customers={customers} />
         </div>
     )
