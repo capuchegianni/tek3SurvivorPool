@@ -23,6 +23,7 @@ def fetchEmployeesIDs(headers, backoff_factor=0.3):
                 data = response.json()
                 if data:
                     return [employee["id"] for employee in data]
+            return []
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -38,6 +39,7 @@ def fetchEmployeeImage(employee_id, headers, backoff_factor=0.3):
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.content
+            return None
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -82,7 +84,7 @@ def updateEmployee(employee_id, headers):
                 data = response.json()
                 old_data = db.employees.find_one(
                     {"id": employee_id},
-                    {"_id": 0, "events": 0}
+                    {"_id": 0, "image": 0, "events": 0, "assigned_customers": 0}
                 )
 
                 if old_data:
@@ -96,7 +98,7 @@ def updateEmployee(employee_id, headers):
                         )
                         debugPrint(f"Updated {key} for employee {employee_id}")
                 else:
-                    db.employees.insert_one(data)
+                    db.employees.insert_one({**data, "assigned_customers": []})
                     debugPrint(f"Inserted employee {employee_id}")
 
                 updateEmployeeImage(employee_id, headers)

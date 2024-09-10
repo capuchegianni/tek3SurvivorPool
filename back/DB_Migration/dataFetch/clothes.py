@@ -47,6 +47,7 @@ def fetchClotheImage(clothe_id, headers, backoff_factor=0.3):
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.content
+            return None
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))

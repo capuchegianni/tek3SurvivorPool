@@ -21,6 +21,7 @@ def fetchEventsIDs(headers, backoff_factor=0.3):
                 data = response.json()
                 if data:
                     return [event["id"] for event in data]
+            return []
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -36,6 +37,7 @@ def fetchEvent(event_id, headers, backoff_factor=0.3):
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
+            return None
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))

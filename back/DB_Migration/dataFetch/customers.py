@@ -23,6 +23,7 @@ def fetchCustomersIDs(headers, backoff_factor=0.3):
                 data = response.json()
                 if data:
                     return [customer["id"] for customer in data]
+            return []
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -38,6 +39,7 @@ def fetchCustomerImage(customer_id, headers, backoff_factor=0.3):
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.content
+            return None
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -53,6 +55,7 @@ def fetchCustomerPaymentsHistory(customer_id, headers, backoff_factor=0.3):
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
+            return []
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -68,6 +71,7 @@ def fetchCustomerClothes(customer_id, headers, backoff_factor=0.3):
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
+            return []
         except (RequestException, IncompleteRead) as e:
             attempt += 1
             time.sleep(backoff_factor * (2 ** attempt))
@@ -146,8 +150,8 @@ def updateCustomerClothes(customer_id, headers):
         old_clothes = old_clothes.get("clothes")
         for clothe in customer_clothes:
             existing_clothe = find_cloth_by_id(clothe["id"])
-            image = existing_clothe.pop("image", None)
             if existing_clothe:
+                image = existing_clothe.pop("image", None)
                 if existing_clothe != clothe:
                     clothe = {**clothe, "image": image}
                     db.customers.update_one(
@@ -180,7 +184,8 @@ def updateCustomer(customer_id, headers):
                 data = response.json()
                 old_data = db.customers.find_one(
                     {"id": customer_id},
-                    {"_id": 0, "image": 0, "payments_history": 0, "clothes": 0, "encounters": 0}
+                    {"_id": 0, "image": 0, "payments_history": 0,
+                     "clothes": 0, "saved_clothes": 0, "encounters": 0}
                 )
 
                 if old_data:
@@ -194,7 +199,7 @@ def updateCustomer(customer_id, headers):
                         )
                         debugPrint(f"Updated {key} for customer {customer_id}")
                 else:
-                    db.customers.insert_one(data)
+                    db.customers.insert_one({**data, "saved_clothes": []})
                     debugPrint(f"Inserted customer {customer_id}")
 
                 updateCustomerImage(customer_id, headers)
