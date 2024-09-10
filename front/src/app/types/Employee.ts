@@ -8,10 +8,9 @@ export type Employee = {
   birth_date: string
   gender: string
   work: string
-  events: Event
+  events: Event[]
   image: string
   assigned_customers: number[]
-}
 
 export type BasicEmployee = Omit<Employee, 'id' | 'events' | 'image' | 'assigned_customers'>
 
