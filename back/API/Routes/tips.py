@@ -7,8 +7,7 @@ from ..decorators import role_required
 tips_blueprint = Blueprint('tips', __name__)
 
 @tips_blueprint.route('/api/tips', methods=['GET'])
-@jwt_required(locations='cookies')
-# @role_required('Coach')
+@jwt_required()
 def getTips():
     tips = db.tips.find()
     return jsonify([{
