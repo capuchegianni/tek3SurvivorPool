@@ -90,7 +90,6 @@ def login():
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
     response = make_response(jsonify({ 'details': 'Login successful' }))
     set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
-    set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
     return response
 
 @log_employees_blueprint.route('/api/employees/logout', methods=['POST'])
