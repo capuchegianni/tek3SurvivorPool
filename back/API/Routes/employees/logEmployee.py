@@ -9,9 +9,11 @@ import base64
 from flask_jwt_extended import create_access_token, decode_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 from flask_jwt_extended.exceptions import NoAuthorizationError
 import bcrypt
+from ...JWT_manager import jwt
+from datetime import timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..decorators import role_required
-from ..decorators import ADMIN_ROLES
+from ...decorators import role_required
+from ...decorators import ADMIN_ROLES
 
 employees_blueprint = Blueprint('employees', __name__)
 
@@ -54,7 +56,6 @@ def hash_password(password):
 def check_password(password, hashed_password):
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
 
-
 @employees_blueprint.route('/api/employees/login', methods=['POST'])
 def login():
     token = request.cookies.get('access_token_cookie')
@@ -89,8 +90,8 @@ def login():
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
     response = make_response(jsonify({ 'details': 'Login successful' }))
     set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
+    set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
     return response
-
 
 @employees_blueprint.route('/api/employees/logout', methods=['POST'])
 @jwt_required(locations='cookies')
@@ -106,7 +107,6 @@ def logout():
     response = make_response(jsonify({ 'details': 'Logout successful' }))
     unset_jwt_cookies(response)
     return response
-
 
 @employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
 @jwt_required(locations=['headers', 'cookies'], optional=True)

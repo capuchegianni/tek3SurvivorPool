@@ -1,10 +1,26 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from dbConnection import db
-from ..JWT_manager import jwt
 from flask_jwt_extended import jwt_required
 from ..decorators import role_required
 
 tips_blueprint = Blueprint('tips', __name__)
+
+@tips_blueprint.route('/api/tips', methods=['POST'])
+@jwt_required(locations='cookies')
+@role_required('Coach')
+def createTip():
+    data = request.get_json()
+    if not data:
+        return jsonify({'details': 'Invalid input'}), 400
+
+    new_tip = {
+        'id': data.get('id'),
+        'title': data.get('title'),
+        'tip': data.get('tip')
+    }
+
+    db.tips.insert_one(new_tip)
+    return jsonify({'details': 'Tip created successfully'}), 201
 
 @tips_blueprint.route('/api/tips', methods=['GET'])
 @jwt_required(locations='cookies')
@@ -16,3 +32,33 @@ def getTips():
         'title': tip['title'],
         'tip': tip['tip']
     } for tip in tips])
+
+@tips_blueprint.route('/api/tips/<tip_id>', methods=['PUT'])
+@jwt_required(locations='cookies')
+@role_required('Coach')
+def updateTip(tip_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'details': 'Invalid input'}), 400
+
+    updated_tip = {
+        'title': data.get('title'),
+        'tip': data.get('tip')
+    }
+
+    db.tips.update_one({ 'id': int(tip_id) }, { '$set': updated_tip })
+    return jsonify({'details': 'Tip updated successfully'})
+
+@tips_blueprint.route('/api/tips/<tip_id>', methods=['DELETE'])
+@jwt_required(locations='cookies')
+@role_required('Coach')
+def deleteTip(tip_id):
+    db.tips.delete_one({ 'id': int(tip_id) })
+    return jsonify({'details': 'Tip deleted successfully'})
+
+@tips_blueprint.route('/api/tips/<tip_id>', methods=['DELETE'])
+@jwt_required(locations='cookies')
+@role_required('Coach')
+def deleteTip(tip_id):
+    db.tips.delete_one({ 'id': int(tip_id) })
+    return jsonify({'details': 'Tip deleted successfully'})
