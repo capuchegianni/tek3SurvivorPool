@@ -14,7 +14,7 @@ interface StatisticsProps {
     number: number;
 }
 
-export default function CustomersOverview({ selectedTime }: any) {
+export default function CustomersOverview() {
     return (
         <div className="bg-white ml-6 mt-12 rounded w-full">
             <div className="m-12">

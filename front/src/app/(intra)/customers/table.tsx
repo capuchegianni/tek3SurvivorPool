@@ -33,15 +33,23 @@ export default function CustomersTable({ customers }: { customers?: CustomerDTO[
         return customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.surname.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
+    const inputText = () => {
+        return (
+            <div className="flex justify-between">
+                <InputText value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search..." />
+                <Button label="Add new customers" className="mr-6" icon="pi pi-plus" />
+            </div>
+        )
+    }
+
     return (
         <div className="p-6 border-0">
-            <InputText value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search..." />
-            <DisplayAllCustomers customers={filteredCustomers} />
+            <DisplayAllCustomers customers={filteredCustomers} inputText={inputText}/>
         </div>
     )
 }
 
-function DisplayAllCustomers({ customers }: { customers: Customer[] }) {
+function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], inputText?: () => JSX.Element }) {
     const customerTemplate = (rowData: Customer) => {
         return (
             <div>
@@ -60,10 +68,10 @@ function DisplayAllCustomers({ customers }: { customers: Customer[] }) {
     }
 
     return (
-        <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/${e.data.id}`} className="cursor-pointer" rows={8} paginator>
+        <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/${e.data.id}`} className="cursor-pointer" rows={8} paginator header={inputText}>
             <Column body={customerTemplate} header="Customer" style={{width:'30%'}}/>
             <Column field="email" header="Email" style={{width:'30%'}}/>
-            <Column field="phone_number" header="Phone Number" style={{width:'30%'}}/>
+            <Column field="phoneNumber" header="Phone Number" style={{width:'30%'}}/>
             <Column body={customersActions} header="Actions" style={{width:'10%'}}/>
         </DataTable>
     )

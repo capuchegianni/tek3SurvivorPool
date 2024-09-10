@@ -26,7 +26,6 @@ export default function Customers() {
             <div className="text-4xl font-light mt-6 ml-6"> Customers List </div>
             <div className="flex justify-between">
                 <div className="text-gray-500 text-l font-light ml-6"> You have total {customers.length} customers </div>
-                <Button label="Add new customers" className="mr-6" icon="pi pi-plus" />
             </div>
             <CustomersTable customers={customers} />
         </div>

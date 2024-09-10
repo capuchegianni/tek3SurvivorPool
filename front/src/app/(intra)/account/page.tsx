@@ -37,8 +37,8 @@ export default function Coaches() {
             <div className="text-3xl sm:text-4xl font-bold mb-6">
                 <p> Employee details </p>
             </div>
-            <div className="flex flex-row flex-grow h-full">
-                <div className="flex-grow bg-white h-full max-w-lg mr-4 border-2 rounded-md">
+            <div className="flex flex-grow h-full lg:flex-row flex-col">
+                <div className="flex-grow bg-white h-full lg:max-w-lg mr-4 border-2 rounded-md">
                     <div className="flex flex-col justify-center items-center text-center text-xl font-bold p-6 border-b-2">
                         <Image
                             src={`data:image/jpeg;base64,${employeeImage}`}
@@ -69,16 +69,16 @@ export default function Coaches() {
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
-                        <DataTable value={employee?.events} header='Events' size="small">
-                            <Column field="id" header="ID" />
-                            <Column field="name" header="Name" />
-                            <Column field="date" header="Date" />
-                            <Column field="max_participants" header="Participants" />
-                            <Column field="type" header="Type"></Column>
+                        <DataTable value={employee?.events} header='Events' size="small" rows={5} paginator>
+                            <Column field="id" header="ID" style={{width:'10%'}}/>
+                            <Column field="name" header="Name" style={{width:'25%'}}/>
+                            <Column field="date" header="Date" style={{width:'25%'}}/>
+                            <Column field="max_participants" header="Participants" style={{width:'25%'}}/>
+                            <Column field="type" header="Type" style={{width:'25%'}} />
                         </DataTable>
                     </div>
                     <div className="p-4">
-                        <DataTable header='Customers' size="small"/>
+                        <DataTable header='Customers' size="small" rows={4} paginator/>
                     </div>
                 </div>
             </div>

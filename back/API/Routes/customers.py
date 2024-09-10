@@ -31,12 +31,14 @@ def getCustomerId(customer_id):
         'email': customer['email'],
         'name': customer['name'],
         'surname': customer['surname'],
-        'birth_date': customer['birth_date'],
+        'birthDate': customer['birth_date'],
         'gender': customer['gender'],
         'description': customer['description'],
-        'astrological_sign': customer['astrological_sign'],
-        'phone_number': customer['phone_number'],
-        'address': customer['address']
+        'astrologicalSign': customer['astrological_sign'],
+        'phoneNumber': customer['phone_number'],
+        'address': customer['address'],
+        'encounters': customer['encounters'],
+        'paymentsHistory': customer['payments_history']
     })
 
 
@@ -60,7 +62,7 @@ def getCustomerPaymentsHistory(customer_id):
     return jsonify([{
         'id': payment['id'],
         'date': payment['date'],
-        'payment_method': payment['payment_method'],
+        'paymentMethod': payment['payment_method'],
         'amount': payment['amount'],
         'comment': payment['comment']
     } for payment in customer['payments_history']])

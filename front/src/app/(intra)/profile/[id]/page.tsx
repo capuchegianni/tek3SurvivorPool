@@ -48,8 +48,8 @@ export default function ProfileId() {
             <div className="text-3xl sm:text-4xl font-bold mb-6">
                 <p> Customer details </p>
             </div>
-            <div className="flex flex-row flex-grow h-full">
-                <div className="flex-grow bg-white h-full max-w-lg mr-4 border-2 rounded-md">
+            <div className="flex flex-grow h-full lg:flex-row flex-col">
+                <div className="flex-grow bg-white h-full lg:max-w-lg mr-4 border-2 rounded-md">
                     <div className="flex flex-col justify-center items-center text-center text-xl font-bold p-6 border-b-2">
                         <Image
                             src={`data:image/jpeg;base64,${customerImage}`}
@@ -75,22 +75,27 @@ export default function ProfileId() {
                         <ShortDetails name="User ID:" value={customerData?.id} />
                         <ShortDetails name="Email:" value={customerData?.email} />
                         <ShortDetails name="Gender:" value={customerData?.gender} />
-                        <ShortDetails name="Phone number:" value={customerData?.phone_number} />
+                        <ShortDetails name="Phone number:" value={customerData?.phoneNumber} />
                         <ShortDetails name="Address:" value={customerData?.address} />
-                        <ShortDetails name="Birth date:" value={new Date(customerData ? customerData.birth_date : 0).toUTCString().slice(0, 16)} />
+                        <ShortDetails name="Birth date:" value={new Date(customerData ? customerData.birthDate : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
-                        <DataTable value={customerData?.encounters} header='Encounter' size="small">
-                            <Column field="date" header="Date" />
-                            <Column field="rating" header="Rating" body={rating}/>
-                            <Column field="comment" header="Report" />
-                            <Column field="source" header="Source" />
+                        <DataTable value={customerData?.encounters} header='Encounter' size="small" rows={5} paginator>
+                            <Column field="date" header="Date" style={{width:'10%'}}/>
+                            <Column field="rating" header="Rating" body={rating} style={{width:'10%'}}/>
+                            <Column field="comment" header="Report" style={{width:'50%'}}/>
+                            <Column field="source" header="Source" style={{width:'10%'}} />
                         </DataTable>
                     </div>
                     <div className="p-4">
-                        <DataTable header='Payments History' size="small"/>
+                        <DataTable value={customerData?.paymentsHistory} header='Payments History' size="small" rows={4} paginator>
+                            <Column field="date" header="Date" style={{width:'25%'}}/>
+                            <Column field="payment_method" header="Payment Method" style={{width:'25%'}}/>
+                            <Column field="amount" header="Amount" style={{width:'25%'}}/>
+                            <Column field="comment" header="Comment" style={{width:'40%'}}/>
+                        </DataTable>
                     </div>
                 </div>
             </div>
