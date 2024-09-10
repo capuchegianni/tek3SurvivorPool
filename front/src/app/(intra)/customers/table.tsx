@@ -5,6 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Button } from "primereact/button";
+import { Popup } from "react-leaflet";
 
 const customerService = new CustomersService()
 
@@ -51,9 +52,9 @@ function DisplayAllCustomers({ customers }: { customers: Customer[] }) {
 
     const customersActions = () => {
         return(
-            <div className="">
-                <Button className="bg-blue-500 border-none rounded-3xl" icon="pi pi-pencil"/>
-                <Button className="bg-red-500 border-none rounded-3xl ml-3" icon="pi pi-trash"/>
+            <div>
+                <Button className="bg-white rounded-3xl text-blue-400 border-blue-400" icon="pi pi-pencil" />
+                <Button className="bg-white rounded-3xl ml-3 text-red-400 border-red-400" icon="pi pi-trash"/>
             </div>
         )
     }
