@@ -57,10 +57,16 @@ export default function Wardrobe() {
                         onClick={onClick}
                     />
                 </div>
-                <SelectedClothe clothes={getRightImages('hat/cap')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Hat/Cap' typeAsNum={0} />
-                <SelectedClothe clothes={getRightImages('top')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Top' typeAsNum={1} />
-                <SelectedClothe clothes={getRightImages('bottom')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Bottom' typeAsNum={2} />
-                <SelectedClothe clothes={getRightImages('shoes')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Shoes' typeAsNum={3} />
+                <div className="flex flex-col md:flex-row justify-between w-full items-center">
+                    <div className="flex flex-col w-1/2">
+                        <SelectedClothe clothes={getRightImages('hat/cap')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Hat/Cap' typeAsNum={0} />
+                        <SelectedClothe clothes={getRightImages('top')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Top' typeAsNum={1} />
+                    </div>
+                    <div className="flex flex-col w-1/2 items-center">
+                        <SelectedClothe clothes={getRightImages('bottom')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Bottom' typeAsNum={2} />
+                        <SelectedClothe clothes={getRightImages('shoes')} selectedClothes={selectedClothes} setSelectedClothes={setSelectedClothes} type='Shoes' typeAsNum={3} />
+                    </div>
+                </div>
             </div>
         </div>
     )
@@ -130,12 +136,13 @@ const SelectedClothe = ({ clothes, selectedClothes, setSelectedClothes, type, ty
 
     const clotheTemplate = (clothe: Clothe) => {
         return (
-            <div className={`flex justify-center items-center relative`}>
+            <div className="flex justify-center items-center relative aspect-w-1 aspect-h-1">
                 <Image
                     src={clothesWithRightLink.find(clotheTemp => clotheTemp.id === clothe.id)!.image}
                     alt={clothe.type}
-                    width={100}
-                    height={100}
+                    width={0}
+                    height={0}
+                    style={{ width: 'auto', height: '200px' }}
                 />
             </div>
         );

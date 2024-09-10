@@ -16,7 +16,7 @@ const astroSigns = [
     { name: 'pisces', value: 35, image: '/poissons-astro.png' },
     { name: 'gemini', value: 50, image: '/gemeaux-astro.png' },
     { name: 'leo', value: 28, image: '/lion-astro.png' },
-    { name: 'sagitarus', value: 42, image: '/sagittaire-astro.png' },
+    { name: 'sagittarius', value: 42, image: '/sagittaire-astro.png' },
     { name: 'cancer', value: 49, image: '/cancer-astro.png' },
     { name: 'virgo', value: 12, image: '/vierge-astro.png' },
     { name: 'libra', value: 19, image: '/belier-astro.png' },
