@@ -7,7 +7,7 @@ import './compatibility.css';
 import { Button } from 'primereact/button';
 import Image from 'next/image';
 
-import CustomersService from '../../services/customers';
+import CustomersService from '../../services/customers/get-customers';
 import { Customer, CustomerDTO } from '../../types/Customer'
 
 const customerService = new CustomersService()

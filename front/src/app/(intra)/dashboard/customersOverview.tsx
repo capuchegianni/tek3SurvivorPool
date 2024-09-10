@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 
 import { Chart } from 'primereact/chart';
 
-import CustomersService from '../../services/customers';
+import CustomersService from '../../services/customers/get-customers';
 import { CustomerDTO } from '../../types/Customer'
 
 const customerService = new CustomersService()

@@ -4,6 +4,8 @@ export type Clothe = {
   image: string
 }
 
+export type BasicClothe = Omit<Clothe, 'id'>
+
 export function isClothe(data: unknown): data is Clothe {
   return !!data &&
     typeof (data as Clothe).id === 'number' &&

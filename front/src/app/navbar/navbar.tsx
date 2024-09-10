@@ -8,7 +8,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Image from 'next/image'
 import Link from 'next/link';
 
-import EmployeesService from "../services/employees";
+import EmployeesService from "../services/employees/get-employees";
 import Swal from "sweetalert2";
 import FetchError from "../types/FetchErrors";
 
