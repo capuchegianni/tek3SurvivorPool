@@ -22,7 +22,7 @@ export default function Customers() {
     }, []);
 
     return (
-        <div className="scrollbar-hide">
+        <div>
             <div className="text-4xl font-light mt-6 ml-6"> Customers List </div>
             <div className="text-gray-500 text-l font-light ml-6"> You have total {customers.length} customers </div>
             <CustomersTable customers={customers} />
