@@ -136,7 +136,8 @@ def getMe():
         'surname': employee['surname'],
         'birth_date': employee['birth_date'],
         'gender': employee['gender'],
-        'work': employee['work']
+        'work': employee['work'],
+        'events': employee['events']
     })
 
 
@@ -153,7 +154,8 @@ def getEmployeeId(employee_id):
         'surname': employee['surname'],
         'birth_date': employee['birth_date'],
         'gender': employee['gender'],
-        'work': employee['work']
+        'work': employee['work'],
+        'events': employee['events']
     })
 
 

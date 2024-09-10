@@ -30,9 +30,7 @@ export default async function middleware(req: NextRequest) {
         }
         if (!isConnected.isConnected)
             return NextResponse.redirect(new URL('/login', origin));
-    } catch (error) {
-        console.log(error)
-    }
+    } catch { }
 
     return NextResponse.next();
 }
