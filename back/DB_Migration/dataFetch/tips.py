@@ -31,14 +31,15 @@ def updateTip(tip_id, tip):
         debugPrint(f"Inserted tip {tip_id}")
 
 
-def fetchTips(access_token, retries=3, backoff_factor=0.3):
+def fetchTips(access_token, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/tips"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "X-Group-Authorization": os.getenv("API_KEY")
     }
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
@@ -54,7 +55,6 @@ def fetchTips(access_token, retries=3, backoff_factor=0.3):
                 print("\033[92m - Fetching tips completed ✔\033[0m")
                 return
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch tips after {retries} attempts: {e}")
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch tips (attempt {attempt}): {e}")

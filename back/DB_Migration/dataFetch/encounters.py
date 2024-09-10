@@ -10,40 +10,38 @@ import time
 
 load_dotenv()
 
-def fetchEncountersIDs(headers, retries=3, backoff_factor=0.3):
+def fetchEncountersIDs(headers, backoff_factor=0.3):
     url = "https://soul-connection.fr/api/encounters"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 data = response.json()
                 if data:
                     return [encounter["id"] for encounter in data]
+            return []
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch encounter IDs after {retries} attempts: {e}")
-                return []
-    return []
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch encounter IDs (attempt {attempt}): {e}")
 
 
-def fetchEncounter(encounter_id, headers, retries=3, backoff_factor=0.3):
+def fetchEncounter(encounter_id, headers, backoff_factor=0.3):
     url = f"https://soul-connection.fr/api/encounters/{encounter_id}"
+    attempt = 0
 
-    for attempt in range(retries):
+    while True:
         try:
             response = requests.get(url, headers=headers)
             if response and response.status_code == 200:
                 return response.json()
+            return None
         except (RequestException, IncompleteRead) as e:
-            if attempt < retries - 1:
-                time.sleep(backoff_factor * (2 ** attempt))
-            else:
-                print(f"Failed to fetch encounter {encounter_id} after {retries} attempts: {e}")
-                return None
-    return None
+            attempt += 1
+            time.sleep(backoff_factor * (2 ** attempt))
+            print(f"Retrying to fetch encounter {encounter_id} (attempt {attempt}): {e}")
 
 
 def updateEncounter(encounter_id, headers):
