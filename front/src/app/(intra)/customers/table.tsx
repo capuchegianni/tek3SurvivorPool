@@ -4,6 +4,7 @@ import CustomersService from '../../services/customers';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
+import { Button } from "primereact/button";
 
 const customerService = new CustomersService()
 
@@ -43,16 +44,26 @@ function DisplayAllCustomers({ customers }: { customers: Customer[] }) {
     const customerTemplate = (rowData: Customer) => {
         return (
             <div>
-                <a href={`/profile/${rowData.id}`}>{rowData.name} {rowData.surname}</a>
+                {rowData.name} {rowData.surname}
             </div>
         );
     };
 
+    const customersActions = () => {
+        return(
+            <div className="">
+                <Button className="bg-blue-500 border-none rounded-3xl" icon="pi pi-pencil"/>
+                <Button className="bg-red-500 border-none rounded-3xl ml-3" icon="pi pi-trash"/>
+            </div>
+        )
+    }
+
     return (
-        <DataTable value={customers}>
-            <Column body={customerTemplate} header="Customer"></Column>
-            <Column field="email" header="Email"></Column>
-            <Column field="phone_number" header="Phone Number"></Column>
+        <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/${e.data.id}`} className="cursor-pointer" rows={8} paginator>
+            <Column body={customerTemplate} header="Customer" style={{width:'30%'}}/>
+            <Column field="email" header="Email" style={{width:'30%'}}/>
+            <Column field="phone_number" header="Phone Number" style={{width:'30%'}}/>
+            <Column body={customersActions} header="Actions" style={{width:'10%'}}/>
         </DataTable>
     )
 }
