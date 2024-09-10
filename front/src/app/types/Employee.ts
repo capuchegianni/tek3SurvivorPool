@@ -8,8 +8,9 @@ export type Employee = {
   birth_date: string
   gender: string
   work: string
-  events: Event
+  events: Event[]
   image: string
+  assigned_customers: string[]
 }
 
 export type EmployeeDTO = {
