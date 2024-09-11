@@ -130,3 +130,14 @@ def deleteEmployeeEvent(employee_id, event_id):
     if result.modified_count == 0:
         return jsonify({'details': 'Event not found'}), 404
     return jsonify({'details': 'Event deleted successfully'}), 200
+
+@events_employees_blueprint.route('/api/employees/events', methods=['GET'])
+@jwt_required()
+# @role_required('Admin')
+def getAllEvents():
+    pipeline = [
+        {'$unwind': '$events'},
+        {'$group': {'_id': None, 'events': {'$push': '$events'}}}
+    ]
+    result = list(db.employees.aggregate(pipeline))
+    return jsonify(result[0]['events']) if result else jsonify([])
