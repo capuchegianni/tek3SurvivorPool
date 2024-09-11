@@ -1,5 +1,3 @@
-import { Event } from "./Event"
-
 export type Employee = {
   id: number
   email: string
@@ -8,7 +6,6 @@ export type Employee = {
   birth_date: string
   gender: string
   work: string
-  events: Event[]
   image: string
   assigned_customers: string[]
 }

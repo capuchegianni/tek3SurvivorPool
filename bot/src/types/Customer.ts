@@ -1,7 +1,3 @@
-import { Clothe } from "./Clothe"
-import { Encounter } from "./Encounter"
-import { Payment } from "./PaymentHistory"
-
 export type Customer = {
   id: number
   email: string
@@ -13,9 +9,6 @@ export type Customer = {
   astrological_sign: string
   phone_number: string
   address: string
-  paymentHistory: Payment[]
-  clothes: Clothe[]
-  encounters: Encounter[]
   image: string
 }
 
