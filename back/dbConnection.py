@@ -29,3 +29,6 @@ def dbConnection():
     return db
 
 db = dbConnection()
+
+if db is None:
+    exit(1)
