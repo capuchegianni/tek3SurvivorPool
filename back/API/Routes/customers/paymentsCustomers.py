@@ -23,7 +23,7 @@ def createCustomerPaymentsHistory(customer_id):
     new_payment = {
         'id': data.get('id'),
         'date': data.get('date'),
-        'payment_method': data.get('payment_method'),
+        'paymentMethod': data.get('payment_method'),
         'amount': data.get('amount'),
         'comment': data.get('comment')
     }
@@ -44,7 +44,7 @@ def getCustomerPaymentsHistory(customer_id):
     return jsonify([{
         'id': payment['id'],
         'date': payment['date'],
-        'payment_method': payment['payment_method'],
+        'paymentMethod': payment['payment_method'],
         'amount': payment['amount'],
         'comment': payment['comment']
     } for payment in customer['payments_history']])

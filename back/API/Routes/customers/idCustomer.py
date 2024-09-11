@@ -24,11 +24,11 @@ def createCustomer():
         'email': data.get('email'),
         'name': data.get('name'),
         'surname': data.get('surname'),
-        'birth_date': data.get('birth_date'),
+        'birthDate': data.get('birth_date'),
         'gender': data.get['gender'],
         'description': data.get['description'],
-        'astrological_sign': data.get['astrological_sign'],
-        'phone_number': data.get['phone_number'],
+        'astrologicalSign': data.get['astrological_sign'],
+        'phoneNumber': data.get['phone_number'],
         'address': data.get['address']
     }
     db.customers.insert_one(new_customer)
@@ -45,12 +45,14 @@ def getCustomerInfo(customer_id):
         'email': customer['email'],
         'name': customer['name'],
         'surname': customer['surname'],
-        'birth_date': customer['birth_date'],
+        'birthDate': customer['birth_date'],
         'gender': customer['gender'],
         'description': customer['description'],
-        'astrological_sign': customer['astrological_sign'],
-        'phone_number': customer['phone_number'],
-        'address': customer['address']
+        'astrologicalSign': customer['astrological_sign'],
+        'phoneNumber': customer['phone_number'],
+        'address': customer['address'],
+        'encounters': customer['encounters'],
+        'paymentsHistory': customer['payments_history']
     })
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['PUT'])
@@ -80,6 +82,10 @@ def updateCustomer(customer_id):
         update_fields['phone_number'] = data['phone_number']
     if 'address' in data:
         update_fields['address'] = data['address']
+    if 'encounters' in data:
+        update_fields['encounters'] = data['encounters']
+    if 'payments_history' in data:
+        update_fields['payments_history'] = data['payments_history']
 
     if not update_fields:
         return jsonify({'details': 'No valid fields to update'}), 400
