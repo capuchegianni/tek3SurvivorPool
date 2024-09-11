@@ -141,3 +141,22 @@ def getAllEvents():
     ]
     result = list(db.employees.aggregate(pipeline))
     return jsonify(result[0]['events']) if result else jsonify([])
+
+@events_employees_blueprint.route('/api/employees/events/<event_id>', methods=['GET'])
+@jwt_required()
+# @role_required('Admin')
+def getEventByID(event_id):
+    event = db.employees.find_one(
+        {
+            'events': {
+                '$elemMatch': {
+                    'id': int(event_id)
+                }
+            }
+        },
+        {'_id': 0, 'events.$': 1}
+    )
+
+    if event is None:
+        return jsonify({'details': 'Event not found'}), 404
+    return jsonify(event['events'][0])

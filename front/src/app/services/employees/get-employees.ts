@@ -257,4 +257,27 @@ export default class GetEmployeesService extends EmployeesService {
 
     return object
   }
+
+  public async getEventByID(data: { event_id: number }): Promise<Event> {
+    const res = await fetch(`${this._route}/events/${data.event_id}`, {
+      method: 'GET',
+      headers: this._headers,
+      credentials: 'include'
+    })
+    const object = await res.json()
+
+    if (!res.ok) {
+      throw new FetchError({
+        message: 'An error occured when fetching an event.',
+        status: res.status,
+        statusText: res.statusText,
+        details: object.details
+      })
+    }
+
+    if (!isEvent(object))
+      throw new Error(`An error happened when fetching event ${data.event_id}.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
+
+    return object
+  }
 }
