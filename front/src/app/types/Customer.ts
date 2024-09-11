@@ -7,13 +7,13 @@ export type Customer = {
   email: string
   name: string
   surname: string
-  birth_date: string
+  birthDate: string
   gender: string
   description: string
-  astrological_sign: string
-  phone_number: string
+  astrologicalSign: string
+  phoneNumber: string
   address: string
-  paymentHistory: Payment[]
+  paymentsHistory: Payment[]
   clothes: Clothe[]
   encounters: Encounter[]
   image: string
@@ -32,11 +32,11 @@ export function isCustomer(data: unknown): data is Customer {
     typeof (data as Customer).email === 'string' &&
     typeof (data as Customer).name === 'string' &&
     typeof (data as Customer).surname === 'string' &&
-    typeof (data as Customer).birth_date === 'string' &&
+    typeof (data as Customer).birthDate === 'string' &&
     typeof (data as Customer).gender === 'string' &&
     typeof (data as Customer).description === 'string' &&
-    typeof (data as Customer).astrological_sign === 'string' &&
-    typeof (data as Customer).phone_number === 'string' &&
+    typeof (data as Customer).astrologicalSign === 'string' &&
+    typeof (data as Customer).phoneNumber === 'string' &&
     typeof (data as Customer).address === 'string'
 }
 

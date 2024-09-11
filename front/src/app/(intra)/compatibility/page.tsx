@@ -125,7 +125,7 @@ function ClientAstrological({
                 const image = await customerService.getCustomerImage({ id: selectedCustomer!.id })
 
                 setCustomerImage(image ? `data:image/jpeg;base64,${image}` : null)
-                onSignSelected(customer.astrological_sign, index);
+                onSignSelected(customer.astrologicalSign, index);
                 setSelectedFullCustomer(customer)
                 hasFetched.current = true
             } catch (error: any) { }
@@ -162,7 +162,7 @@ function ClientAstrological({
         );
     }
 
-    const image = astroSigns.find(sign => sign.name === selectedFullCustomer?.astrological_sign.toLowerCase())?.image
+    const image = astroSigns.find(sign => sign.name === selectedFullCustomer?.astrologicalSign.toLowerCase())?.image
 
     return (
         <div>
@@ -181,7 +181,7 @@ function ClientAstrological({
                 }}
             />
             <div className='text-4xl flex items-center space-x-2.5 pt-2.5 justify-around p-10%'>
-                {selectedFullCustomer?.astrological_sign}
+                {selectedFullCustomer?.astrologicalSign}
                 { image && (
                         <Image src={image} alt='sign' width={50} height={50} />
 
