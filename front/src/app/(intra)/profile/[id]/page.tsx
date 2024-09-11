@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Customer } from "@/app/types/Customer";
-import CustomersService from '../../../services/customers';
+import CustomersService from "@/app/services/customers/class-customers";
 import { useParams } from "next/navigation";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';

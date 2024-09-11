@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { CustomerDTO, Customer } from "@/app/types/Customer";
-import CustomersService from '../../services/customers';
+import CustomersService from "@/app/services/customers/class-customers";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';

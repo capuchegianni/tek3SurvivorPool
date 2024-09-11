@@ -9,12 +9,14 @@ import { Column } from 'primereact/column';
 import { Employee } from "@/app/types/Employee";
 import GetEmployeesService from "@/app/services/employees/get-employees";
 import FetchError from "@/app/types/FetchErrors";
+import { EventDTO } from "@/app/types/Event";
 
 const getEmployeesService = new GetEmployeesService()
 
 export default function Coaches() {
     const [employee, setEmployee] = useState<Employee | null>(null)
     const [employeeImage, setEmployeeImage] = useState<string | null>(null)
+    const [employeeEvents, setEmployeeEvents] = useState<EventDTO[] | null>(null)
 
     useEffect(() => {
         const getEmployee = async () => {
@@ -23,6 +25,7 @@ export default function Coaches() {
 
                 setEmployee(fetchedEmployee)
                 setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeEvents(await getEmployeesService.getEvents({ id: fetchedEmployee.id }))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
@@ -51,7 +54,7 @@ export default function Coaches() {
                     <div className="flex flex-row justify-around items-center text-center border-b-2 p-6">
                         <div>
                             <p className="text-lg font-bold"> Events </p>
-                            <p> { employee?.events.length } organized </p>
+                            <p> { employeeEvents?.length } organized </p>
                         </div>
                         <div>
                             <p className="text-lg font-bold"> Customers </p>

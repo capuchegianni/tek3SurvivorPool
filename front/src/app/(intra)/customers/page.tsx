@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-import CustomersService from '../../services/customers';
+import CustomersService from "@/app/services/customers/class-customers";
 import { CustomerDTO } from '../../types/Customer'
 import CustomersTable from "./table";
 

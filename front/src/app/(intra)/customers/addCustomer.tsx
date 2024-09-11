@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from "react";
-import { Customer } from "@/app/types/Customer";
 import { InputText } from 'primereact/inputtext';
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";

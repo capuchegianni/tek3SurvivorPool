@@ -7,7 +7,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 import { Employee } from "@/app/types/Employee";
-import EmployeesService from "@/app/services/employees";
+import EmployeesService from "@/app/services/employees/class-employees";
 import FetchError from "@/app/types/FetchErrors";
 
 const employeesService = new EmployeesService()

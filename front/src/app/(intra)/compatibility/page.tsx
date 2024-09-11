@@ -9,6 +9,7 @@ import Image from 'next/image';
 
 import GetCustomersService from '../../services/customers/get-customers';
 import { Customer, CustomerDTO } from '../../types/Customer'
+import { get } from 'http';
 
 const getCustomerService = new GetCustomersService()
 
@@ -126,6 +127,7 @@ function ClientAstrological({
 
                 setCustomerImage(image ? `data:image/jpeg;base64,${image}` : null)
                 onSignSelected(customer.astrologicalSign, index);
+                getCustomerService.getCustomer({ id: selectedCustomer!.id })
                 setSelectedFullCustomer(customer)
                 hasFetched.current = true
             } catch (error: any) { }
