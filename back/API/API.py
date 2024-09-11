@@ -12,8 +12,9 @@ from .Routes.employees.imageEmployee import image_employees_blueprint
 from .Routes.employees.logEmployee import log_employees_blueprint
 from .Routes.employees.meEmployee import me_employees_blueprint
 from .Routes.employees.permissionsEmployee import permissions_employees_blueprint
+from .Routes.employees.eventsEmployee import events_employees_blueprint
+from .Routes.employees.assignedCustomersEmployee import assigned_customers_employee_blueprint
 
-from .Routes.events import events_blueprint
 from .Routes.tips import tips_blueprint
 from flask_cors import CORS
 import os
@@ -43,8 +44,9 @@ def createAPI():
     app.register_blueprint(log_employees_blueprint)
     app.register_blueprint(me_employees_blueprint)
     app.register_blueprint(permissions_employees_blueprint)
+    app.register_blueprint(events_employees_blueprint)
+    app.register_blueprint(assigned_customers_employee_blueprint)
 
-    app.register_blueprint(events_blueprint)
     app.register_blueprint(tips_blueprint)
 
     return app

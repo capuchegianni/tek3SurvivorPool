@@ -1,10 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response
 from dbConnection import db
 from pymongo import DESCENDING
-import os
 from dotenv import load_dotenv
-import requests
-from gridfs import GridFS
 from flask_jwt_extended import create_access_token, decode_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 from ...JWT_manager import jwt
 from ...decorators import role_required
@@ -15,7 +12,7 @@ load_dotenv()
 
 @id_employees_blueprint.route('/api/employees', methods=['POST'])
 @jwt_required()
-# @role_required('Admin')
+@role_required('Admin')
 def createEmployee():
     data = request.get_json()
     if not data:
@@ -37,7 +34,7 @@ def createEmployee():
 
 @id_employees_blueprint.route('/api/employees/<employee_id>', methods=['GET'])
 @jwt_required()
-# @role_required('Admin')
+@role_required('Coach')
 def getEmployeeId(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
     if employee is None:
@@ -54,7 +51,7 @@ def getEmployeeId(employee_id):
 
 @id_employees_blueprint.route('/api/employees/<employee_id>', methods=['PUT'])
 @jwt_required()
-# @role_required('Admin')
+@role_required('Admin')
 def updateEmployee(employee_id):
     data = request.get_json()
     if not data:
@@ -85,7 +82,7 @@ def updateEmployee(employee_id):
 
 @id_employees_blueprint.route('/api/employees/<employee_id>', methods=['DELETE'])
 @jwt_required()
-# @role_required('Admin')
+@role_required('Admin')
 def deleteEmployee(employee_id):
     result = db.employees.delete_one({ 'id': int(employee_id) })
     if result.deleted_count == 0:

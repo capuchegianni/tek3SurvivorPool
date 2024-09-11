@@ -94,7 +94,7 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
 
     return (
         <div>
-            <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/${e.data.id}`} className="cursor-pointer" rows={8} paginator header={inputText}>
+            <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/customer/${e.data.id}`} className="cursor-pointer" rows={8} paginator header={inputText}>
                 <Column body={customerTemplate} header="Customer" style={{width:'30%'}}/>
                 <Column field="email" header="Email" style={{width:'30%'}}/>
                 <Column field="phoneNumber" header="Phone Number" style={{width:'30%'}}/>

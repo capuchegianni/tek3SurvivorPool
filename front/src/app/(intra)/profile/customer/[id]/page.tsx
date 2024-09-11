@@ -10,6 +10,8 @@ import { Rating } from "primereact/rating";
 import Image from 'next/image'
 import { Encounter, EncounterDTO } from "@/app/types/Encounter";
 import { Payment } from "@/app/types/PaymentHistory";
+import { Button } from 'primereact/button';
+import Link from 'next/link';
 
 const getCustomersService = new GetCustomersService()
 
@@ -53,8 +55,13 @@ export default function ProfileId() {
 
     return (
         <div className="flex flex-col m-6">
-            <div className="text-3xl sm:text-4xl font-bold mb-6">
-                <p> Customer details </p>
+            <div className="flex justify-between">
+                <div className="text-3xl sm:text-4xl font-bold mb-6">
+                    <p> Customer details </p>
+                </div>
+                <Link href="/customers" >
+                    <Button label="return" icon="pi pi-arrow-left" className="h-10" />
+                </Link>
             </div>
             <div className="flex flex-grow h-full lg:flex-row flex-col">
                 <div className="flex-grow bg-white h-full lg:max-w-lg mr-4 border-2 rounded-md">
@@ -100,7 +107,7 @@ export default function ProfileId() {
                     <div className="p-4">
                         <DataTable value={paymentsHistory} header='Payments History' size="small" rows={4} paginator>
                             <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="payment_method" header="Payment Method" style={{width:'25%'}}/>
+                            <Column field="paymentMethod" header="Payment Method" style={{width:'25%'}}/>
                             <Column field="amount" header="Amount" style={{width:'25%'}}/>
                             <Column field="comment" header="Comment" style={{width:'40%'}}/>
                         </DataTable>

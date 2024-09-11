@@ -1,16 +1,14 @@
 from flask import Blueprint, jsonify, request
 from dbConnection import db
-from gridfs import GridFS
-import base64
 from ...JWT_manager import jwt
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from ...decorators import role_required
 
 payments_customers_blueprint = Blueprint('payments_customers', __name__)
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history', methods=['POST'])
 @jwt_required()
-# @role_required('Coach')
+@role_required('Admin')
 def createCustomerPaymentsHistory(customer_id):
     data = request.get_json()
     if not data:
@@ -36,7 +34,7 @@ def createCustomerPaymentsHistory(customer_id):
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history', methods=['GET'])
 @jwt_required()
-# @role_required('Coach')
+@role_required('Coach')
 def getCustomerPaymentsHistory(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -51,7 +49,7 @@ def getCustomerPaymentsHistory(customer_id):
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history/<payment_id>', methods=['PUT'])
 @jwt_required()
-# @role_required('Coach')
+@role_required('Admin')
 def updateCustomerPaymentsHistory(customer_id, payment_id):
     data = request.get_json()
     if not data:
@@ -84,7 +82,7 @@ def updateCustomerPaymentsHistory(customer_id, payment_id):
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history/<payment_id>', methods=['DELETE'])
 @jwt_required()
-# @role_required('Coach')
+@role_required('Admin')
 def deleteCustomerPaymentsHistory(customer_id, payment_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
