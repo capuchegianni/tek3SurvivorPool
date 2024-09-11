@@ -7,8 +7,7 @@ import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import Swal from 'sweetalert2'
 import { InputNumber } from "primereact/inputnumber";
-import { Dropdown } from "primereact/dropdown";
-import { EmployeeDTO } from "@/app/types/Employee";
+import { Employee } from "@/app/types/Employee";
 import GetEmployeesService from "@/app/services/employees/get-employees";
 import FetchError from "@/app/types/FetchErrors";
 import { Event } from "@/app/types/Event";
@@ -122,7 +121,7 @@ function FormsDetails({ value, setValue, title, style }: {value: string, setValu
 }
 
 function ChoseResponsible({setResponsible, responsible: initialResponsible}: {setResponsible: (value: string) => void, responsible?: string}) {
-    const [employee, setEmployee] = useState<EmployeeDTO[]>([]);
+    const [employee, setEmployee] = useState<Employee[]>([]);
     const [responsible, setLocalResponsible] = useState<string>(initialResponsible || '');
 
     useEffect(() => {
