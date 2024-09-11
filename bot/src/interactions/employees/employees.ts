@@ -60,8 +60,12 @@ export default class EmployeesInteraction extends InteractionModule {
                 })
                 const object = await res.json()
 
-                if (!res.ok)
-                    throw Error(`${res.status} ${res.statusText}\n${object.details}`)
+                if (!res.ok) {
+                    return interaction.reply({
+                        content: object.details ?? 'Une erreur est survenue.',
+                        ephemeral: true
+                    })
+                }
                 if (!isEmployees(object))
                     throw Error(`Wrong data type received:\n${JSON.stringify(object)}`)
 
@@ -87,11 +91,15 @@ export default class EmployeesInteraction extends InteractionModule {
                 })
                 const object = await res.json()
 
-                if (!res.ok)
-                    throw Error(`${res.status} ${res.statusText}\n${object.details}`)
+                if (!res.ok) {
+                    return interaction.reply({
+                        content: object.details ?? 'Une erreur est survenue.',
+                        ephemeral: true
+                    })
+                }
                 if (!isEmployee(object)) {
                     return interaction.reply({
-                        content: `User ${id} doesn't exist.`,
+                        content: `Customer ${id} doesn't exist.`,
                         ephemeral: true
                     })
                 }
