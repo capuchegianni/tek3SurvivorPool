@@ -20,9 +20,9 @@ export type Customer = {
   image: string
 }
 
-export type BasicCustomer = Omit<Customer, 'id' | 'paymentsHistory' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
+export type BasicCustomer = Omit<Customer, 'id' | 'payments_history' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
 
-export type BasicCustomerWithID = Omit<Customer, 'paymentsHistory' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
+export type BasicCustomerWithID = Omit<Customer, 'payments_history' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
 
 export function isCustomer(data: unknown): data is Customer {
   return !!data &&
