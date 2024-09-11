@@ -42,6 +42,6 @@ export function isEventDTO(data: unknown): data is EventDTO {
     typeof (data as EventDTO).maxParticipants === 'string'
 }
 
-export function isEvents(datas: unknown): datas is EventDTO[] {
-  return Array.isArray(datas) && datas.every(data => isEventDTO(data))
+export function isEvents(datas: unknown): datas is Event[] {
+  return Array.isArray(datas) && datas.every(data => isEvent(data))
 }
