@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import EmployeesService from './app/services/employees';
+import EmployeesService from './app/services/employees/get-employees';
 import { cookies } from 'next/headers';
 
 const employeesService = new EmployeesService();

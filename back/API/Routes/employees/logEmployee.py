@@ -16,7 +16,7 @@ log_employees_blueprint = Blueprint('log_employees', __name__)
 load_dotenv()
 
 @log_employees_blueprint.route('/api/employees', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 def getEmployees():
     employees = db.employees.find()
     return jsonify([{
@@ -84,16 +84,19 @@ def login():
         return jsonify({ 'details': 'Wrong password or email.' }), 401
 
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
-    response = make_response(jsonify({ 'details': 'Login successful' }))
+    response = make_response(jsonify({ 'details': 'Login successful', 'token': access_token }))
     set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
     return response
 
 @log_employees_blueprint.route('/api/employees/logout', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 def logout():
     token = request.cookies.get('access_token_cookie')
     if not token:
-        return jsonify({ 'details': 'You are not connected.' }), 401
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'details': 'You are not connected.'}), 401
+        token = auth_header.split(' ')[1]
 
     try:
         decode_token(token)

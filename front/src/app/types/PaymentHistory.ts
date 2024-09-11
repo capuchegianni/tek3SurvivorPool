@@ -6,6 +6,8 @@ export type Payment = {
   comment: string
 }
 
+export type BasicPayment = Omit<Payment, 'id'>
+
 export function isPayment(data: unknown): data is Payment {
   return !!data &&
     typeof (data as Payment).id === 'number' &&
@@ -15,6 +17,6 @@ export function isPayment(data: unknown): data is Payment {
     typeof (data as Payment).comment === 'string'
 }
 
-export function isPaymentHistory(datas: unknown): datas is Payment[] {
+export function isPaymentsHistory(datas: unknown): datas is Payment[] {
   return Array.isArray(datas) && datas.every(data => isPayment(data))
 }

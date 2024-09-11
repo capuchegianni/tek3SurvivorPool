@@ -9,6 +9,7 @@ all_customers_blueprint = Blueprint('all_customers', __name__)
 @all_customers_blueprint.route('/api/customers', methods=['GET'])
 @jwt_required(locations='cookies')
 @role_required('Admin')
+
 def getCustomers():
 
     customers = db.customers.find()
@@ -22,6 +23,7 @@ def getCustomers():
 @all_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
 @jwt_required(locations='cookies')
 @role_required('Coach')
+
 def oneCustomer(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -31,10 +33,10 @@ def oneCustomer(customer_id):
         'email': customer['email'],
         'name': customer['name'],
         'surname': customer['surname'],
-        'birth_date': customer['birth_date'],
+        'birthDate': customer['birth_date'],
         'gender': customer['gender'],
         'description': customer['description'],
-        'astrological_sign': customer['astrological_sign'],
-        'phone_number': customer['phone_number'],
+        'astrologicalSign': customer['astrological_sign'],
+        'phoneNumber': customer['phone_number'],
         'address': customer['address']
     })

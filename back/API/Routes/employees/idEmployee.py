@@ -25,7 +25,7 @@ def createEmployee():
         'email': data.get('email'),
         'name': data.get('name'),
         'surname': data.get('surname'),
-        'birth_date': data.get('birth_date'),
+        'birthDate': data.get('birth_date'),
         'gender': data.get('gender'),
         'work': data.get('work')
     }
@@ -44,7 +44,7 @@ def getEmployeeId(employee_id):
         'email': employee['email'],
         'name': employee['name'],
         'surname': employee['surname'],
-        'birth_date': employee['birth_date'],
+        'birthDate': employee['birth_date'],
         'gender': employee['gender'],
         'work': employee['work']
     })

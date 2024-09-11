@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 
-import CustomersService from '../../services/customers';
+import GetCustomersService from "@/app/services/customers/get-customers";
 import { CustomerDTO } from '../../types/Customer'
 import CustomersTable from "./table";
 
-const customerService = new CustomersService()
+const getCustomerService = new GetCustomersService()
 
 export default function Customers() {
     const [customers, setCustomers] = useState<CustomerDTO[]>([])
@@ -14,7 +14,7 @@ export default function Customers() {
     useEffect(() => {
         const getCustomers = async () => {
             try {
-                setCustomers(await customerService.getCustomers())
+                setCustomers(await getCustomerService.getCustomers())
             } catch (error) { }
         }
         getCustomers()

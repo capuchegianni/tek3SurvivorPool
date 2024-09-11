@@ -25,12 +25,12 @@ def createEvents():
         'name': data.get('name'),
         'date': data.get('date'),
         'duration': data.get('duration'),
-        'max_participants': data.get('max_participants'),
-        'location_x': data.get('location_x'),
-        'location_y': data.get('location_y'),
+        'maxParticipants': data.get('max_participants'),
+        'locationX': data.get('location_x'),
+        'locationY': data.get('location_y'),
         'type': data.get('type'),
         'employees': employee['id'],
-        'location_name': data.get('location_name'),
+        'locationName': data.get('location_name'),
     }
 
     db.employees.update_one(

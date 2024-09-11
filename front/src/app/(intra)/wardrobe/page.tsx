@@ -8,11 +8,11 @@ import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 
 import { Clothe } from "@/app/types/Clothe";
-import CustomersService from "@/app/services/customers";
+import GetCustomersService from "@/app/services/customers/get-customers";
 import { CustomerDTO } from "@/app/types/Customer";
 import FetchError from "@/app/types/FetchErrors";
 
-const customersService = new CustomersService()
+const getCustomersService = new GetCustomersService()
 
 export default function Wardrobe() {
     const [customers, setCustomers] = useState<CustomerDTO[]>([])
@@ -23,7 +23,7 @@ export default function Wardrobe() {
     useEffect(() => {
         const getCustomers = async () => {
             try {
-                setCustomers(await customersService.getCustomers())
+                setCustomers(await getCustomersService.getCustomers())
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
@@ -82,7 +82,7 @@ const GetCustomerClothes = ({ customers, setSaveState, setClothes }: { customers
                 return
             }
             try {
-                setClothes(await customersService.getCustomerClothes({ id: selectedCustomer.id }))
+                setClothes(await getCustomersService.getCustomerClothes({ id: selectedCustomer.id }))
                 setSaveState(false)
             } catch (error) {
                 if (error instanceof FetchError)

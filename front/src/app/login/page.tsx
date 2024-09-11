@@ -7,10 +7,10 @@ import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 
-import EmployeesService from '@/app/services/employees'
+import GetEmployeesService from '@/app/services/employees/get-employees'
 import Image from "next/image";
 
-const employeesService = new EmployeesService()
+const getEmployeesService = new GetEmployeesService()
 
 export default function Home() {
   const [email, setEmail] = useState('')
@@ -25,7 +25,7 @@ export default function Home() {
 
   const handleLogIn = async () => {
     try {
-      const res = await employeesService.login({ email, password });
+      const res = await getEmployeesService.login({ email, password });
 
       Swal.fire({
         title: res,

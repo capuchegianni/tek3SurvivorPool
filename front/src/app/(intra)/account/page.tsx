@@ -7,22 +7,25 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 import { Employee } from "@/app/types/Employee";
-import EmployeesService from "@/app/services/employees";
+import GetEmployeesService from "@/app/services/employees/get-employees";
 import FetchError from "@/app/types/FetchErrors";
+import { EventDTO } from "@/app/types/Event";
 
-const employeesService = new EmployeesService()
+const getEmployeesService = new GetEmployeesService()
 
 export default function Coaches() {
     const [employee, setEmployee] = useState<Employee | null>(null)
     const [employeeImage, setEmployeeImage] = useState<string | null>(null)
+    const [employeeEvents, setEmployeeEvents] = useState<EventDTO[] | null>(null)
 
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const fetchedEmployee = await employeesService.getEmployeeMe()
+                const fetchedEmployee = await getEmployeesService.getEmployeeMe()
 
                 setEmployee(fetchedEmployee)
-                setEmployeeImage(await employeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeEvents(await getEmployeesService.getEvents({ id: fetchedEmployee.id }))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
@@ -51,7 +54,7 @@ export default function Coaches() {
                     <div className="flex flex-row justify-around items-center text-center border-b-2 p-6">
                         <div>
                             <p className="text-lg font-bold"> Events </p>
-                            <p> { employee?.events.length } organized </p>
+                            <p> { employeeEvents?.length } organized </p>
                         </div>
                         <div>
                             <p className="text-lg font-bold"> Customers </p>
@@ -64,7 +67,7 @@ export default function Coaches() {
                         <ShortDetails name="Email:" value={employee?.email} />
                         <ShortDetails name="Gender:" value={employee?.gender} />
                         <ShortDetails name="Work:" value={employee?.work} />
-                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birth_date : 0).toUTCString().slice(0, 16)} />
+                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birthDate : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
@@ -73,7 +76,7 @@ export default function Coaches() {
                             <Column field="id" header="ID" style={{width:'10%'}}/>
                             <Column field="name" header="Name" style={{width:'25%'}}/>
                             <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="max_participants" header="Participants" style={{width:'25%'}}/>
+                            <Column field="maxParticipants" header="Participants" style={{width:'25%'}}/>
                             <Column field="type" header="Type" style={{width:'25%'}} />
                         </DataTable>
                     </div>

@@ -5,13 +5,17 @@ export type Employee = {
   email: string
   name: string
   surname: string
-  birth_date: string
+  birthDate: string
   gender: string
   work: string
   events: Event[]
   image: string
-  assigned_customers: string[]
+  assignedCustomers: number[]
 }
+
+export type BasicEmployee = Omit<Employee, 'id' | 'events' | 'image' | 'assignedCustomers'>
+
+export type BasicEmployeeWithID = Omit<Employee, 'events' | 'image' | 'assignedCustomers'>
 
 export type EmployeeDTO = {
   id: number
@@ -26,7 +30,7 @@ export function isEmployee(data: unknown): data is Employee {
     typeof (data as Employee).email === 'string' &&
     typeof (data as Employee).name === 'string' &&
     typeof (data as Employee).surname === 'string' &&
-    typeof (data as Employee).birth_date === 'string' &&
+    typeof (data as Employee).birthDate === 'string' &&
     typeof (data as Employee).gender === 'string' &&
     typeof (data as Employee).work === 'string'
 }
