@@ -7,10 +7,10 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 import { Employee } from "@/app/types/Employee";
-import EmployeesService from "@/app/services/employees/class-employees";
+import GetEmployeesService from "@/app/services/employees/get-employees";
 import FetchError from "@/app/types/FetchErrors";
 
-const employeesService = new EmployeesService()
+const getEmployeesService = new GetEmployeesService()
 
 export default function Coaches() {
     const [employee, setEmployee] = useState<Employee | null>(null)
@@ -19,10 +19,10 @@ export default function Coaches() {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const fetchedEmployee = await employeesService.getEmployeeMe()
+                const fetchedEmployee = await getEmployeesService.getEmployeeMe()
 
                 setEmployee(fetchedEmployee)
-                setEmployeeImage(await employeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()

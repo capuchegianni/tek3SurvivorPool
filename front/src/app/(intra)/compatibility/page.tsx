@@ -8,8 +8,7 @@ import { Button } from 'primereact/button';
 import Image from 'next/image';
 
 import GetCustomersService from '../../services/customers/get-customers';
-import { Customer, CustomerDTO } from '../../types/Customer'
-import { get } from 'http';
+import { BasicCustomerWithID, Customer, CustomerDTO } from '../../types/Customer'
 
 const getCustomerService = new GetCustomersService()
 
@@ -111,7 +110,7 @@ function ClientAstrological({
     onCustomerSelect
 }: ClientAstrologicalProps) {
     const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null);
-    const [selectedFullCustomer, setSelectedFullCustomer] = useState<Customer | null>(null)
+    const [selectedFullCustomer, setSelectedFullCustomer] = useState<BasicCustomerWithID | null>(null)
     const [customerImage, setCustomerImage] = useState<string | null>(null)
     const [filteredCustomers, setFilteredCustomers] = useState<CustomerDTO[]>([]);
     const hasFetched = useRef<boolean>(false)
