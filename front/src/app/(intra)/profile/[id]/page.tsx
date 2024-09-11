@@ -1,35 +1,43 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { Customer } from "@/app/types/Customer";
-import CustomersService from '../../../services/customers';
+import { BasicCustomerWithID, Customer } from "@/app/types/Customer";
+import GetCustomersService from "@/app/services/customers/get-customers";
 import { useParams } from "next/navigation";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Rating } from "primereact/rating";
 import Image from 'next/image'
-import { Encounter } from "@/app/types/Encounter";
+import { Encounter, EncounterDTO } from "@/app/types/Encounter";
+import { Payment } from "@/app/types/PaymentHistory";
 
-const customerService = new CustomersService()
+const getCustomersService = new GetCustomersService()
 
 export default function ProfileId() {
     const { id } = useParams<{ id: string }>();
-    const [customerData, setCustomerData] = useState<Customer | null>(null);
+    const [customerData, setCustomerData] = useState<BasicCustomerWithID | null>(null);
     const [customerImage, setCustomerImage] = useState<string | null>(null)
+    const [encounters, setEncounters] = useState<EncounterDTO[]>([])
     const [positivesEncounters, setPositivesEncounters] = useState<number>(0);
+    const [paymentsHistory, setPaymentsHistory] = useState<Payment[]>([])
 
     useEffect(() => {
         const fetchCustomer = async () => {
-            const customer = await customerService.getCustomer({ id: Number(id) }).catch(error => {
+            const customer = await getCustomersService.getCustomer({ id: Number(id) }).catch(error => {
                 console.error(error);
                 return null;
             });
+            const encounters = await getCustomersService.getCustomerEncounters({ id: Number(id) })
+            const payments = await getCustomersService.getCustomerPaymentsHistory({ id: Number(id) })
 
             setCustomerData(customer);
-            setCustomerImage(await customerService.getCustomerImage({ id: Number(id) }));
+            setCustomerImage(await getCustomersService.getCustomerImage({ id: Number(id) }));
 
-            const positives = customer?.encounters.filter(encounter => encounter.rating > 2.5).length || 0;
+            const positives = encounters.filter(encounter => encounter.rating > 2.5).length || 0;
+            setEncounters(encounters)
             setPositivesEncounters(positives);
+
+            setPaymentsHistory(payments)
         }
 
         fetchCustomer();
@@ -61,7 +69,7 @@ export default function ProfileId() {
                     </div>
                     <div className="flex flex-row justify-around items-center text-center border-b-2 p-6">
                         <div>
-                            <p className="text-lg font-bold"> { customerData?.encounters.length } </p>
+                            <p className="text-lg font-bold"> { encounters.length } </p>
                             <p> Total </p>
                             <p> Encounter </p>
                         </div>
@@ -82,7 +90,7 @@ export default function ProfileId() {
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
-                        <DataTable value={customerData?.encounters} header='Encounter' size="small" rows={5} paginator>
+                        <DataTable value={encounters} header='Encounter' size="small" rows={5} paginator>
                             <Column field="date" header="Date" style={{width:'10%'}}/>
                             <Column field="rating" header="Rating" body={rating} style={{width:'10%'}}/>
                             <Column field="comment" header="Report" style={{width:'50%'}}/>
@@ -90,7 +98,7 @@ export default function ProfileId() {
                         </DataTable>
                     </div>
                     <div className="p-4">
-                        <DataTable value={customerData?.paymentsHistory} header='Payments History' size="small" rows={4} paginator>
+                        <DataTable value={paymentsHistory} header='Payments History' size="small" rows={4} paginator>
                             <Column field="date" header="Date" style={{width:'25%'}}/>
                             <Column field="payment_method" header="Payment Method" style={{width:'25%'}}/>
                             <Column field="amount" header="Amount" style={{width:'25%'}}/>

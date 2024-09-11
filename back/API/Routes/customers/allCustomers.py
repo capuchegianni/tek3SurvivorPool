@@ -33,10 +33,10 @@ def oneCustomer(customer_id):
         'email': customer['email'],
         'name': customer['name'],
         'surname': customer['surname'],
-        'birth_date': customer['birth_date'],
+        'birthDate': customer['birth_date'],
         'gender': customer['gender'],
         'description': customer['description'],
-        'astrological_sign': customer['astrological_sign'],
-        'phone_number': customer['phone_number'],
+        'astrologicalSign': customer['astrological_sign'],
+        'phoneNumber': customer['phone_number'],
         'address': customer['address']
     })

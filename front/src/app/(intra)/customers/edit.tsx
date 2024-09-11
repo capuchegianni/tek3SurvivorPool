@@ -92,9 +92,9 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
             <FormsDetails value={email} setValue={setEmail} title="Email" />
             <FormsDetails value={phone} setValue={setPhone} title="Phone" />
             <FormsDetails value={address} setValue={setAddress} title="Address" />
-            <label htmlFor="birth_date" className="flex flex-col w-full pt-3">
+            <label htmlFor="birthDate" className="flex flex-col w-full pt-3">
                 Birth date
-                <InputMask id="birth_date" mask="99/99/9999" value={birthDateOrdered} onChange={(e) => setBirthDateSave(e.target.value || '')} className="w-full"/>
+                <InputMask id="birthDate" mask="99/99/9999" value={birthDateOrdered} onChange={(e) => setBirthDateSave(e.target.value || '')} className="w-full"/>
             </label>
             <label htmlFor="astrological_sign" className="flex flex-col w-full pt-3">
                 Astrological sign
@@ -121,7 +121,7 @@ function GenderRadio({initialGender, setGender}: {initialGender: string, setGend
 
     useEffect(() => {
         setGender(gender);
-    }, [gender]);
+    }, [gender, setGender]);
 
     return (
         <div className="flex flex-wrap gap-3">
