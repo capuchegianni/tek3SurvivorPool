@@ -16,7 +16,7 @@ get_employees_blueprint = Blueprint('get_employee', __name__)
 def getEmployee(employee_id):
     employee = db.employees.find_one(
         {'id': int(employee_id)},
-        {'_id': 0, 'events': 0, 'image': 0, 'assigned_customers': 0}
+        {'_id': 0, 'events': 0, 'image': 0, 'assigned_customers': 0, 'password': 0}
     )
     if employee is None:
         return jsonify({'details': 'Employee not found'}), 404
@@ -30,7 +30,7 @@ def getEmployee(employee_id):
 def getEmployees():
     employees = db.employees.find(
         {},
-        {'_id': 0, 'events': 0, 'image': 0, 'assigned_customers': 0}
+        {'_id': 0, 'events': 0, 'image': 0, 'assigned_customers': 0, 'password': 0}
     )
     if employees is None:
         return jsonify({'details': 'No employees found'}), 404
@@ -42,9 +42,9 @@ def getEmployees():
 @jwt_required()
 def getMe():
     user_email = get_jwt_identity()
-    user = db.employees.find(
+    user = db.employees.find_one(
         {'email': user_email},
-        {'_id': 0, 'events': 0, 'image': 0, 'assigned_customers': 0}
+        {'_id': 0, 'events': 0, 'image': 0, 'assigned_customers': 0, 'password': 0}
     )
     if user is None:
         return jsonify({'details': 'User not found'}), 404
