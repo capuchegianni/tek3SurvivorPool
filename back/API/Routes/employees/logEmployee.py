@@ -19,18 +19,6 @@ log_employees_blueprint = Blueprint('log_employees', __name__)
 
 load_dotenv()
 
-@log_employees_blueprint.route('/api/employees', methods=['GET'])
-@jwt_required()
-def getEmployees():
-    employees = db.employees.find()
-    return jsonify([{
-        'id': employee['id'],
-        'email': employee['email'],
-        'name': employee['name'],
-        'surname': employee['surname']
-    } for employee in employees])
-
-
 def userConnected(email, password):
     api_key = os.getenv("API_KEY")
     if not api_key:

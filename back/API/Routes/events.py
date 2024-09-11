@@ -66,15 +66,15 @@ def updateEvents(event_id):
         updated_event['date'] = data.get('date')
     if data.get('duration'):
         updated_event['duration'] = data.get('duration')
-    if data.get('max_participants'):
+    if data.get('maxParticipants'):
         updated_event['max_participants'] = data.get('max_participants')
-    if data.get('location_x'):
+    if data.get('locationX'):
         updated_event['location_x'] = data.get('location_x')
-    if data.get('location_y'):
+    if data.get('locationY'):
         updated_event['location_y'] = data.get('location_y')
     if data.get('type'):
         updated_event['type'] = data.get('type')
-    if data.get('location_name'):
+    if data.get('locationName'):
         updated_event['location_name'] = data.get('location_name')
 
     if not updated_event:

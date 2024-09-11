@@ -67,7 +67,7 @@ def updateEmployee(employee_id):
         updated_employee['name'] = data.get('name')
     if data.get('surname'):
         updated_employee['surname'] = data.get('surname')
-    if data.get('birth_date'):
+    if data.get('birthDate'):
         updated_employee['birth_date'] = data.get('birth_date')
     if data.get('gender'):
         updated_employee['gender'] = data.get('gender')

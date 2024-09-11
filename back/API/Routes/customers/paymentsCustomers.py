@@ -64,7 +64,7 @@ def updateCustomerPaymentsHistory(customer_id, payment_id):
     updated_payment = {}
     if 'date' in data:
         updated_payment['payments_history.$.date'] = data['date']
-    if 'payment_method' in data:
+    if 'paymentMethod' in data:
         updated_payment['payments_history.$.payment_method'] = data['payment_method']
     if 'amount' in data:
         updated_payment['payments_history.$.amount'] = data['amount']

@@ -24,15 +24,26 @@ def createCustomer():
         'email': data.get('email'),
         'name': data.get('name'),
         'surname': data.get('surname'),
-        'birthDate': data.get('birth_date'),
-        'gender': data.get['gender'],
-        'description': data.get['description'],
-        'astrologicalSign': data.get['astrological_sign'],
-        'phoneNumber': data.get['phone_number'],
-        'address': data.get['address']
+        'birth_date': data.get('birthDate'),
+        'gender': data.get('gender'),
+        'description': data.get('description'),
+        'astrological_sign': data.get('astrologicalSign'),
+        'phone_number': data.get('phoneNumber'),
+        'address': data.get('address')
     }
     db.customers.insert_one(new_customer)
-    return jsonify({'details': 'Customer created successfully', 'customer': new_customer}), 201
+    return jsonify({'details': 'Customer created successfully', 'customer': {
+        'id': new_customer['id'],
+        'email': new_customer['email'],
+        'name': new_customer['name'],
+        'surname': new_customer['surname'],
+        'birthDate': new_customer['birth_date'],
+        'gender': new_customer['gender'],
+        'description': new_customer['description'],
+        'astrologicalSign': new_customer['astrological_sign'],
+        'phoneNumber': new_customer['phone_number'],
+        'address': new_customer['address']
+    }}), 201
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
 @jwt_required()
@@ -50,9 +61,7 @@ def getCustomerInfo(customer_id):
         'description': customer['description'],
         'astrologicalSign': customer['astrological_sign'],
         'phoneNumber': customer['phone_number'],
-        'address': customer['address'],
-        'encounters': customer['encounters'],
-        'paymentsHistory': customer['payments_history']
+        'address': customer['address']
     })
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['PUT'])
@@ -70,23 +79,20 @@ def updateCustomer(customer_id):
         update_fields['name'] = data['name']
     if 'surname' in data:
         update_fields['surname'] = data['surname']
-    if 'birth_date' in data:
+    if 'birthDate' in data:
         update_fields['birth_date'] = data['birth_date']
     if 'gender' in data:
         update_fields['gender'] = data['gender']
     if 'description' in data:
         update_fields['description'] = data['description']
-    if 'astrological_sign' in data:
+    if 'astrologicalSign' in data:
         update_fields['astrological_sign'] = data['astrological_sign']
-    if 'phone_number' in data:
+    if 'phoneNumber' in data:
         update_fields['phone_number'] = data['phone_number']
     if 'address' in data:
         update_fields['address'] = data['address']
-    if 'encounters' in data:
-        update_fields['encounters'] = data['encounters']
-    if 'payments_history' in data:
-        update_fields['payments_history'] = data['payments_history']
 
+    print(update_fields)
     if not update_fields:
         return jsonify({'details': 'No valid fields to update'}), 400
 
