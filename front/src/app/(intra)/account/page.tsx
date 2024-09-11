@@ -80,11 +80,11 @@ export default function Coaches() {
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
                         <DataTable value={employeeEvents} header='Events' size="small" rows={5} paginator>
-                            <Column field="id" header="ID" style={{width:'10%'}}/>
-                            <Column field="name" header="Name" style={{width:'25%'}}/>
-                            <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="maxParticipants" header="Participants" style={{width:'25%'}}/>
-                            <Column field="type" header="Type" style={{width:'25%'}} />
+                            <Column field="id" header="ID" />
+                            <Column field="name" header="Name" />
+                            <Column field="date" header="Date" />
+                            <Column field="max_participants" header="Participants" />
+                            <Column field="type" header="Type" />
                         </DataTable>
                     </div>
                     <div className="p-4">
@@ -92,7 +92,9 @@ export default function Coaches() {
                             <Column field="id" header="ID" />
                             <Column field="name" header="Name" />
                             <Column field="surname" header="Last name" />
+                            <Column field="gender" header="Gender" />
                             <Column field="email" header="Email" />
+                            <Column field="phone_number" header="Phone" />
                         </DataTable>
                     </div>
                 </div>
