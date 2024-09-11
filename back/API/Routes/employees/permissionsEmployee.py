@@ -14,11 +14,11 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...decorators import role_required
 from ...decorators import ADMIN_ROLES
 
-employees_blueprint = Blueprint('employees', __name__)
+permissions_employees_blueprint = Blueprint('permissions_employees', __name__)
 
 load_dotenv()
 
-@employees_blueprint.route('/api/employees/has_permissions/<role>', methods=['GET'])
+@permissions_employees_blueprint.route('/api/employees/has_permissions/<role>', methods=['GET'])
 @jwt_required(locations='cookies')
 def hasPermissions(role):
     user_email = get_jwt_identity()

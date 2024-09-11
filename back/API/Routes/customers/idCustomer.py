@@ -2,22 +2,25 @@ from flask import Blueprint, jsonify, request
 from dbConnection import db
 from gridfs import GridFS
 import base64
+from pymongo import DESCENDING
 from ...JWT_manager import jwt
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...decorators import role_required
 
-customers_blueprint = Blueprint('customers', __name__)
+id_customers_blueprint = Blueprint('id_customers', __name__)
 
-@customers_blueprint.route('/api/customers', methods=['POST'])
+@id_customers_blueprint.route('/api/customers', methods=['POST'])
 @jwt_required(locations='cookies')
-@role_required('Admin')
+# @role_required('Admin')
 def createCustomer():
     data = request.get_json()
     if not data:
         return jsonify({'details': 'Invalid input'}), 400
+    last_customer = db.employees.find_one(sort=[("id", DESCENDING)])
+    new_id = last_customer['id'] + 1 if last_customer else 1
 
     new_customer = {
-        'id': data.get('id'),
+        'id': new_id,
         'email': data.get('email'),
         'name': data.get('name'),
         'surname': data.get('surname'),
@@ -28,10 +31,12 @@ def createCustomer():
         'phone_number': data.get['phone_number'],
         'address': data.get['address']
     }
+    db.customers.insert_one(new_customer)
+    return jsonify({'details': 'Customer created successfully', 'customer': new_customer}), 201
 
-@customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
+@id_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
 @jwt_required(locations='cookies')
-def getCustomerId(customer_id):
+def getCustomerInfo(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
@@ -48,29 +53,50 @@ def getCustomerId(customer_id):
         'address': customer['address']
     })
 
-@customers_blueprint.route('/api/customers/<customer_id>', methods=['PUT'])
+@id_customers_blueprint.route('/api/customers/<customer_id>', methods=['PUT'])
 @jwt_required(locations='cookies')
-@role_required('Admin')
+# @role_required('Admin')
 def updateCustomer(customer_id):
     data = request.get_json()
     if not data:
         return jsonify({'details': 'Invalid input'}), 400
 
-    updated_customer = {
-        'email': data.get('email'),
-        'name': data.get('name'),
-        'surname': data.get('surname'),
-        'birth_date': data.get('birth_date'),
-        'gender': data.get['gender'],
-        'description': data.get['description'],
-        'astrological_sign': data.get['astrological_sign'],
-        'phone_number': data.get['phone_number'],
-        'address': data.get['address']
-    }
+    update_fields = {}
+    if 'email' in data:
+        update_fields['email'] = data['email']
+    if 'name' in data:
+        update_fields['name'] = data['name']
+    if 'surname' in data:
+        update_fields['surname'] = data['surname']
+    if 'birth_date' in data:
+        update_fields['birth_date'] = data['birth_date']
+    if 'gender' in data:
+        update_fields['gender'] = data['gender']
+    if 'description' in data:
+        update_fields['description'] = data['description']
+    if 'astrological_sign' in data:
+        update_fields['astrological_sign'] = data['astrological_sign']
+    if 'phone_number' in data:
+        update_fields['phone_number'] = data['phone_number']
+    if 'address' in data:
+        update_fields['address'] = data['address']
 
-@customers_blueprint.route('/api/customers/<customer_id>', methods=['DELETE'])
+    if not update_fields:
+        return jsonify({'details': 'No valid fields to update'}), 400
+
+    result = db.customers.update_one(
+        {'id': int(customer_id)},
+        {'$set': update_fields}
+    )
+
+    if result.matched_count == 0:
+        return jsonify({'details': 'Customer not found'}), 404
+
+    return jsonify({'details': 'Customer updated successfully'}), 200
+
+@id_customers_blueprint.route('/api/customers/<customer_id>', methods=['DELETE'])
 @jwt_required(locations='cookies')
-@role_required('Admin')
+# @role_required('Admin')
 def deleteCustomer(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:

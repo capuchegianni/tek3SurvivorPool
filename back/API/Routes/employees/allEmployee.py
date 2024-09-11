@@ -14,13 +14,13 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...decorators import role_required
 from ...decorators import ADMIN_ROLES
 
-employees_blueprint = Blueprint('employees', __name__)
+all_employees_blueprint = Blueprint('all_employees', __name__)
 
 load_dotenv()
 
-@employees_blueprint.route('/api/employees', methods=['GET'])
+@all_employees_blueprint.route('/api/employees', methods=['GET'])
 @jwt_required(locations='cookies')
-@role_required('Admin')
+# @role_required('Admin')
 def getEmployees():
     employees = db.employees.find()
     return jsonify([{
@@ -30,3 +30,20 @@ def getEmployees():
         'surname': employee['surname']
     } for employee in employees])
 
+
+@all_employees_blueprint.route('/api/employees/<customer_id>', methods=['POST'])
+@jwt_required(locations='cookies')
+# @role_required('Admin')
+def oneEmployee(customer_id):
+    employee = db.employees.find_one({ 'id': int(customer_id) })
+    if employee is None:
+        return jsonify({'details': 'Employee not found'}), 404
+    return jsonify({
+        'id': employee['id'],
+        'email': employee['email'],
+        'name': employee['name'],
+        'surname': employee['surname'],
+        'birth_date': employee['birth_date'],
+        'gender': employee['gender'],
+        'work': employee['work']
+    })

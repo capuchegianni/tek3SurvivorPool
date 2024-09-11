@@ -14,30 +14,13 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...decorators import role_required
 from ...decorators import ADMIN_ROLES
 
-employees_blueprint = Blueprint('employees', __name__)
+me_employees_blueprint = Blueprint('me_employees', __name__)
 
 load_dotenv()
 
-@employees_blueprint.route('/api/employees/me', methods=['POST'])
-def createMe():
-    data = request.get_json()
-    if not data:
-        return jsonify({'details': 'Invalid input'}), 400
-
-    new_employee = {
-        'id': data.get('id'),
-        'email': data.get('email'),
-        'name': data.get('name'),
-        'surname': data.get('surname'),
-        'birth_date': data.get('birth_date'),
-        'gender': data.get('gender'),
-        'work': data.get('work')
-    }
-    return jsonify(new_employee), 201
-
-@employees_blueprint.route('/api/employees/me', methods=['GET'])
+@me_employees_blueprint.route('/api/employees/me', methods=['GET'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# # @role_required('Coach')
 def getMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })
@@ -54,9 +37,9 @@ def getMe():
         'work': employee['work']
     })
 
-@employees_blueprint.route('/api/employees/me', methods=['PUT'])
+@me_employees_blueprint.route('/api/employees/me', methods=['PUT'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def updateMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })
@@ -67,12 +50,23 @@ def updateMe():
     if not data:
         return jsonify({ 'details': 'Invalid input' }), 400
 
+    allowed_properties = {'email', 'name', 'surname', 'birth_date', 'gender', 'work'}
+
+    for key in data.keys():
+        if key not in allowed_properties:
+            return jsonify({ 'details': f'Invalid property: {key}' }), 400
+    new_email = data.get('email')
+    if new_email and new_email != current_employee_email:
+        existing_employee = db.employees.find_one({ 'email': new_email })
+        if existing_employee:
+            return jsonify({ 'details': 'Email already in use' }), 400
+
     db.employees.update_one({ 'email': current_employee_email }, { '$set': data })
     return jsonify({ 'details': 'Employee updated successfully' }), 200
 
-@employees_blueprint.route('/api/employees/me', methods=['DELETE'])
+@me_employees_blueprint.route('/api/employees/me', methods=['DELETE'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def deleteMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })

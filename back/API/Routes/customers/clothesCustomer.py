@@ -6,11 +6,11 @@ from ...JWT_manager import jwt
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...decorators import role_required
 
-customers_blueprint = Blueprint('customers', __name__)
+clothes_customers_blueprint = Blueprint('clothes_customers', __name__)
 
-@customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['POST'])
+@clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['POST'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def createCustomerClothes(customer_id):
     data = request.get_json()
     if not data:
@@ -24,14 +24,16 @@ def createCustomerClothes(customer_id):
         'id': data.get('id'),
         'type': data.get('type')
     }
-    customer['clothes'].append(new_clothes)
-    db.customers.update_one({ 'id': int(customer_id) }, { '$set': { 'clothes': customer['clothes'] } })
+    db.customers.update_one(
+        { 'id': int(customer_id) },
+        { '$push': { 'clothes': new_clothes } }
+    )
     return jsonify(new_clothes)
 
 
-@customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
+@clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def getCustomerClothes(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -47,9 +49,9 @@ def getCustomerClothes(customer_id):
         })
     return jsonify(clothes_with_images)
 
-@customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['PUT'])
+@clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['PUT'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def updateCustomerClothes(customer_id, clothes_id):
     data = request.get_json()
     if not data:
@@ -64,12 +66,15 @@ def updateCustomerClothes(customer_id, clothes_id):
         return jsonify({'details': 'Clothes not found'}), 404
 
     clothes['type'] = data.get('type')
-    db.customers.update_one({ 'id': int(customer_id) }, { '$set': { 'clothes': customer['clothes'] } })
+    db.customers.update_one(
+        {"id": customer_id, "clothes.id": clothes["id"]},
+        {"$set": {"clothes.$": clothes}}
+    )
     return jsonify(clothes)
 
-@customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['DELETE'])
+@clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['DELETE'])
 @jwt_required(locations='cookies')
-@role_required('Coach')
+# @role_required('Coach')
 def deleteCustomerClothes(customer_id, clothes_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -80,5 +85,8 @@ def deleteCustomerClothes(customer_id, clothes_id):
         return jsonify({'details': 'Clothes not found'}), 404
 
     customer['clothes'].remove(clothes)
-    db.customers.update_one({ 'id': int(customer_id) }, { '$set': { 'clothes': customer['clothes'] } })
+    db.customers.update_one(
+        { 'id': int(customer_id) },
+        { '$pull': { 'clothes': { 'id': int(clothes_id)}}}
+    )
     return jsonify({'details': 'Clothes deleted'})
