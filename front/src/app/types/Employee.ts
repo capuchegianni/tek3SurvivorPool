@@ -18,6 +18,7 @@ export type BasicEmployee = Omit<Employee, 'id' | 'events' | 'image' | 'assigned
 export type BasicEmployeeWithID = Omit<Employee, 'events' | 'image' | 'assignedCustomers'>
 
 export type EmployeeDTO = {
+  fullName(fullName: any): unknown
   id: number
   email: string
   name: string
