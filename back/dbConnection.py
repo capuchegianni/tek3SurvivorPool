@@ -1,6 +1,7 @@
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from utils import debugPrint
 
 load_dotenv()
 
@@ -17,8 +18,13 @@ def dbConnection():
             print("Missing environment variables. Please check your .env file.")
             return None
 
-        client = MongoClient(mongodb_uri)
-        db = client[mongodb_db_name]
+        try:
+            client = MongoClient(mongodb_uri)
+            db = client[mongodb_db_name]
+            debugPrint("Database connection established.")
+        except Exception as e:
+            print(f"Failed to connect to MongoDB: {e}")
+            return None
 
     return db
 
