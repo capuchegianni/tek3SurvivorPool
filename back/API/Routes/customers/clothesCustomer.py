@@ -3,14 +3,14 @@ from dbConnection import db
 from gridfs import GridFS
 import base64
 from ...JWT_manager import jwt
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from ...decorators import role_required
 
 clothes_customers_blueprint = Blueprint('clothes_customers', __name__)
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['POST'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def createCustomerClothes(customer_id):
     data = request.get_json()
     if not data:
@@ -33,7 +33,7 @@ def createCustomerClothes(customer_id):
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def getCustomerClothes(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -51,7 +51,7 @@ def getCustomerClothes(customer_id):
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['PUT'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def updateCustomerClothes(customer_id, clothes_id):
     data = request.get_json()
     if not data:
@@ -74,7 +74,7 @@ def updateCustomerClothes(customer_id, clothes_id):
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['DELETE'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def deleteCustomerClothes(customer_id, clothes_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:

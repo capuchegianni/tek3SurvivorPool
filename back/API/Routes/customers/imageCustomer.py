@@ -3,14 +3,14 @@ from dbConnection import db
 from gridfs import GridFS
 import base64
 from ...JWT_manager import jwt
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from ...decorators import role_required
 
 image_customers_blueprint = Blueprint('image_customers', __name__)
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['POST'])
 @jwt_required(locations='cookies')
-# @role_required('Admin')
+@role_required('Admin')
 def createCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -24,7 +24,7 @@ def createCustomerImage(customer_id):
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['GET'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def getCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -35,7 +35,7 @@ def getCustomerImage(customer_id):
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['PUT'])
 @jwt_required(locations='cookies')
-# @role_required('Admin')
+@role_required('Admin')
 def updateCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -55,7 +55,7 @@ def updateCustomerImage(customer_id):
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['DELETE'])
 @jwt_required(locations='cookies')
-# @role_required('Admin')
+@role_required('Admin')
 def deleteCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:

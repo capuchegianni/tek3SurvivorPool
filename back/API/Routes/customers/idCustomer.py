@@ -1,17 +1,15 @@
 from flask import Blueprint, jsonify, request
 from dbConnection import db
-from gridfs import GridFS
-import base64
 from pymongo import DESCENDING
 from ...JWT_manager import jwt
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from ...decorators import role_required
 
 id_customers_blueprint = Blueprint('id_customers', __name__)
 
 @id_customers_blueprint.route('/api/customers', methods=['POST'])
 @jwt_required(locations='cookies')
-# @role_required('Admin')
+@role_required('Admin')
 def createCustomer():
     data = request.get_json()
     if not data:
@@ -36,6 +34,7 @@ def createCustomer():
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
 @jwt_required(locations='cookies')
+@role_required('Coach')
 def getCustomerInfo(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
@@ -57,7 +56,7 @@ def getCustomerInfo(customer_id):
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['PUT'])
 @jwt_required(locations='cookies')
-# @role_required('Admin')
+@role_required('Admin')
 def updateCustomer(customer_id):
     data = request.get_json()
     if not data:
@@ -102,7 +101,7 @@ def updateCustomer(customer_id):
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['DELETE'])
 @jwt_required(locations='cookies')
-# @role_required('Admin')
+@role_required('Admin')
 def deleteCustomer(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:

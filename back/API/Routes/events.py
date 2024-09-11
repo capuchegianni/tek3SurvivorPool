@@ -9,7 +9,7 @@ events_blueprint = Blueprint('events', __name__)
 
 @events_blueprint.route('/api/events', methods=['POST'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def createEvents():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })
@@ -41,7 +41,7 @@ def createEvents():
 
 @events_blueprint.route('/api/events/<int:employee_id>', methods=['GET'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def getEvents(employee_id):
     employee = db.employees.find_one({ 'id': employee_id }, { '_id': 0, 'events': 1 })
     if not employee or 'events' not in employee:
@@ -51,7 +51,7 @@ def getEvents(employee_id):
 
 @events_blueprint.route('/api/events/<event_id>', methods=['PUT'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def updateEvents(event_id):
     if not event_id:
         return jsonify({'details': 'Invalid input'}), 400
@@ -88,7 +88,7 @@ def updateEvents(event_id):
 
 @events_blueprint.route('/api/events/<event_id>', methods=['DELETE'])
 @jwt_required(locations='cookies')
-# @role_required('Coach')
+@role_required('Coach')
 def deleteEvents(event_id):
     if not event_id:
         return jsonify({'details': 'Invalid input'}), 400
