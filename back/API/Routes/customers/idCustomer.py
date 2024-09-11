@@ -32,7 +32,7 @@ def createCustomer():
         'address': data.get('address')
     }
     db.customers.insert_one(new_customer)
-    return jsonify({'details': 'Customer created successfully', 'customer': {
+    return jsonify({
         'id': new_customer['id'],
         'email': new_customer['email'],
         'name': new_customer['name'],
@@ -43,7 +43,7 @@ def createCustomer():
         'astrologicalSign': new_customer['astrological_sign'],
         'phoneNumber': new_customer['phone_number'],
         'address': new_customer['address']
-    }}), 201
+    }), 201
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
 @jwt_required()
