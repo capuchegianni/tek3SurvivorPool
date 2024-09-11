@@ -7,10 +7,10 @@ import './compatibility.css';
 import { Button } from 'primereact/button';
 import Image from 'next/image';
 
-import CustomersService from '../../services/customers/get-customers';
+import GetCustomersService from '../../services/customers/get-customers';
 import { Customer, CustomerDTO } from '../../types/Customer'
 
-const customerService = new CustomersService()
+const getCustomerService = new GetCustomersService()
 
 const astroSigns = [
     { name: 'pisces', value: 35, image: '/poissons-astro.png' },
@@ -44,7 +44,7 @@ export default function Compatibility() {
     useEffect(() => {
         const getCustomers = async () => {
             try {
-                setCustomers(await customerService.getCustomers())
+                setCustomers(await getCustomerService.getCustomers())
             } catch (error) { }
         }
         getCustomers()
@@ -121,8 +121,8 @@ function ClientAstrological({
             if (hasFetched.current)
                 return
             try {
-                const customer = await customerService.getCustomer({ id: selectedCustomer!.id })
-                const image = await customerService.getCustomerImage({ id: selectedCustomer!.id })
+                const customer = await getCustomerService.getCustomer({ id: selectedCustomer!.id })
+                const image = await getCustomerService.getCustomerImage({ id: selectedCustomer!.id })
 
                 setCustomerImage(image ? `data:image/jpeg;base64,${image}` : null)
                 onSignSelected(customer.astrological_sign, index);
