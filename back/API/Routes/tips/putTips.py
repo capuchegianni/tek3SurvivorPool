@@ -22,5 +22,6 @@ def putTip(tip_id):
         {'id': int(tip_id)},
         {'$set': data}
     )
+    data.pop('_id', None)
 
     return jsonify(data), 200

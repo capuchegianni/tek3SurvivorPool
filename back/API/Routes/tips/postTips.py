@@ -23,5 +23,6 @@ def postTip():
     tip = {'id': tip_id, **data}
 
     db.tips.insert_one(tip)
+    tip.pop('_id', None)
 
     return jsonify(tip), 201
