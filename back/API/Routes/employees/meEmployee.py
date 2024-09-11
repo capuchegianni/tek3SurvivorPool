@@ -1,18 +1,10 @@
 from flask import Blueprint, jsonify, request, make_response
 from dbConnection import db
-import os
 from dotenv import load_dotenv
-import requests
-from gridfs import GridFS
-import base64
 from flask_jwt_extended import create_access_token, decode_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
-from flask_jwt_extended.exceptions import NoAuthorizationError
-import bcrypt
 from ...JWT_manager import jwt
-from datetime import timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ...decorators import role_required
-from ...decorators import ADMIN_ROLES
 
 me_employees_blueprint = Blueprint('me_employees', __name__)
 
@@ -20,7 +12,7 @@ load_dotenv()
 
 @me_employees_blueprint.route('/api/employees/me', methods=['GET'])
 @jwt_required()
-# # @role_required('Coach')
+@role_required('Coach')
 def getMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })
@@ -39,7 +31,7 @@ def getMe():
 
 @me_employees_blueprint.route('/api/employees/me', methods=['PUT'])
 @jwt_required()
-# @role_required('Coach')
+@role_required('Coach')
 def updateMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })
@@ -66,7 +58,7 @@ def updateMe():
 
 @me_employees_blueprint.route('/api/employees/me', methods=['DELETE'])
 @jwt_required()
-# @role_required('Coach')
+@role_required('Coach')
 def deleteMe():
     current_employee_email = get_jwt_identity()
     employee = db.employees.find_one({ 'email': current_employee_email })

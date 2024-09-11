@@ -1,16 +1,15 @@
 from flask import Blueprint, jsonify, request
 from dbConnection import db
-from gridfs import GridFS
-import base64
 from ...JWT_manager import jwt
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from ...decorators import role_required
 
 all_customers_blueprint = Blueprint('all_customers', __name__)
 
 @all_customers_blueprint.route('/api/customers', methods=['GET'])
 @jwt_required()
-# @role_required('Admin')
+@role_required('Admin')
+
 def getCustomers():
 
     customers = db.customers.find()
@@ -23,7 +22,8 @@ def getCustomers():
 
 @all_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
 @jwt_required()
-# @role_required('Admin')
+@role_required('Coach')
+
 def oneCustomer(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
     if customer is None:
