@@ -27,8 +27,7 @@ def createTip():
     return jsonify({'details': 'Tip created successfully'}), 201
 
 @tips_blueprint.route('/api/tips', methods=['GET'])
-@jwt_required(locations='cookies')
-# @role_required('Coach')
+@jwt_required()
 def getTips():
     tips = db.tips.find()
     return jsonify([{
