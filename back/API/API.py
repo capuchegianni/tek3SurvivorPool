@@ -1,21 +1,20 @@
-from datetime import timedelta
+from .Routes.customers.delCustomers import del_customers_blueprint
+from .Routes.customers.getCustomers import get_customers_blueprint
+from .Routes.customers.postCustomers import post_customers_blueprint
+from .Routes.customers.putCustomers import put_customers_blueprint
+
+from .Routes.employees.delEmployees import del_employees_blueprint
+from .Routes.employees.getEmployees import get_employees_blueprint
+from .Routes.employees.postEmployees import post_employees_blueprint
+from .Routes.employees.putEmployees import put_employees_blueprint
+from .Routes.employees.logEmployees import log_employees_blueprint
+
+from .Routes.tips.delTips import del_tips_blueprint
+from .Routes.tips.getTips import get_tips_blueprint
+from .Routes.tips.postTips import post_tips_blueprint
+from .Routes.tips.putTips import put_tips_blueprint
+
 from flask import Flask
-from .Routes.customers.allCustomers import all_customers_blueprint
-from .Routes.customers.clothesCustomer import clothes_customers_blueprint
-from .Routes.customers.idCustomer import id_customers_blueprint
-from .Routes.customers.imageCustomer import image_customers_blueprint
-from .Routes.customers.paymentsCustomers import payments_customers_blueprint
-
-from .Routes.employees.allEmployee import all_employees_blueprint
-from .Routes.employees.idEmployee import id_employees_blueprint
-from .Routes.employees.imageEmployee import image_employees_blueprint
-from .Routes.employees.logEmployee import log_employees_blueprint
-from .Routes.employees.meEmployee import me_employees_blueprint
-from .Routes.employees.permissionsEmployee import permissions_employees_blueprint
-from .Routes.employees.eventsEmployee import events_employees_blueprint
-from .Routes.employees.assignedCustomersEmployee import assigned_customers_employee_blueprint
-
-from .Routes.tips import tips_blueprint
 from flask_cors import CORS
 import os
 from .JWT_manager import jwt
@@ -32,21 +31,20 @@ def createAPI():
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
 
 
-    app.register_blueprint(all_customers_blueprint)
-    app.register_blueprint(clothes_customers_blueprint)
-    app.register_blueprint(id_customers_blueprint)
-    app.register_blueprint(image_customers_blueprint)
-    app.register_blueprint(payments_customers_blueprint)
+    app.register_blueprint(del_customers_blueprint)
+    app.register_blueprint(get_customers_blueprint)
+    app.register_blueprint(post_customers_blueprint)
+    app.register_blueprint(put_customers_blueprint)
 
-    app.register_blueprint(all_employees_blueprint)
-    app.register_blueprint(id_employees_blueprint)
-    app.register_blueprint(image_employees_blueprint)
+    app.register_blueprint(del_employees_blueprint)
+    app.register_blueprint(get_employees_blueprint)
+    app.register_blueprint(post_employees_blueprint)
+    app.register_blueprint(put_employees_blueprint)
     app.register_blueprint(log_employees_blueprint)
-    app.register_blueprint(me_employees_blueprint)
-    app.register_blueprint(permissions_employees_blueprint)
-    app.register_blueprint(events_employees_blueprint)
-    app.register_blueprint(assigned_customers_employee_blueprint)
 
-    app.register_blueprint(tips_blueprint)
+    app.register_blueprint(del_tips_blueprint)
+    app.register_blueprint(get_tips_blueprint)
+    app.register_blueprint(post_tips_blueprint)
+    app.register_blueprint(put_tips_blueprint)
 
     return app

@@ -123,7 +123,7 @@ export default class PostCustomersService extends CustomersService {
     if (!object || typeof object.details !== 'string')
       throw new Error('An error happened when posting a customer saved clothe.', { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
-    return object
+    return object.details
   }
 
   public async postCustomerEncounter(data: { id: number, encounter: BasicEncounter }): Promise<Encounter> {

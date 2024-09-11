@@ -5,24 +5,17 @@ export type Employee = {
   email: string
   name: string
   surname: string
-  birthDate: string
+  birth_date: string
   gender: string
   work: string
   events: Event[]
   image: string
-  assignedCustomers: number[]
+  assigned_customers: number[]
 }
 
-export type BasicEmployee = Omit<Employee, 'id' | 'events' | 'image' | 'assignedCustomers'>
+export type BasicEmployee = Omit<Employee, 'id' | 'events' | 'image' | 'assigned_customers'>
 
-export type BasicEmployeeWithID = Omit<Employee, 'events' | 'image' | 'assignedCustomers'>
-
-export type EmployeeDTO = {
-  id: number
-  email: string
-  name: string
-  surname: string
-}
+export type BasicEmployeeWithID = Omit<Employee, 'events' | 'image' | 'assigned_customers'>
 
 export function isEmployee(data: unknown): data is Employee {
   return !!data &&
@@ -30,19 +23,11 @@ export function isEmployee(data: unknown): data is Employee {
     typeof (data as Employee).email === 'string' &&
     typeof (data as Employee).name === 'string' &&
     typeof (data as Employee).surname === 'string' &&
-    typeof (data as Employee).birthDate === 'string' &&
+    typeof (data as Employee).birth_date === 'string' &&
     typeof (data as Employee).gender === 'string' &&
     typeof (data as Employee).work === 'string'
 }
 
-export function isEmployeeDTO(data: unknown): data is EmployeeDTO {
-  return !!data &&
-    typeof (data as EmployeeDTO).id === 'number' &&
-    typeof (data as EmployeeDTO).email === 'string' &&
-    typeof (data as EmployeeDTO).name === 'string' &&
-    typeof (data as EmployeeDTO).surname === 'string'
-}
-
-export function isEmployees(datas: unknown): datas is EmployeeDTO[] {
-  return Array.isArray(datas) && datas.every(data => isEmployeeDTO(data))
+export function isEmployees(datas: unknown): datas is Employee[] {
+  return Array.isArray(datas) && datas.every(data => isEmployee(data))
 }

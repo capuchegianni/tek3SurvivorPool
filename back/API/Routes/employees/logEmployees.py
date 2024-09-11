@@ -29,21 +29,23 @@ def userConnected(email, password):
         "email": email,
         "password": password
     }
-
     response = requests.post(url, headers=headers, json=payload)
+
     return response.ok, response.status_code
+
 
 def hash_password(password):
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode('utf-8'), salt)
 
+
 def check_password(password, hashed_password):
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
+
 
 @log_employees_blueprint.route('/api/employees/login', methods=['POST'])
 def login():
     token = request.cookies.get('access_token_cookie')
-
     if token:
         return jsonify({ 'details': 'You are already connected.' }), 200
 
@@ -74,7 +76,9 @@ def login():
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
     response = make_response(jsonify({ 'details': 'Login successful', 'token': access_token }))
     set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
+
     return response
+
 
 @log_employees_blueprint.route('/api/employees/logout', methods=['POST'])
 @jwt_required()
@@ -90,15 +94,19 @@ def logout():
         decode_token(token)
     except NoAuthorizationError:
         return jsonify({'details': 'You are not connected.'}), 401
+
     response = make_response(jsonify({ 'details': 'Logout successful' }))
     unset_jwt_cookies(response)
+
     return response
+
 
 @log_employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
 @jwt_required(locations=['headers', 'cookies'], optional=True)
 def isConnected():
     try:
         identity = get_jwt_identity()
+
         if identity:
             return jsonify({'details': 'Connected'}), 200
         else:
