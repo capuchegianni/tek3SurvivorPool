@@ -15,7 +15,7 @@ from .Routes.employees.permissionsEmployee import permissions_employees_blueprin
 from .Routes.employees.eventsEmployee import events_employees_blueprint
 from .Routes.employees.assignedCustomersEmployee import assigned_customers_employee_blueprint
 
-from .Routes.tips import tips_blueprint
+from .Routes.oldtips.tips import tips_blueprint
 from flask_cors import CORS
 import os
 from .JWT_manager import jwt
