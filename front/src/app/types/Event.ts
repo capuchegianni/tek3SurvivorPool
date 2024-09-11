@@ -3,12 +3,12 @@ export type Event = {
   name: string
   date: string
   duration: number
-  maxParticipants: number
-  locationX: string
-  locationY: string
+  max_participants: number
+  location_x: string
+  location_y: string
   type: string
   employee_id: number
-  locationName: string
+  location_name: string
 }
 
 export type BasicEvent = Omit<Event, 'id'>
@@ -17,7 +17,7 @@ export type EventDTO = {
   id: number
   name: string
   date: string
-  maxParticipants: number
+  max_participants: number
 }
 
 export function isEvent(data: unknown): data is Event {
@@ -26,12 +26,12 @@ export function isEvent(data: unknown): data is Event {
     typeof (data as Event).name === 'string' &&
     typeof (data as Event).date === 'string' &&
     typeof (data as Event).duration == 'number' &&
-    typeof (data as Event).maxParticipants === 'number' &&
-    typeof (data as Event).locationX === 'string' &&
-    typeof (data as Event).locationY === 'string' &&
+    typeof (data as Event).max_participants === 'number' &&
+    typeof (data as Event).location_x === 'string' &&
+    typeof (data as Event).location_y === 'string' &&
     typeof (data as Event).type === 'string' &&
     typeof (data as Event).employee_id === 'number' &&
-    typeof (data as Event).locationName === 'string'
+    typeof (data as Event).location_name === 'string'
 }
 
 export function isEventDTO(data: unknown): data is EventDTO {
@@ -39,7 +39,7 @@ export function isEventDTO(data: unknown): data is EventDTO {
     typeof (data as EventDTO).id === 'number' &&
     typeof (data as EventDTO).name === 'string' &&
     typeof (data as EventDTO).date === 'string' &&
-    typeof (data as EventDTO).maxParticipants === 'string'
+    typeof (data as EventDTO).max_participants === 'string'
 }
 
 export function isEvents(datas: unknown): datas is Event[] {

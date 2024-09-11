@@ -51,7 +51,7 @@ export default function Navbar() {
             <Link href="/tips" className={`no-underline text-inherit ${pathName === '/tips' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Tips</Button>
             </Link>
-            <Link href="/events" className={`no-underline text-inherit ${pathName === '/events' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/events" className={`no-underline text-inherit ${(pathName === '/events' || pathName.startsWith('/events/details')) ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Events</Button>
             </Link>
             <Link href="/compatibility" className={`no-underline text-inherit ${pathName === '/compatibility' ? 'border-b-2 border-blue-500 rounded' : ''}`}>

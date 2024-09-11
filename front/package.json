@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
     "@maptiler/sdk": "^2.2.2",
     "chart.js": "^4.4.4",
     "country-list": "^2.3.0",
