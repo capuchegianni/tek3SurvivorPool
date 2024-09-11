@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 
 import CustomersService from '../../services/customers';
 import { CustomerDTO } from '../../types/Customer'
-import { Button } from "primereact/button";
 import CustomersTable from "./table";
 
 const customerService = new CustomersService()

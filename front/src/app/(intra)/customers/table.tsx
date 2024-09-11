@@ -118,11 +118,11 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
     const [description, setDescription] = useState<string>(customer.description);
     const [astrologicalSign, setAstrologicalSign] = useState<string>(customer.astrologicalSign);
     const [gender, setGender] = useState<string>(customer.gender);
+    const [birthDateSave, setBirthDateSave] = useState<string>(customer.birthDate);
 
     const handleSave = () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         const phoneRegex = /^\d{10,15}$/;
-        const birthDateRegex = /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
 
         if (!emailRegex.test(email)) {
             ToasterError({message: 'Please enter a valid email address'});
@@ -132,11 +132,13 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
             ToasterError({message: 'Please enter a valid phone number (10 to 15 digits)'});
             return;
         }
-        console.log('Birthdate:', customer.birthDate);
-        if (!birthDateRegex.test(customer.birthDate)) {
+
+        if (birthDateSave.length !== 10) {
             ToasterError({message: 'Please enter a valid birthdate (dd/mm/yyyy)'});
             return;
         }
+
+        const rightOrderBirthday = birthDateSave.split('/').reverse().join('/');
 
         const customerData = {
             name,
@@ -146,7 +148,8 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
             address,
             description,
             astrologicalSign,
-            gender
+            gender,
+            rightOrderBirthday
         };
         console.log(customerData);
     }
@@ -169,7 +172,7 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
             <FormsDetails value={address} setValue={setAddress} title="Address" />
             <label htmlFor="birth_date" className="flex flex-col w-full pt-3">
                 Birth date
-                <InputMask id="birth_date" mask="99/99/9999" value={birthDateOrdered} />
+                <InputMask id="birth_date" mask="99/99/9999" value={birthDateOrdered} onChange={(e) => setBirthDateSave(e.target.value || '')} className="w-full"/>
             </label>
             <label htmlFor="astrological_sign" className="flex flex-col w-full pt-3">
                 Astrological sign
