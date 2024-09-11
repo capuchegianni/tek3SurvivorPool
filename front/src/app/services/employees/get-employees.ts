@@ -1,11 +1,11 @@
 import { Credentials } from '@/app/types/Credentials'
-import { Employee, EmployeeDTO, isEmployee, isEmployees } from '@/app/types/Employee'
+import { Employee, EmployeeDTO, BasicEmployeeWithID, isEmployee, isEmployees } from '@/app/types/Employee'
 import { Event, EventDTO, isEvent, isEvents } from '@/app/types/Event'
 import FetchError from '@/app/types/FetchErrors'
 import EmployeesService from '@/app/services/employees/class-employees'
 
 export default class GetEmployeesService extends EmployeesService {
-  public async getEmployee(data: { id: number }): Promise<Employee> {
+  public async getEmployee(data: { id: number }): Promise<BasicEmployeeWithID> {
     const res = await fetch(`${this._route}/${data.id}`, {
       method: 'GET',
       headers: this._headers,

@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 
 import { Chart } from 'primereact/chart';
 
-import CustomersService from '../../services/customers/get-customers';
+import GetCustomersService from '../../services/customers/get-customers';
 import { CustomerDTO } from '../../types/Customer'
 
-const customerService = new CustomersService()
+const getCustomerService = new GetCustomersService()
 
 interface StatisticsProps {
     title: string;
@@ -30,7 +30,7 @@ function CustomersInfo() {
     useEffect(() => {
         const getCustomers = async () => {
             try {
-                setCustomers(await customerService.getCustomers())
+                setCustomers(await getCustomerService.getCustomers())
             } catch (error) { }
         }
         getCustomers()
@@ -58,7 +58,7 @@ function StatisticsGraph({ customers }: { customers: CustomerDTO[] }) {
             const genders = { Male: 0, Female: 0, Other: 0 };
 
             const promises = customers.map(customer =>
-                customerService.getCustomer({ id: customer.id }).catch(error => {
+                getCustomerService.getCustomer({ id: customer.id }).catch(error => {
                     console.error(error);
                     return null;
                 })

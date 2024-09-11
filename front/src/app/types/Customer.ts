@@ -22,7 +22,7 @@ export type Customer = {
 
 export type BasicCustomer = Omit<Customer, 'id' | 'paymentHistory' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
 
-export type BasicCustomerWithID = BasicCustomer & { id: number }
+export type BasicCustomerWithID = Omit<Customer, 'paymentHistory' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
 
 export type CustomerDTO = {
   id: number

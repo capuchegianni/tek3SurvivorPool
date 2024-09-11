@@ -8,11 +8,11 @@ import { useRouter, usePathname } from "next/navigation";
 import Image from 'next/image'
 import Link from 'next/link';
 
-import EmployeesService from "../services/employees/get-employees";
+import GetEmployeesService from "../services/employees/get-employees";
 import Swal from "sweetalert2";
 import FetchError from "../types/FetchErrors";
 
-const employeesService = new EmployeesService()
+const getEmployeesService = new GetEmployeesService()
 
 export default function Navbar() {
     const [imgSrc, setImgSrc] = useState<'/france.png' | '/usa.png'>("/france.png");
@@ -73,7 +73,7 @@ export default function Navbar() {
 
     const handleLogoutClick = async () => {
         try {
-            const res = await employeesService.logout()
+            const res = await getEmployeesService.logout()
             Swal.fire({
                 title: res,
                 icon: 'success',
@@ -108,8 +108,8 @@ export default function Navbar() {
 
     const getEmployeeImage = async () => {
         try {
-            const myself = await employeesService.getEmployeeMe()
-            const encodedImage = await employeesService.getEmployeeImage({ id: myself.id })
+            const myself = await getEmployeesService.getEmployeeMe()
+            const encodedImage = await getEmployeesService.getEmployeeImage({ id: myself.id })
 
             return `data:image/jpeg;base64,${encodedImage}`
         } catch (error) {
