@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { BasicCustomerWithID, Customer } from "@/app/types/Customer";
+import { BasicCustomerWithID } from "@/app/types/Customer";
 import GetCustomersService from "@/app/services/customers/get-customers";
 import { useParams } from "next/navigation";
 import { DataTable } from 'primereact/datatable';
@@ -12,6 +12,7 @@ import { Encounter, EncounterDTO } from "@/app/types/Encounter";
 import { Payment } from "@/app/types/PaymentHistory";
 import { Button } from 'primereact/button';
 import Link from 'next/link';
+import FetchError from "@/app/types/FetchErrors";
 
 const getCustomersService = new GetCustomersService()
 
@@ -25,21 +26,26 @@ export default function ProfileId() {
 
     useEffect(() => {
         const fetchCustomer = async () => {
-            const customer = await getCustomersService.getCustomer({ id: Number(id) }).catch(error => {
-                console.error(error);
-                return null;
-            });
-            const encounters = await getCustomersService.getCustomerEncounters({ id: Number(id) })
-            const payments = await getCustomersService.getCustomerPaymentsHistory({ id: Number(id) })
+            try {
+                const customer = await getCustomersService.getCustomer({ id: Number(id) }).catch(error => {
+                    console.error(error);
+                    return null;
+                });
+                const encounters = await getCustomersService.getCustomerEncounters({ id: Number(id) })
+                const payments = await getCustomersService.getCustomerPaymentsHistory({ id: Number(id) })
 
-            setCustomerData(customer);
-            setCustomerImage(await getCustomersService.getCustomerImage({ id: Number(id) }));
+                setCustomerData(customer);
+                setCustomerImage(await getCustomersService.getCustomerImage({ id: Number(id) }));
 
-            const positives = encounters.filter(encounter => encounter.rating > 2.5).length || 0;
-            setEncounters(encounters)
-            setPositivesEncounters(positives);
+                const positives = encounters.filter(encounter => encounter.rating > 2.5).length || 0;
+                setEncounters(encounters)
+                setPositivesEncounters(positives);
 
-            setPaymentsHistory(payments)
+                setPaymentsHistory(payments)
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
         }
 
         fetchCustomer();

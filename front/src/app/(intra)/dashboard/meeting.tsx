@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 
 import { Chart } from 'primereact/chart';
 import { SelectButton } from 'primereact/selectbutton';
+import FetchError from "@/app/types/FetchErrors";
 
 interface JustifyOption {
     date: string;
@@ -57,7 +58,9 @@ function MeetingInfo({ selectedTime }: any) {
     }
 
     useEffect(() => {
+        try {
         setValue(selectedTime);
+        } catch (error) { }
     }, [selectedTime]);
 
     return (
@@ -88,35 +91,40 @@ function MeetingChart({selectedTime}: {selectedTime: string}) {
     const [chartData, setChartData] = useState({});
 
     useEffect(() => {
-        const documentStyle = getComputedStyle(document.documentElement);
-        const db = getDatabase(selectedTime);
-        const labels = db.map(item => item.Source);
-        const data = db.map(item => item['Meetings number']);
+        try {
+            const documentStyle = getComputedStyle(document.documentElement);
+            const db = getDatabase(selectedTime);
+            const labels = db.map(item => item.Source);
+            const data = db.map(item => item['Meetings number']);
 
-        const chartData = {
-            labels: labels,
-            datasets: [
-                {
-                    data: data,
-                    backgroundColor: [
-                        documentStyle.getPropertyValue('--blue-500'),
-                        documentStyle.getPropertyValue('--blue-200'),
-                        documentStyle.getPropertyValue('--green-400'),
-                        documentStyle.getPropertyValue('--green-600'),
-                        documentStyle.getPropertyValue('--blue-800')
-                    ],
-                    hoverBackgroundColor: [
-                        documentStyle.getPropertyValue('--blue-400'),
-                        documentStyle.getPropertyValue('--blue-100'),
-                        documentStyle.getPropertyValue('--green-200'),
-                        documentStyle.getPropertyValue('--green-400'),
-                        documentStyle.getPropertyValue('--blue-600')
-                    ]
-                }
-            ]
-        };
+            const chartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        data: data,
+                        backgroundColor: [
+                            documentStyle.getPropertyValue('--blue-500'),
+                            documentStyle.getPropertyValue('--blue-200'),
+                            documentStyle.getPropertyValue('--green-400'),
+                            documentStyle.getPropertyValue('--green-600'),
+                            documentStyle.getPropertyValue('--blue-800')
+                        ],
+                        hoverBackgroundColor: [
+                            documentStyle.getPropertyValue('--blue-400'),
+                            documentStyle.getPropertyValue('--blue-100'),
+                            documentStyle.getPropertyValue('--green-200'),
+                            documentStyle.getPropertyValue('--green-400'),
+                            documentStyle.getPropertyValue('--blue-600')
+                        ]
+                    }
+                ]
+            };
 
-        setChartData(chartData);
+            setChartData(chartData);
+        } catch (error) {
+            if (error instanceof FetchError)
+                error.logError()
+        }
     }, [selectedTime]);
 
     const chartOptions = {

@@ -64,7 +64,9 @@ function MapInfo({ selectedTime }: any) {
     }
 
     useEffect(() => {
+        try {
         setValue(selectedTime);
+        } catch (error) { }
     }, [selectedTime]);
 
     return (

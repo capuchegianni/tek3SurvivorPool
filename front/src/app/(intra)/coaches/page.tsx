@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import GetEmployeesService from "@/app/services/employees/get-employees";
 import { EmployeeDTO } from "@/app/types/Employee";
 import EmployeesTable from "@/app/(intra)/coaches/table";
+import FetchError from "@/app/types/FetchErrors";
 
 const getEmployeesService = new GetEmployeesService()
 
@@ -15,7 +16,10 @@ export default function Coaches() {
         const getCustomers = async () => {
             try {
                 setEmployee(await getEmployeesService.getEmployees())
-            } catch (error) { }
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
         }
         getCustomers()
     }, []);

@@ -10,6 +10,7 @@ import { Button } from "primereact/button";
 import Swal from 'sweetalert2'
 import EditEmployee from "./edit";
 import AddEmployee from "./addCoach";
+import FetchError from "@/app/types/FetchErrors";
 
 const getEmployeesService = new GetEmployeesService()
 
@@ -20,17 +21,20 @@ export default function EmployeesTable({ employees }: { employees?: EmployeeDTO[
 
     useEffect(() => {
         const fetchEmployees = async () => {
-            const promises = (employees ?? []).map(customer =>
-                getEmployeesService.getEmployee({ id: customer.id }).catch(error => {
-                    console.error(error);
-                    return null;
-                })
-            );
-
-            const results = await Promise.all(promises);
-            setEmployeesData(results.filter(result => result !== null) as Employee[]);
+            try {
+                const promises = (employees ?? []).map(customer =>
+                    getEmployeesService.getEmployee({ id: customer.id }).catch(error => {
+                        console.error(error);
+                        return null;
+                    })
+                );
+                const results = await Promise.all(promises);
+                setEmployeesData(results.filter(result => result !== null) as Employee[]);
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
         }
-
         fetchEmployees();
     }, [employees]);
 

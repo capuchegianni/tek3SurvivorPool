@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
 import Swal from 'sweetalert2'
+import FetchError from "@/app/types/FetchErrors";
 
 export default function EditEmployee({ employee, onClose }: { employee: Employee, onClose: () => void }) {
     const [visible, setVisible] = useState<boolean>(true);
@@ -94,7 +95,12 @@ function GenderRadio({initialGender, setGender}: {initialGender: string, setGend
     const [gender, setLocalGender] = useState<string>(initialGender);
 
     useEffect(() => {
-        setGender(gender);
+        try {
+            setGender(gender);
+        } catch (error) {
+            if (error instanceof FetchError)
+                error.logError()
+        }
     }, [gender, setGender]);
 
     return (
