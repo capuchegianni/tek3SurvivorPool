@@ -7,7 +7,7 @@ from pymongo import DESCENDING
 tips_blueprint = Blueprint('tips', __name__)
 
 @tips_blueprint.route('/api/tips', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def createTip():
     data = request.get_json()
@@ -37,7 +37,7 @@ def getTips():
     } for tip in tips])
 
 @tips_blueprint.route('/api/tips/<tip_id>', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def updateTip(tip_id):
     data = request.get_json()
@@ -57,7 +57,7 @@ def updateTip(tip_id):
     return jsonify({'details': 'Tip updated successfully'}), 200
 
 @tips_blueprint.route('/api/tips/<tip_id>', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def deleteTip(tip_id):
     db.tips.delete_one({ 'id': int(tip_id) })

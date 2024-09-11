@@ -8,7 +8,7 @@ from pymongo import DESCENDING
 events_blueprint = Blueprint('events', __name__)
 
 @events_blueprint.route('/api/events', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def createEvents():
     current_employee_email = get_jwt_identity()
@@ -40,7 +40,7 @@ def createEvents():
     return jsonify({'details': 'Event created successfully'}), 201
 
 @events_blueprint.route('/api/events/<int:employee_id>', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def getEvents(employee_id):
     employee = db.employees.find_one({ 'id': employee_id }, { '_id': 0, 'events': 1 })
@@ -50,7 +50,7 @@ def getEvents(employee_id):
     return jsonify(employee['events']), 200
 
 @events_blueprint.route('/api/events/<event_id>', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def updateEvents(event_id):
     if not event_id:
@@ -87,7 +87,7 @@ def updateEvents(event_id):
     return jsonify({'details': 'Event updated successfully'}), 200
 
 @events_blueprint.route('/api/events/<event_id>', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def deleteEvents(event_id):
     if not event_id:

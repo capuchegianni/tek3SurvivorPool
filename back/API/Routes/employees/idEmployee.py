@@ -14,7 +14,7 @@ id_employees_blueprint = Blueprint('id_employees', __name__)
 load_dotenv()
 
 @id_employees_blueprint.route('/api/employees', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Admin')
 def createEmployee():
     data = request.get_json()
@@ -36,7 +36,7 @@ def createEmployee():
     return jsonify({'details': 'Employee created successfully'}), 201
 
 @id_employees_blueprint.route('/api/employees/<employee_id>', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Admin')
 def getEmployeeId(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
@@ -53,7 +53,7 @@ def getEmployeeId(employee_id):
     })
 
 @id_employees_blueprint.route('/api/employees/<employee_id>', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Admin')
 def updateEmployee(employee_id):
     data = request.get_json()
@@ -84,7 +84,7 @@ def updateEmployee(employee_id):
     return jsonify({'details': 'Employee updated successfully'}), 200
 
 @id_employees_blueprint.route('/api/employees/<employee_id>', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Admin')
 def deleteEmployee(employee_id):
     result = db.employees.delete_one({ 'id': int(employee_id) })

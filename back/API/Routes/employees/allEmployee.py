@@ -19,7 +19,7 @@ all_employees_blueprint = Blueprint('all_employees', __name__)
 load_dotenv()
 
 @all_employees_blueprint.route('/api/employees', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Admin')
 def getEmployees():
     employees = db.employees.find()
@@ -32,7 +32,7 @@ def getEmployees():
 
 
 @all_employees_blueprint.route('/api/employees/<customer_id>', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Admin')
 def oneEmployee(customer_id):
     employee = db.employees.find_one({ 'id': int(customer_id) })

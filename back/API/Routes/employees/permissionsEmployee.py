@@ -19,7 +19,7 @@ permissions_employees_blueprint = Blueprint('permissions_employees', __name__)
 load_dotenv()
 
 @permissions_employees_blueprint.route('/api/employees/has_permissions/<role>', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 def hasPermissions(role):
     user_email = get_jwt_identity()
     user = db.employees.find_one({ 'email': user_email })

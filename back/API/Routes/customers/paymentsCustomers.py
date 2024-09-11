@@ -9,7 +9,7 @@ from ...decorators import role_required
 payments_customers_blueprint = Blueprint('payments_customers', __name__)
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def createCustomerPaymentsHistory(customer_id):
     data = request.get_json()
@@ -35,7 +35,7 @@ def createCustomerPaymentsHistory(customer_id):
     return jsonify(new_payment), 201
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def getCustomerPaymentsHistory(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
@@ -50,7 +50,7 @@ def getCustomerPaymentsHistory(customer_id):
     } for payment in customer['payments_history']])
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history/<payment_id>', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def updateCustomerPaymentsHistory(customer_id, payment_id):
     data = request.get_json()
@@ -83,7 +83,7 @@ def updateCustomerPaymentsHistory(customer_id, payment_id):
     return jsonify({'details': 'Payment updated successfully'})
 
 @payments_customers_blueprint.route('/api/customers/<customer_id>/payments_history/<payment_id>', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 # @role_required('Coach')
 def deleteCustomerPaymentsHistory(customer_id, payment_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
