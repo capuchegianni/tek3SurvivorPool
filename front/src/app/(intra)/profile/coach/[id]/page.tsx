@@ -9,6 +9,7 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import Image from 'next/image'
 import Link from 'next/link';
+import FetchError from "@/app/types/FetchErrors";
 
 const getEmployeesService = new GetEmployeesService()
 
@@ -19,6 +20,7 @@ export default function ProfileId() {
 
     useEffect(() => {
         const fetchEmployee = async () => {
+            try {
             const customer = await getEmployeesService.getEmployee({ id: Number(id) }).catch(error => {
                 console.error(error);
                 return null;
@@ -26,6 +28,10 @@ export default function ProfileId() {
 
             setEmployeeData(customer);
             setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: Number(id) }));
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
         }
 
         fetchEmployee();

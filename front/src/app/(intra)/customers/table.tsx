@@ -10,6 +10,7 @@ import { Button } from "primereact/button";
 import Swal from 'sweetalert2'
 import EditCustomers from "./edit";
 import AddCustomer from "./addCustomer";
+import FetchError from "@/app/types/FetchErrors";
 
 const getCustomerService = new GetCustomersService()
 
@@ -20,15 +21,20 @@ export default function CustomersTable({ customers }: { customers?: CustomerDTO[
 
     useEffect(() => {
         const fetchCustomers = async () => {
-            const promises = (customers ?? []).map(customer =>
-                getCustomerService.getCustomer({ id: customer.id }).catch(error => {
-                    console.error(error);
-                    return null;
-                })
-            );
+            try {
+                const promises = (customers ?? []).map(customer =>
+                    getCustomerService.getCustomer({ id: customer.id }).catch(error => {
+                        console.error(error);
+                        return null;
+                    })
+                );
 
-            const results = await Promise.all(promises);
-            setCustomersData(results.filter(result => result !== null) as Customer[]);
+                const results = await Promise.all(promises);
+                setCustomersData(results.filter(result => result !== null) as Customer[]);
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
         }
 
         fetchCustomers();

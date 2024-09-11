@@ -6,6 +6,7 @@ import { Chart } from 'primereact/chart';
 
 import GetCustomersService from '../../services/customers/get-customers';
 import { CustomerDTO } from '../../types/Customer'
+import FetchError from "@/app/types/FetchErrors";
 
 const getCustomerService = new GetCustomersService()
 
@@ -55,42 +56,47 @@ function StatisticsGraph({ customers }: { customers: CustomerDTO[] }) {
 
     useEffect(() => {
         const fetchCustomers = async () => {
-            const genders = { Male: 0, Female: 0, Other: 0 };
+            try {
+                const genders = { Male: 0, Female: 0, Other: 0 };
 
-            const promises = customers.map(customer =>
-                getCustomerService.getCustomer({ id: customer.id }).catch(error => {
-                    console.error(error);
-                    return null;
-                })
-            );
+                const promises = customers.map(customer =>
+                    getCustomerService.getCustomer({ id: customer.id }).catch(error => {
+                        console.error(error);
+                        return null;
+                    })
+                );
 
-            const results = await Promise.all(promises);
+                const results = await Promise.all(promises);
 
-            for (let result of results)
-                if (result && result.gender in genders)
-                    genders[result.gender as 'Male' | 'Female' | 'Other']++;
+                for (let result of results)
+                    if (result && result.gender in genders)
+                        genders[result.gender as 'Male' | 'Female' | 'Other']++;
 
-            const data = {
-                labels: Object.keys(genders),
-                datasets: [
-                    {
-                        label: 'Genders',
-                        data: Object.values(genders),
-                        backgroundColor: [
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(54, 162, 235, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgb(255, 159, 64)',
-                            'rgb(75, 192, 192)',
-                            'rgb(54, 162, 235)'
-                        ],
-                        borderWidth: 1
-                    }
-                ]
-            };
-            setChartData(data);
+                const data = {
+                    labels: Object.keys(genders),
+                    datasets: [
+                        {
+                            label: 'Genders',
+                            data: Object.values(genders),
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 159, 64)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)'
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                };
+                setChartData(data);
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+            }
         };
 
         fetchCustomers();

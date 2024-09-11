@@ -36,7 +36,9 @@ function EventsInfo({ selectedTime }: any) {
     const [value, setValue] = useState<JustifyOption>(selectedTime);
 
     useEffect(() => {
+        try {
         setValue(selectedTime);
+        } catch (error) { }
     }, [selectedTime]);
 
     return (
@@ -70,29 +72,31 @@ function StatisticsEvent({timelapsed, clientNbr}: StatisticsGraphProps) {
     }
 
     useEffect(() => {
-        const generateLabels = (timelapse: string) => {
-            const days = convertTimelapsedToDays(timelapse);
-            const labels = [];
-            for (let i = 0; i < days; i++) {
-                const date = subDays(new Date(), i);
-                labels.unshift(format(date, 'MM/dd/yyyy'));
-            }
-            return labels;
-        }
-
-        const data = {
-            labels: generateLabels(timelapsed),
-            datasets: [
-                {
-                    type: 'bar',
-                    label: 'Number of client',
-                    backgroundColor: '#9CA5FF',
-                    data: clientNbr
+        try {
+            const generateLabels = (timelapse: string) => {
+                const days = convertTimelapsedToDays(timelapse);
+                const labels = [];
+                for (let i = 0; i < days; i++) {
+                    const date = subDays(new Date(), i);
+                    labels.unshift(format(date, 'MM/dd/yyyy'));
                 }
-            ]
-        };
+                return labels;
+            }
 
-        setChartData(data);
+            const data = {
+                labels: generateLabels(timelapsed),
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Number of client',
+                        backgroundColor: '#9CA5FF',
+                        data: clientNbr
+                    }
+                ]
+            };
+
+            setChartData(data);
+        } catch (error) { }
     }, [timelapsed, clientNbr]);
 
     const chartOptions = {
