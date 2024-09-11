@@ -84,3 +84,4 @@ def getCustomerClothes(customer_id):
                 'image': base64_image
             })
     return jsonify(clothes_with_images)
+

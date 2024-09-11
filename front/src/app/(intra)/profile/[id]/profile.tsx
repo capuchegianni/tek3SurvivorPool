@@ -7,10 +7,10 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 import { Employee } from "@/app/types/Employee";
-import GetEmployeesService from "@/app/services/employees/get-employees";
+import EmployeesService from "@/app/services/employees";
 import FetchError from "@/app/types/FetchErrors";
 
-const getEmployeesService = new GetEmployeesService()
+const employeesService = new EmployeesService()
 
 export default function Coaches() {
     const [employee, setEmployee] = useState<Employee | null>(null)
@@ -19,10 +19,10 @@ export default function Coaches() {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const fetchedEmployee = await getEmployeesService.getEmployeeMe()
+                const fetchedEmployee = await employeesService.getEmployeeMe()
 
                 setEmployee(fetchedEmployee)
-                setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeImage(await employeesService.getEmployeeImage({ id: fetchedEmployee.id }))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
@@ -37,8 +37,8 @@ export default function Coaches() {
             <div className="text-3xl sm:text-4xl font-bold mb-6">
                 <p> Employee details </p>
             </div>
-            <div className="flex flex-grow h-full lg:flex-row flex-col">
-                <div className="flex-grow bg-white h-full lg:max-w-lg mr-4 border-2 rounded-md">
+            <div className="flex flex-row flex-grow h-full">
+                <div className="flex-grow bg-white h-full max-w-lg mr-4 border-2 rounded-md">
                     <div className="flex flex-col justify-center items-center text-center text-xl font-bold p-6 border-b-2">
                         <Image
                             src={`data:image/jpeg;base64,${employeeImage}`}
@@ -69,16 +69,16 @@ export default function Coaches() {
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
-                        <DataTable value={employee?.events} header='Events' size="small" rows={5} paginator>
-                            <Column field="id" header="ID" style={{width:'10%'}}/>
-                            <Column field="name" header="Name" style={{width:'25%'}}/>
-                            <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="max_participants" header="Participants" style={{width:'25%'}}/>
-                            <Column field="type" header="Type" style={{width:'25%'}} />
+                        <DataTable value={employee?.events} header='Events' size="small">
+                            <Column field="id" header="ID" />
+                            <Column field="name" header="Name" />
+                            <Column field="date" header="Date" />
+                            <Column field="max_participants" header="Participants" />
+                            <Column field="type" header="Type"></Column>
                         </DataTable>
                     </div>
                     <div className="p-4">
-                        <DataTable header='Customers' size="small" rows={4} paginator/>
+                        <DataTable header='Customers' size="small"/>
                     </div>
                 </div>
             </div>

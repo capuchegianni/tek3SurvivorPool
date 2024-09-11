@@ -4,6 +4,8 @@ export type Tip = {
   tip: string
 }
 
+export type BasicTip = Omit<Tip, 'id'>
+
 export function isTip(data: unknown): data is Tip {
   return !!data &&
     typeof (data as Tip).id === 'number' &&

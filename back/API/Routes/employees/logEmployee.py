@@ -9,16 +9,18 @@ import base64
 from flask_jwt_extended import create_access_token, decode_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 from flask_jwt_extended.exceptions import NoAuthorizationError
 import bcrypt
+from ...JWT_manager import jwt
+from datetime import timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..decorators import role_required
-from ..decorators import ADMIN_ROLES
+from ...decorators import role_required
+from ...decorators import ADMIN_ROLES
 
-employees_blueprint = Blueprint('employees', __name__)
+log_employees_blueprint = Blueprint('log_employees', __name__)
 
 load_dotenv()
 
-@employees_blueprint.route('/api/employees', methods=['GET'])
-@jwt_required()
+@log_employees_blueprint.route('/api/employees', methods=['GET'])
+@jwt_required(locations='cookies')
 def getEmployees():
     employees = db.employees.find()
     return jsonify([{
@@ -54,8 +56,7 @@ def hash_password(password):
 def check_password(password, hashed_password):
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
 
-
-@employees_blueprint.route('/api/employees/login', methods=['POST'])
+@log_employees_blueprint.route('/api/employees/login', methods=['POST'])
 def login():
     token = request.cookies.get('access_token_cookie')
 
@@ -87,20 +88,16 @@ def login():
         return jsonify({ 'details': 'Wrong password or email.' }), 401
 
     access_token = create_access_token(identity=email, expires_delta=timedelta(days=1))
-    response = make_response(jsonify({ 'details': 'Login successful', 'token': access_token }))
+    response = make_response(jsonify({ 'details': 'Login successful' }))
     set_access_cookies(response=response, encoded_access_token=access_token, max_age=None)
     return response
 
-
-@employees_blueprint.route('/api/employees/logout', methods=['POST'])
-@jwt_required()
+@log_employees_blueprint.route('/api/employees/logout', methods=['POST'])
+@jwt_required(locations='cookies')
 def logout():
     token = request.cookies.get('access_token_cookie')
     if not token:
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
-            return jsonify({'details': 'You are not connected.'}), 401
-        token = auth_header.split(' ')[1]
+        return jsonify({ 'details': 'You are not connected.' }), 401
 
     try:
         decode_token(token)
@@ -110,8 +107,7 @@ def logout():
     unset_jwt_cookies(response)
     return response
 
-
-@employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
+@log_employees_blueprint.route('/api/employees/is_connected', methods=['GET'])
 @jwt_required(locations=['headers', 'cookies'], optional=True)
 def isConnected():
     try:
@@ -122,67 +118,3 @@ def isConnected():
             return jsonify({'details': 'Not connected'}), 401
     except NoAuthorizationError:
         return jsonify({'details': 'Not connected'}), 401
-
-
-@employees_blueprint.route('/api/employees/me', methods=['GET'])
-@jwt_required()
-def getMe():
-    current_employee_email = get_jwt_identity()
-    employee = db.employees.find_one({ 'email': current_employee_email })
-    if not employee:
-        return jsonify({ 'details': 'Could not find the user.' }), 404
-
-    return jsonify({
-        'id': employee['id'],
-        'email': employee['email'],
-        'name': employee['name'],
-        'surname': employee['surname'],
-        'birth_date': employee['birth_date'],
-        'gender': employee['gender'],
-        'work': employee['work'],
-        'events': employee['events']
-    })
-
-
-@employees_blueprint.route('/api/employees/<employee_id>', methods=['GET'])
-@jwt_required()
-def getEmployeeId(employee_id):
-    employee = db.employees.find_one({ 'id': int(employee_id) })
-    if employee is None:
-        return jsonify({'details': 'Employee not found'}), 404
-    return jsonify({
-        'id': employee['id'],
-        'email': employee['email'],
-        'name': employee['name'],
-        'surname': employee['surname'],
-        'birth_date': employee['birth_date'],
-        'gender': employee['gender'],
-        'work': employee['work'],
-        'events': employee['events']
-    })
-
-
-@employees_blueprint.route('/api/employees/<employee_id>/image', methods=['GET'])
-@jwt_required()
-def getEmployeeImage(employee_id):
-    employee = db.employees.find_one({ 'id': int(employee_id) })
-    if employee is None:
-        return jsonify({'details': 'Employee not found'}), 404
-    image_data = GridFS(db).get(employee['image']).read()
-    base64_image = base64.b64encode(image_data).decode('utf-8')
-    return jsonify({ 'image': base64_image })
-
-@employees_blueprint.route('/api/employees/has_permissions/<role>', methods=['GET'])
-@jwt_required()
-def hasPermissions(role):
-    user_email = get_jwt_identity()
-    user = db.employees.find_one({ 'email': user_email })
-
-    if not user:
-        return jsonify({'details': 'User not found'}), 404
-
-    user_role = user.get('work')
-    if user_role in ADMIN_ROLES or user_role == role:
-        return jsonify({ 'details': 'Access granted' }), 200
-    else:
-        return jsonify({ 'details': 'Access forbidden: insufficient permissions' }), 403

@@ -29,7 +29,7 @@ export default function Dashboard() {
                     className="pick-date mr-6 border-white rounded-md" />
             </div>
             <div className="flex lg:flex-row flex-col">
-                <CustomersOverview selectedTime={selectedTime}/>
+                <CustomersOverview/>
                 <EventsRecap selectedTime={selectedTime} />
             </div>
             <div className="flex lg:flex-row flex-col">

@@ -7,6 +7,8 @@ export type Encounter = {
   source: string
 }
 
+export type BasicEncounter = Omit<Encounter, 'id'>
+
 export type EncounterDTO = {
   id: number
   customer_id: number
@@ -14,7 +16,7 @@ export type EncounterDTO = {
   rating: number
 }
 
-export function isCustomer(data: unknown): data is Encounter {
+export function isEncounter(data: unknown): data is Encounter {
   return !!data &&
     typeof (data as Encounter).id === 'number' &&
     typeof (data as Encounter).customer_id === 'string' &&
@@ -24,7 +26,7 @@ export function isCustomer(data: unknown): data is Encounter {
     typeof (data as Encounter).source === 'string'
 }
 
-export function isCustomerDTO(data: unknown): data is EncounterDTO {
+export function isEncounterDTO(data: unknown): data is EncounterDTO {
   return !!data &&
     typeof (data as EncounterDTO).id === 'number' &&
     typeof (data as EncounterDTO).customer_id === 'string' &&
@@ -32,6 +34,6 @@ export function isCustomerDTO(data: unknown): data is EncounterDTO {
     typeof (data as EncounterDTO).rating === 'number'
 }
 
-export function isCustomers(datas: unknown): datas is EncounterDTO[] {
-  return Array.isArray(datas) && datas.every(data => isCustomerDTO(data))
+export function isEncounters(datas: unknown): datas is EncounterDTO[] {
+  return Array.isArray(datas) && datas.every(data => isEncounterDTO(data))
 }

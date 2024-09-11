@@ -11,6 +11,8 @@ export type Event = {
   location_name: string
 }
 
+export type BasicEvent = Omit<Event, 'id'>
+
 export type EventDTO = {
   id: number
   name: string
