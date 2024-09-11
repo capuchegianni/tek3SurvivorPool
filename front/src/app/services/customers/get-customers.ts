@@ -214,6 +214,7 @@ export default class GetCustomersService extends CustomersService {
   }
 
   public async getCustomerEncounters(data: { id: number }): Promise<EncounterDTO[]> {
+    return []
     const res = await fetch(`${this._route}/${data.id}/encounters`, {
       method: 'GET',
       headers: this._headers,

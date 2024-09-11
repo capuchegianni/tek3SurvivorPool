@@ -7,10 +7,10 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 import { Employee } from "@/app/types/Employee";
-import EmployeesService from "@/app/services/employees";
+import GetEmployeesService from "@/app/services/employees/get-employees";
 import FetchError from "@/app/types/FetchErrors";
 
-const employeesService = new EmployeesService()
+const getEmployeesService = new GetEmployeesService()
 
 export default function Coaches() {
     const [employee, setEmployee] = useState<Employee | null>(null)
@@ -19,10 +19,10 @@ export default function Coaches() {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const fetchedEmployee = await employeesService.getEmployeeMe()
+                const fetchedEmployee = await getEmployeesService.getEmployeeMe()
 
                 setEmployee(fetchedEmployee)
-                setEmployeeImage(await employeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
@@ -64,7 +64,7 @@ export default function Coaches() {
                         <ShortDetails name="Email:" value={employee?.email} />
                         <ShortDetails name="Gender:" value={employee?.gender} />
                         <ShortDetails name="Work:" value={employee?.work} />
-                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birth_date : 0).toUTCString().slice(0, 16)} />
+                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birthDate : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
@@ -73,7 +73,7 @@ export default function Coaches() {
                             <Column field="id" header="ID" />
                             <Column field="name" header="Name" />
                             <Column field="date" header="Date" />
-                            <Column field="max_participants" header="Participants" />
+                            <Column field="maxParticipants" header="Participants" />
                             <Column field="type" header="Type"></Column>
                         </DataTable>
                     </div>

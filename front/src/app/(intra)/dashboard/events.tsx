@@ -69,17 +69,17 @@ function StatisticsEvent({timelapsed, clientNbr}: StatisticsGraphProps) {
         }
     }
 
-    const generateLabels = (timelapse: string) => {
-        const days = convertTimelapsedToDays(timelapse);
-        const labels = [];
-        for (let i = 0; i < days; i++) {
-            const date = subDays(new Date(), i);
-            labels.unshift(format(date, 'MM/dd/yyyy'));
-        }
-        return labels;
-    }
-
     useEffect(() => {
+        const generateLabels = (timelapse: string) => {
+            const days = convertTimelapsedToDays(timelapse);
+            const labels = [];
+            for (let i = 0; i < days; i++) {
+                const date = subDays(new Date(), i);
+                labels.unshift(format(date, 'MM/dd/yyyy'));
+            }
+            return labels;
+        }
+
         const data = {
             labels: generateLabels(timelapsed),
             datasets: [
@@ -93,7 +93,7 @@ function StatisticsEvent({timelapsed, clientNbr}: StatisticsGraphProps) {
         };
 
         setChartData(data);
-    }, [timelapsed]);
+    }, [timelapsed, clientNbr]);
 
     const chartOptions = {
         responsive: true,

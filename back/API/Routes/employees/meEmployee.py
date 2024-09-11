@@ -32,7 +32,7 @@ def getMe():
         'email': employee['email'],
         'name': employee['name'],
         'surname': employee['surname'],
-        'birth_date': employee['birth_date'],
+        'birthDate': employee['birth_date'],
         'gender': employee['gender'],
         'work': employee['work']
     })

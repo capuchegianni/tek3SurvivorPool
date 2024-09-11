@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { CustomerDTO, Customer } from "@/app/types/Customer";
-import CustomersService from '../../services/customers';
+import GetCustomersService from "@/app/services/customers/get-customers";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
@@ -11,7 +11,7 @@ import Swal from 'sweetalert2'
 import EditCustomers from "./edit";
 import AddCustomer from "./addCustomer";
 
-const customerService = new CustomersService()
+const getCustomerService = new GetCustomersService()
 
 export default function CustomersTable({ customers }: { customers?: CustomerDTO[] }) {
     const [customersData, setCustomersData] = useState<Customer[]>([]);
@@ -21,7 +21,7 @@ export default function CustomersTable({ customers }: { customers?: CustomerDTO[
     useEffect(() => {
         const fetchCustomers = async () => {
             const promises = (customers ?? []).map(customer =>
-                customerService.getCustomer({ id: customer.id }).catch(error => {
+                getCustomerService.getCustomer({ id: customer.id }).catch(error => {
                     console.error(error);
                     return null;
                 })
