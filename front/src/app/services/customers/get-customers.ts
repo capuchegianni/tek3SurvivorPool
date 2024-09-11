@@ -1,6 +1,6 @@
 import { Clothe, isClothe, isClothes } from "@/app/types/Clothe"
-import { BasicCustomerWithID, CustomerDTO, isCustomer, isCustomers } from "@/app/types/Customer"
-import { Encounter, EncounterDTO, isEncounter, isEncounters } from "@/app/types/Encounter"
+import { BasicCustomerWithID, Customer, isCustomer, isCustomers } from "@/app/types/Customer"
+import { Encounter, isEncounter, isEncounters } from "@/app/types/Encounter"
 import { Payment, isPayment, isPaymentsHistory } from "@/app/types/PaymentHistory"
 import FetchError from '@/app/types/FetchErrors'
 import CustomersService from '@/app/services/customers/class-customers'
@@ -29,7 +29,7 @@ export default class GetCustomersService extends CustomersService {
     return object
   }
 
-  public async getCustomers(): Promise<CustomerDTO[]> {
+  public async getCustomers(): Promise<Customer[]> {
     const res = await fetch(this._route, {
       method: 'GET',
       headers: this._headers,
@@ -58,7 +58,7 @@ export default class GetCustomersService extends CustomersService {
       headers: this._headers,
       credentials: 'include'
     })
-    const object = await res.json() as { image: string } & { details: string }
+    const object = await res.json()
 
     if (!res.ok) {
       throw new FetchError({
@@ -69,10 +69,10 @@ export default class GetCustomersService extends CustomersService {
       })
     }
 
-    if (!object || typeof object.image !== 'string')
+    if (typeof object.image !== 'string')
       throw Error(`An error happened when fetching the customer ${data.id} image.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
-    return object.image
+    return object
   }
 
   public async getCustomerPayment(data: { id: number, payment_id: number }): Promise<Payment> {
@@ -213,8 +213,7 @@ export default class GetCustomersService extends CustomersService {
     return object
   }
 
-  public async getCustomerEncounters(data: { id: number }): Promise<EncounterDTO[]> {
-    return []
+  public async getCustomerEncounters(data: { id: number }): Promise<Encounter[]> {
     const res = await fetch(`${this._route}/${data.id}/encounters`, {
       method: 'GET',
       headers: this._headers,
