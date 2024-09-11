@@ -89,9 +89,9 @@ function CustomersForm({handleClose}: {handleClose: () => void}) {
             <FormsDetails value={'email'} setValue={setEmail} title="Email" />
             <FormsDetails value={'phone_number'} setValue={setPhone} title="Phone" />
             <FormsDetails value={'address'} setValue={setAddress} title="Address" />
-            <label htmlFor="birth_date" className="flex flex-col w-full pt-3">
+            <label htmlFor="birthDate" className="flex flex-col w-full pt-3">
                 Birth date
-                <InputMask id="birth_date" mask="99/99/9999" onChange={(e) => setBirthDateSave(e.target.value || '')} className="w-full"/>
+                <InputMask id="birthDate" mask="99/99/9999" onChange={(e) => setBirthDateSave(e.target.value || '')} className="w-full"/>
             </label>
             <label htmlFor="astrological_sign" className="flex flex-col w-full pt-3">
                 Astrological sign
@@ -103,7 +103,7 @@ function CustomersForm({handleClose}: {handleClose: () => void}) {
             </label>
             <label htmlFor="gender" className="flex flex-col w-full pt-3">
                 Gender
-                <GenderRadio setGender={setGender}/>
+                <GenderRadio gender={gender} setGender={setGender}/>
             </label>
             <div className="flex justify-around">
                 <Button label="Save" className="w-1/4 mt-6" onClick={handleSave} />
@@ -113,23 +113,17 @@ function CustomersForm({handleClose}: {handleClose: () => void}) {
     )
 }
 
-function GenderRadio({setGender}: {setGender: (value: string) => void}) {
-    const [localGender, setLocalGender] = useState<string>('Male');
-
-    useEffect(() => {
-        setGender(localGender);
-    }, [localGender]);
-
+function GenderRadio({gender, setGender}: {gender: string | undefined, setGender: (value: string) => void}) {
     return (
         <div className="flex flex-wrap gap-3">
-            <RadioButtons genderTitle={'Male'} localGender={localGender} setLocalGender={setLocalGender} />
-            <RadioButtons genderTitle={'Female'} localGender={localGender} setLocalGender={setLocalGender} />
-            <RadioButtons genderTitle={'Other'} localGender={localGender} setLocalGender={setLocalGender} />
+            <RadioButtons genderTitle={'Male'} localGender={gender} setLocalGender={setGender} />
+            <RadioButtons genderTitle={'Female'} localGender={gender} setLocalGender={setGender} />
+            <RadioButtons genderTitle={'Other'} localGender={gender} setLocalGender={setGender} />
         </div>
     )
 }
 
-function RadioButtons({genderTitle, localGender, setLocalGender}: {genderTitle: string, localGender: string, setLocalGender: (value: string) => void }) {
+function RadioButtons({genderTitle, localGender, setLocalGender}: {genderTitle: string, localGender: string | undefined, setLocalGender: (value: string) => void }) {
     const handleChange = (e: RadioButtonChangeEvent) => {
         setLocalGender(e.value);
     }

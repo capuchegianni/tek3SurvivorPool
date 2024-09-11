@@ -64,7 +64,7 @@ export default function Coaches() {
                         <ShortDetails name="Email:" value={employee?.email} />
                         <ShortDetails name="Gender:" value={employee?.gender} />
                         <ShortDetails name="Work:" value={employee?.work} />
-                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birth_date : 0).toUTCString().slice(0, 16)} />
+                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birthDate : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
@@ -73,7 +73,7 @@ export default function Coaches() {
                             <Column field="id" header="ID" />
                             <Column field="name" header="Name" />
                             <Column field="date" header="Date" />
-                            <Column field="max_participants" header="Participants" />
+                            <Column field="maxParticipants" header="Participants" />
                             <Column field="type" header="Type"></Column>
                         </DataTable>
                     </div>

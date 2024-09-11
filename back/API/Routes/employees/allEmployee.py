@@ -43,7 +43,7 @@ def oneEmployee(customer_id):
         'email': employee['email'],
         'name': employee['name'],
         'surname': employee['surname'],
-        'birth_date': employee['birth_date'],
+        'birthDate': employee['birth_date'],
         'gender': employee['gender'],
         'work': employee['work']
     })

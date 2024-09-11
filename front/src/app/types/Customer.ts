@@ -15,7 +15,7 @@ export type Customer = {
   address: string
   paymentsHistory: Payment[]
   clothes: Clothe[]
-  saved_clothes: number[]
+  savedClothes: number[]
   encounters: Encounter[]
   image: string
 }
