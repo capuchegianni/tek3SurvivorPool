@@ -40,7 +40,9 @@ def getCustomerClothes(customer_id):
         return jsonify({'details': 'Customer not found'}), 404
     clothes_with_images = []
     for clothe in customer['clothes']:
-        image_data = GridFS(db).get(clothe['image']).read()
+        if not clothe.get('image'):
+            continue
+        image_data = GridFS(db).get(clothe.get('image')).read()
         base64_image = base64.b64encode(image_data).decode('utf-8')
         clothes_with_images.append({
             'id': clothe['id'],
