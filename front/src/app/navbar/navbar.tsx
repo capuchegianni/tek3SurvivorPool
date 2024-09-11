@@ -42,10 +42,10 @@ export default function Navbar() {
             <Link href="/dashboard" className={`no-underline text-inherit ${pathName === '/dashboard' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Dashboard</Button>
             </Link>
-            <Link href="/coaches" className={`no-underline text-inherit ${pathName === '/coaches' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/coaches" className={`no-underline text-inherit ${(pathName === '/coaches' || pathName.startsWith('/profile/coach')) ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Coaches</Button>
             </Link>
-            <Link href="/customers" className={`no-underline text-inherit ${pathName === '/customers' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/customers" className={`no-underline text-inherit ${(pathName === '/customers' || pathName.startsWith('/profile/customer')) ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Customers</Button>
             </Link>
             <Link href="/tips" className={`no-underline text-inherit ${pathName === '/tips' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
