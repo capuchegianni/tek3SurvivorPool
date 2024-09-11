@@ -9,7 +9,7 @@ from ...decorators import role_required
 image_customers_blueprint = Blueprint('image_customers', __name__)
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def createCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
@@ -23,7 +23,7 @@ def createCustomerImage(customer_id):
     return jsonify({ 'details': 'Image uploaded' })
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def getCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
@@ -34,7 +34,7 @@ def getCustomerImage(customer_id):
     return jsonify({ 'image': base64_image })
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def updateCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
@@ -54,7 +54,7 @@ def updateCustomerImage(customer_id):
     return jsonify({ 'details': 'Image updated' })
 
 @image_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def deleteCustomerImage(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })

@@ -8,7 +8,7 @@ from ...decorators import role_required
 id_customers_blueprint = Blueprint('id_customers', __name__)
 
 @id_customers_blueprint.route('/api/customers', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def createCustomer():
     data = request.get_json()
@@ -33,7 +33,7 @@ def createCustomer():
     return jsonify({'details': 'Customer created successfully', 'customer': new_customer}), 201
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def getCustomerInfo(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
@@ -55,7 +55,7 @@ def getCustomerInfo(customer_id):
     })
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def updateCustomer(customer_id):
     data = request.get_json()
@@ -100,7 +100,7 @@ def updateCustomer(customer_id):
     return jsonify({'details': 'Customer updated successfully'}), 200
 
 @id_customers_blueprint.route('/api/customers/<customer_id>', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def deleteCustomer(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })

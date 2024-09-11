@@ -11,7 +11,7 @@ me_employees_blueprint = Blueprint('me_employees', __name__)
 load_dotenv()
 
 @me_employees_blueprint.route('/api/employees/me', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def getMe():
     current_employee_email = get_jwt_identity()
@@ -30,7 +30,7 @@ def getMe():
     })
 
 @me_employees_blueprint.route('/api/employees/me', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def updateMe():
     current_employee_email = get_jwt_identity()
@@ -57,7 +57,7 @@ def updateMe():
     return jsonify({ 'details': 'Employee updated successfully' }), 200
 
 @me_employees_blueprint.route('/api/employees/me', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def deleteMe():
     current_employee_email = get_jwt_identity()

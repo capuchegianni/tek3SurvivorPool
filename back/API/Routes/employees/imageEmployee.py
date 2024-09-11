@@ -12,7 +12,7 @@ image_employees_blueprint = Blueprint('image_employees', __name__)
 load_dotenv()
 
 @image_employees_blueprint.route('/api/employees/<employee_id>/image', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def createEmployeeImage(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
@@ -28,7 +28,7 @@ def createEmployeeImage(employee_id):
     return jsonify({'details': 'Image uploaded successfully'}), 200
 
 @image_employees_blueprint.route('/api/employees/<employee_id>/image', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def getEmployeeImage(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
@@ -39,7 +39,7 @@ def getEmployeeImage(employee_id):
     return jsonify({ 'image': base64_image })
 
 @image_employees_blueprint.route('/api/employees/<employee_id>/image', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def updateEmployeeImage(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })
@@ -64,7 +64,7 @@ def updateEmployeeImage(employee_id):
     return jsonify({'details': 'Image updated successfully'})
 
 @image_employees_blueprint.route('/api/employees/<employee_id>/image', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 def deleteEmployeeImage(employee_id):
     employee = db.employees.find_one({ 'id': int(employee_id) })

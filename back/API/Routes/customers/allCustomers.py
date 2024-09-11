@@ -7,7 +7,7 @@ from ...decorators import role_required
 all_customers_blueprint = Blueprint('all_customers', __name__)
 
 @all_customers_blueprint.route('/api/customers', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Admin')
 
 def getCustomers():
@@ -21,7 +21,7 @@ def getCustomers():
     } for customer in customers])
 
 @all_customers_blueprint.route('/api/customers/<customer_id>', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 
 def oneCustomer(customer_id):

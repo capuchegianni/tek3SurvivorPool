@@ -9,7 +9,7 @@ from ...decorators import role_required
 clothes_customers_blueprint = Blueprint('clothes_customers', __name__)
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['POST'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 
 def createCustomerClothes(customer_id):
@@ -33,7 +33,7 @@ def createCustomerClothes(customer_id):
 
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def getCustomerClothes(customer_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
@@ -53,7 +53,7 @@ def getCustomerClothes(customer_id):
     return jsonify(clothes_with_images)
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['PUT'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def updateCustomerClothes(customer_id, clothes_id):
     data = request.get_json()
@@ -76,7 +76,7 @@ def updateCustomerClothes(customer_id, clothes_id):
     return jsonify(clothes)
 
 @clothes_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothes_id>', methods=['DELETE'])
-@jwt_required(locations='cookies')
+@jwt_required()
 @role_required('Coach')
 def deleteCustomerClothes(customer_id, clothes_id):
     customer = db.customers.find_one({ 'id': int(customer_id) })
