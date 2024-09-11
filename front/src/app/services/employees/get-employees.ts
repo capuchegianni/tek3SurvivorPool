@@ -1,6 +1,6 @@
 import { Credentials } from '@/app/types/Credentials'
-import { Employee, EmployeeDTO, BasicEmployeeWithID, isEmployee, isEmployees } from '@/app/types/Employee'
-import { Event, EventDTO, isEvent, isEvents } from '@/app/types/Event'
+import { Employee, BasicEmployeeWithID, isEmployee, isEmployees } from '@/app/types/Employee'
+import { Event, isEvent, isEvents } from '@/app/types/Event'
 import FetchError from '@/app/types/FetchErrors'
 import EmployeesService from '@/app/services/employees/class-employees'
 
@@ -28,7 +28,7 @@ export default class GetEmployeesService extends EmployeesService {
     return object
   }
 
-  public async getEmployees(): Promise<EmployeeDTO[]> {
+  public async getEmployees(): Promise<Employee[]> {
     const res = await fetch(this._route, {
       method: 'GET',
       headers: this._headers,
@@ -155,17 +155,6 @@ export default class GetEmployeesService extends EmployeesService {
     return object.image
   }
 
-  public async getEmployeePermissions(): Promise<{ details: string, code: number }> {
-    const res = await fetch(`${this._route}/has_permissions/Admin`, {
-      method: 'GET',
-      headers: this._headers,
-      credentials: 'include'
-    })
-    const jsonObject = await res.json()
-
-    return { details: jsonObject.details, code: res.status }
-  }
-
   public async getAssignedCustomers(data: { id: number }): Promise<number[]> {
     const res = await fetch(`${this._route}/${data.id}/assigned_customers`, {
       method: 'GET',
@@ -212,7 +201,7 @@ export default class GetEmployeesService extends EmployeesService {
     return object
   }
 
-  public async getEvents(data: { id: number }): Promise<EventDTO[]> {
+  public async getEvents(data: { id: number }): Promise<Event[]> {
     const res = await fetch(`${this._route}/${data.id}/events`, {
       method: 'GET',
       headers: this._headers,

@@ -117,7 +117,7 @@ def delCustomerSavedClothe(customer_id, clothe_id):
 
     db.customers.update_one(
         {'id': int(customer_id)},
-        {'$pull': {'saved_clothes': {'id': int(clothe_id)} }}
+        {'$pull': {'saved_clothes': int(clothe_id)}}
     )
 
     return jsonify({'details': 'Clothe deleted successfully'}), 200

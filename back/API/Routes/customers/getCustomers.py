@@ -13,22 +13,28 @@ get_customers_blueprint = Blueprint('get_customers', __name__)
 @jwt_required()
 @role_required('Coach')
 def getCustomer(customer_id):
-    customer = db.customers.find_one({'id': int(customer_id)}, {'_id': 0})
+    customer = db.customers.find_one(
+        {'id': int(customer_id)},
+        {'_id': 0, 'paymentsHistory': 0, 'clothes': 0, 'saved_clothes': 0, 'encounters': 0, 'image': 0}
+    )
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
 
-    return jsonify(customer)
+    return jsonify(customer), 200
 
 
 @get_customers_blueprint.route('/api/customers', methods=['GET'])
 @jwt_required()
 @role_required('Admin')
 def getCustomers():
-    customers = db.customers.find({}, {'_id': 0})
+    customers = db.customers.find(
+        {},
+        {'_id': 0, 'paymentsHistory': 0, 'clothes': 0, 'saved_clothes': 0, 'encounters': 0, 'image': 0}
+    )
     if customers is None:
         return jsonify({'details': 'No customers found'}), 404
 
-    return jsonify(list(customers))
+    return jsonify(list(customers)), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/image', methods=['GET'])
@@ -43,7 +49,7 @@ def getCustomerImage(customer_id):
     if image_data is None:
         return jsonify({'details': 'Image not found'}), 404
 
-    return jsonify(image_data)
+    return jsonify(image_data), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/payments_history/<payment_id>', methods=['GET'])
@@ -61,7 +67,7 @@ def getCustomerPayment(customer_id, payment_id):
     if payment is None:
         return jsonify({'details': 'Payment not found'}), 404
 
-    return jsonify(payment)
+    return jsonify(payment), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/payments_history', methods=['GET'])
@@ -72,7 +78,7 @@ def getCustomerPayments(customer_id):
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
 
-    return jsonify(customer.get('payments_history', []))
+    return jsonify(customer.get('payments_history', [])), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/clothes/<clothe_id>', methods=['GET'])
@@ -90,7 +96,7 @@ def getCustomerClothe(customer_id, clothe_id):
     if clothe is None:
         return jsonify({'details': 'Clothe not found'}), 404
 
-    return jsonify(clothe)
+    return jsonify(clothe), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
@@ -101,7 +107,7 @@ def getCustomerClothes(customer_id):
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
 
-    return jsonify(customer.get('clothes', []))
+    return jsonify(customer.get('clothes', [])), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/saved_clothes', methods=['GET'])
@@ -112,7 +118,7 @@ def getCustomerSavedClothes(customer_id):
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
 
-    return jsonify(customer.get('saved_clothes', []))
+    return jsonify(customer.get('saved_clothes', [])), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/encounters/<encounter_id>', methods=['GET'])
@@ -130,7 +136,7 @@ def getCustomerEncounter(customer_id, encounter_id):
     if encounter is None:
         return jsonify({'details': 'Encounter not found'}), 404
 
-    return jsonify(encounter)
+    return jsonify(encounter), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/encounters', methods=['GET'])
@@ -141,4 +147,4 @@ def getCustomerEncounters(customer_id):
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
 
-    return jsonify(customer.get('encounters', []))
+    return jsonify(customer.get('encounters', [])), 200
