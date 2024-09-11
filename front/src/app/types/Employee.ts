@@ -10,8 +10,12 @@ export type Employee = {
   work: string
   events: Event[]
   image: string
-  assigned_customers: string[]
+  assigned_customers: number[]
 }
+
+export type BasicEmployee = Omit<Employee, 'id' | 'events' | 'image' | 'assigned_customers'>
+
+export type BasicEmployeeWithID = Omit<Employee, 'events' | 'image' | 'assigned_customers'>
 
 export type EmployeeDTO = {
   id: number

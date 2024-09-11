@@ -15,9 +15,14 @@ export type Customer = {
   address: string
   paymentsHistory: Payment[]
   clothes: Clothe[]
+  saved_clothes: number[]
   encounters: Encounter[]
   image: string
 }
+
+export type BasicCustomer = Omit<Customer, 'id' | 'paymentHistory' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
+
+export type BasicCustomerWithID = Omit<Customer, 'paymentHistory' | 'clothes' | 'saved_clothes' | 'encounters' | 'image'>
 
 export type CustomerDTO = {
   id: number

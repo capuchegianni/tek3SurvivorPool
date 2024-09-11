@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
-import TipsService from '@/app/services/tips'
+import GetTipsService from '@/app/services/tips/get-tips'
 import { Tip } from '@/app/types/Tip'
 
-const tipsService = new TipsService()
+const getTipsService = new GetTipsService()
 
 export default function Tips() {
     const [tips, setTips] = useState<Tip[]>([])
@@ -14,7 +14,7 @@ export default function Tips() {
     useEffect(() => {
         const getTips = async () => {
             try {
-                setTips(await tipsService.getTips())
+                setTips(await getTipsService.getTips())
             } catch (error) { }
         }
         getTips()
