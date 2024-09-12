@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { BasicCustomerWithID, Customer } from "@/app/types/Customer";
+import { BasicCustomerWithID } from "@/app/types/Customer";
 import GetCustomersService from "@/app/services/customers/get-customers";
 import { useParams } from "next/navigation";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Rating } from "primereact/rating";
 import Image from 'next/image'
-import { Encounter, EncounterDTO } from "@/app/types/Encounter";
+import { Encounter } from "@/app/types/Encounter";
 import { Payment } from "@/app/types/PaymentHistory";
 import { Button } from 'primereact/button';
 import Link from 'next/link';
+import FetchError from "@/app/types/FetchErrors";
 
 const getCustomersService = new GetCustomersService()
 
@@ -19,27 +20,30 @@ export default function ProfileId() {
     const { id } = useParams<{ id: string }>();
     const [customerData, setCustomerData] = useState<BasicCustomerWithID | null>(null);
     const [customerImage, setCustomerImage] = useState<string | null>(null)
-    const [encounters, setEncounters] = useState<EncounterDTO[]>([])
+    const [encounters, setEncounters] = useState<Encounter[]>([])
     const [positivesEncounters, setPositivesEncounters] = useState<number>(0);
     const [paymentsHistory, setPaymentsHistory] = useState<Payment[]>([])
 
     useEffect(() => {
         const fetchCustomer = async () => {
-            const customer = await getCustomersService.getCustomer({ id: Number(id) }).catch(error => {
-                console.error(error);
-                return null;
-            });
-            const encounters = await getCustomersService.getCustomerEncounters({ id: Number(id) })
-            const payments = await getCustomersService.getCustomerPaymentsHistory({ id: Number(id) })
+            try {
+                const customer = await getCustomersService.getCustomer({ id: Number(id) })
+                setCustomerData(customer);
+                setCustomerImage(await getCustomersService.getCustomerImage({ id: Number(id) }));
 
-            setCustomerData(customer);
-            setCustomerImage(await getCustomersService.getCustomerImage({ id: Number(id) }));
+                const encounters = await getCustomersService.getCustomerEncounters({ id: Number(id) })
+                const payments = await getCustomersService.getCustomerPaymentsHistory({ id: Number(id) })
+                const positives = encounters.filter(encounter => encounter.rating > 2.5).length || 0;
 
-            const positives = encounters.filter(encounter => encounter.rating > 2.5).length || 0;
-            setEncounters(encounters)
-            setPositivesEncounters(positives);
-
-            setPaymentsHistory(payments)
+                setEncounters(encounters)
+                setPositivesEncounters(positives);
+                setPaymentsHistory(payments)
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+                else
+                    console.error(error)
+            }
         }
 
         fetchCustomer();
@@ -90,26 +94,26 @@ export default function ProfileId() {
                         <ShortDetails name="User ID:" value={customerData?.id} />
                         <ShortDetails name="Email:" value={customerData?.email} />
                         <ShortDetails name="Gender:" value={customerData?.gender} />
-                        <ShortDetails name="Phone number:" value={customerData?.phoneNumber} />
+                        <ShortDetails name="Phone number:" value={customerData?.phone_number} />
                         <ShortDetails name="Address:" value={customerData?.address} />
-                        <ShortDetails name="Birth date:" value={new Date(customerData ? customerData.birthDate : 0).toUTCString().slice(0, 16)} />
+                        <ShortDetails name="Birth date:" value={new Date(customerData ? customerData.birth_date : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
                         <DataTable value={encounters} header='Encounter' size="small" rows={5} paginator>
-                            <Column field="date" header="Date" style={{width:'10%'}}/>
-                            <Column field="rating" header="Rating" body={rating} style={{width:'10%'}}/>
-                            <Column field="comment" header="Report" style={{width:'50%'}}/>
-                            <Column field="source" header="Source" style={{width:'10%'}} />
+                            <Column field="date" header="Date" />
+                            <Column field="rating" header="Rating" body={rating} />
+                            <Column field="comment" header="Report" />
+                            <Column field="source" header="Source"  />
                         </DataTable>
                     </div>
                     <div className="p-4">
                         <DataTable value={paymentsHistory} header='Payments History' size="small" rows={4} paginator>
-                            <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="paymentMethod" header="Payment Method" style={{width:'25%'}}/>
-                            <Column field="amount" header="Amount" style={{width:'25%'}}/>
-                            <Column field="comment" header="Comment" style={{width:'40%'}}/>
+                            <Column field="date" header="Date" />
+                            <Column field="payment_method" header="Payment Method" />
+                            <Column field="amount" header="Amount" />
+                            <Column field="comment" header="Comment" />
                         </DataTable>
                     </div>
                 </div>

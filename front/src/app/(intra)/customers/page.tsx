@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 
 import GetCustomersService from "@/app/services/customers/get-customers";
-import { CustomerDTO } from '../../types/Customer'
+import { Customer } from '../../types/Customer'
 import CustomersTable from "./table";
 
 const getCustomerService = new GetCustomersService()
 
 export default function Customers() {
-    const [customers, setCustomers] = useState<CustomerDTO[]>([])
+    const [customers, setCustomers] = useState<Customer[]>([])
 
     useEffect(() => {
         const getCustomers = async () => {
@@ -24,7 +24,7 @@ export default function Customers() {
         <div>
             <div className="text-4xl font-light mt-6 ml-6"> Customers List </div>
             <div className="text-gray-500 text-l font-light ml-6"> You have total {customers.length} customers </div>
-            <CustomersTable customers={customers} />
+            <CustomersTable customers={customers} setCustomers={setCustomers} />
         </div>
     )
 }

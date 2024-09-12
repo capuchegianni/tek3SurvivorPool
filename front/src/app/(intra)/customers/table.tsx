@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { CustomerDTO, Customer } from "@/app/types/Customer";
-import GetCustomersService from "@/app/services/customers/get-customers";
+import React, { useState } from "react";
+import { Customer } from "@/app/types/Customer";
+import DelCustomersService from "@/app/services/customers/del-customers";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
@@ -10,31 +10,15 @@ import { Button } from "primereact/button";
 import Swal from 'sweetalert2'
 import EditCustomers from "./edit";
 import AddCustomer from "./addCustomer";
+import FetchError from "@/app/types/FetchErrors";
 
-const getCustomerService = new GetCustomersService()
+const delCustomerService = new DelCustomersService()
 
-export default function CustomersTable({ customers }: { customers?: CustomerDTO[] }) {
-    const [customersData, setCustomersData] = useState<Customer[]>([]);
+export default function CustomersTable({ customers, setCustomers }: { customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [showAddCustomer, setShowAddCustomer] = useState(false);
 
-    useEffect(() => {
-        const fetchCustomers = async () => {
-            const promises = (customers ?? []).map(customer =>
-                getCustomerService.getCustomer({ id: customer.id }).catch(error => {
-                    console.error(error);
-                    return null;
-                })
-            );
-
-            const results = await Promise.all(promises);
-            setCustomersData(results.filter(result => result !== null) as Customer[]);
-        }
-
-        fetchCustomers();
-    }, [customers]);
-
-    const filteredCustomers = customersData.filter((customer) => {
+    const filteredCustomers = customers.filter((customer) => {
         return customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.surname.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
@@ -49,13 +33,13 @@ export default function CustomersTable({ customers }: { customers?: CustomerDTO[
 
     return (
         <div className="p-6 border-0">
-            <DisplayAllCustomers customers={filteredCustomers} inputText={inputText}/>
-            {showAddCustomer && <AddCustomer onClose={() => setShowAddCustomer(false)} />}
+            <DisplayAllCustomers customers={filteredCustomers} inputText={inputText} setCustomers={setCustomers}/>
+            {showAddCustomer && <AddCustomer onClose={() => setShowAddCustomer(false)} customers={customers} setCustomers={setCustomers} />}
         </div>
     )
 }
 
-function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], inputText?: () => JSX.Element }) {
+function DisplayAllCustomers({ customers, inputText, setCustomers }: { customers: Customer[], inputText?: () => JSX.Element, setCustomers: (value: Customer[]) => void }) {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
     const customerTemplate = (rowData: Customer) => {
@@ -67,8 +51,8 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
     };
 
     const customersActions = (rowData: Customer) => {
-        const handleDelete = () => {
-            Swal.fire({
+        const handleDelete = async () => {
+            const result = await Swal.fire({
                 title: 'Delete: ' + rowData.name + ' ' + rowData.surname,
                 text: "Are you sure you want to delete this?",
                 icon: 'warning',
@@ -77,11 +61,19 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes',
                 cancelButtonText: 'No'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log('Deleted customer: ', rowData.id);
-                }
             })
+
+            try {
+                if (result.isConfirmed) {
+                    await delCustomerService.delCustomer({ id: rowData.id })
+                    setCustomers(customers.filter(customer => customer.id !== rowData.id))
+                }
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+                else
+                    console.error(error)
+            }
         }
 
         return(
@@ -95,12 +87,12 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
     return (
         <div>
             <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/customer/${e.data.id}`} className="cursor-pointer" rows={8} paginator header={inputText}>
-                <Column body={customerTemplate} header="Customer" style={{width:'30%'}}/>
-                <Column field="email" header="Email" style={{width:'30%'}}/>
-                <Column field="phoneNumber" header="Phone Number" style={{width:'30%'}}/>
-                <Column body={customersActions} header="Actions" style={{width:'10%'}}/>
+                <Column body={customerTemplate} header="Customer" />
+                <Column field="email" header="Email" />
+                <Column field="phone_number" header="Phone Number" />
+                <Column body={customersActions} header="Actions" className="flex justify-end"/>
             </DataTable>
-            {selectedCustomer && <EditCustomers customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />}
+            {selectedCustomer && <EditCustomers customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} customers={customers} setCustomers={setCustomers} />}
         </div>
     )
 }

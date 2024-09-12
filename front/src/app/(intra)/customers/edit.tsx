@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from "react";
-import { Customer } from "@/app/types/Customer";
+import { BasicCustomer, Customer } from "@/app/types/Customer";
 import { InputText } from 'primereact/inputtext';
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -10,11 +10,16 @@ import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
 import { InputTextarea } from 'primereact/inputtextarea';
 import Swal from 'sweetalert2'
 
+import PutCustomersService from "@/app/services/customers/put-customers";
+import FetchError from "@/app/types/FetchErrors";
+
+const putCustomersService = new PutCustomersService()
+
 const astrologicalSigns = [
     'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
 ];
 
-export default function EditCustomers({ customer, onClose }: { customer: Customer, onClose: () => void }) {
+export default function EditCustomers({ customer, onClose, customers, setCustomers }: { customer: Customer, onClose: () => void, customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [visible, setVisible] = useState<boolean>(true);
 
     const handleClose = () => {
@@ -25,24 +30,24 @@ export default function EditCustomers({ customer, onClose }: { customer: Custome
     return (
         <div>
             <Dialog onHide={handleClose} header={`Edit ${customer.name} ${customer.surname}`} visible={visible} style={{width: '50vw'}} modal >
-                <CustomersForm customer={customer} handleClose={handleClose}/>
+                <CustomersForm customer={customer} handleClose={handleClose} customers={customers} setCustomers={setCustomers} />
             </Dialog>
         </div>
     )
 }
 
-function CustomersForm({customer, handleClose}: {customer: Customer, handleClose: () => void}) {
+function CustomersForm({ customer, handleClose, customers, setCustomers }: { customer: Customer, handleClose: () => void, customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [name, setName] = useState<string>(customer.name);
     const [surname, setSurname] = useState<string>(customer.surname);
     const [email, setEmail] = useState<string>(customer.email);
-    const [phone, setPhone] = useState<string>(customer.phoneNumber);
+    const [phoneNumber, setPhone] = useState<string>(customer.phone_number);
     const [address, setAddress] = useState<string>(customer.address);
     const [description, setDescription] = useState<string>(customer.description);
-    const [astrologicalSign, setAstrologicalSign] = useState<string>(customer.astrologicalSign);
+    const [astrologicalSign, setAstrologicalSign] = useState<string>(customer.astrological_sign);
     const [gender, setGender] = useState<string>(customer.gender);
-    const [birthDateSave, setBirthDateSave] = useState<string>(customer.birthDate);
+    const [birthDateSave, setBirthDateSave] = useState<string>(customer.birth_date);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         const phoneRegex = /^\d{10,15}$/;
 
@@ -50,7 +55,7 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
             ToasterError({message: 'Please enter a valid email address'});
             return;
         }
-        if (!phoneRegex.test(phone)) {
+        if (!phoneRegex.test(phoneNumber)) {
             ToasterError({message: 'Please enter a valid phone number (10 to 15 digits)'});
             return;
         }
@@ -60,23 +65,47 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
             return;
         }
 
-        const rightOrderBirthday = birthDateSave.split('/').reverse().join('/');
+        const birth_date = birthDateSave.split('/').reverse().join('/');
 
-        const customerData = {
-            name,
-            surname,
-            email,
-            phone,
-            address,
-            description,
-            astrologicalSign,
-            gender,
-            rightOrderBirthday
-        };
-        console.log(customerData);
+        try {
+            const customerData: BasicCustomer = {
+                name,
+                surname,
+                email,
+                gender,
+                birth_date,
+                astrological_sign: astrologicalSign,
+                address,
+                description,
+                phone_number: phoneNumber
+            };
+
+            const updatedCustomer = await putCustomersService.putCustomer({ id: customer.id, customer: customerData });
+            const index = customers.findIndex(emp => emp.id === updatedCustomer.id);
+
+            if (index !== -1) {
+                customers[index] = updatedCustomer;
+                setCustomers([...customers]);
+            }
+            handleClose()
+            Swal.fire({
+                title: 'Successfully edited an customer.',
+                icon: 'success',
+                timer: 5000,
+                timerProgressBar: true,
+                position: 'top-right',
+                toast: true,
+                showConfirmButton: false
+              })
+        } catch (error) {
+            if (error instanceof FetchError)
+                error.logError()
+            else
+                console.error(error)
+        }
     }
 
-    const birthDate = new Date(customer.birthDate);
+    const birthDate = new Date(customer.birth_date);
     const day = birthDate.getDate().toString().padStart(2, '0');
     const month = (birthDate.getMonth() + 1).toString().padStart(2, '0');
     const year = birthDate.getFullYear();
@@ -90,7 +119,7 @@ function CustomersForm({customer, handleClose}: {customer: Customer, handleClose
                 <FormsDetails value={surname} setValue={setSurname} title="Surname" />
             </div>
             <FormsDetails value={email} setValue={setEmail} title="Email" />
-            <FormsDetails value={phone} setValue={setPhone} title="Phone" />
+            <FormsDetails value={phoneNumber} setValue={setPhone} title="Phone" />
             <FormsDetails value={address} setValue={setAddress} title="Address" />
             <label htmlFor="birthDate" className="flex flex-col w-full pt-3">
                 Birth date
@@ -146,7 +175,7 @@ function RadioButtons({genderTitle, gender, setGender}: {genderTitle: string, ge
 }
 
 function AstroDropdown({customer, setAstrologicalSign}: {customer: Customer, setAstrologicalSign: (value: string) => void}) {
-    const [astrologicalSign, setLocalAstrologicalSign] = useState<string>(customer.astrologicalSign);
+    const [astrologicalSign, setLocalAstrologicalSign] = useState<string>(customer.astrological_sign);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setLocalAstrologicalSign(e.target.value);
