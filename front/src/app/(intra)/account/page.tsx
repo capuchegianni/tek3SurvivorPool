@@ -9,14 +9,18 @@ import { Column } from 'primereact/column';
 import { Employee } from "@/app/types/Employee";
 import GetEmployeesService from "@/app/services/employees/get-employees";
 import FetchError from "@/app/types/FetchErrors";
-import { EventDTO } from "@/app/types/Event";
+import { Event } from "@/app/types/Event";
+import { BasicCustomerWithID } from "@/app/types/Customer";
+import GetCustomersService from "@/app/services/customers/get-customers";
 
 const getEmployeesService = new GetEmployeesService()
+const getCustomersService = new GetCustomersService()
 
 export default function Coaches() {
     const [employee, setEmployee] = useState<Employee | null>(null)
     const [employeeImage, setEmployeeImage] = useState<string | null>(null)
-    const [employeeEvents, setEmployeeEvents] = useState<EventDTO[] | null>(null)
+    const [employeeEvents, setEmployeeEvents] = useState<Event[]>([])
+    const [employeeCustomers, setEmployeeCustomers] = useState<BasicCustomerWithID[]>([])
 
     useEffect(() => {
         const getEmployee = async () => {
@@ -26,6 +30,9 @@ export default function Coaches() {
                 setEmployee(fetchedEmployee)
                 setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
                 setEmployeeEvents(await getEmployeesService.getEvents({ id: fetchedEmployee.id }))
+
+                const customersIds = await getEmployeesService.getAssignedCustomers({ id: fetchedEmployee.id })
+                setEmployeeCustomers(await Promise.all(customersIds.map(id => getCustomersService.getCustomer({ id }))))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
@@ -54,11 +61,11 @@ export default function Coaches() {
                     <div className="flex flex-row justify-around items-center text-center border-b-2 p-6">
                         <div>
                             <p className="text-lg font-bold"> Events </p>
-                            <p> { employeeEvents?.length } organized </p>
+                            <p> { employeeEvents.length } organized </p>
                         </div>
                         <div>
                             <p className="text-lg font-bold"> Customers </p>
-                            <p> upcoming </p>
+                            <p> { employeeCustomers.length } </p>
                         </div>
                     </div>
                     <div className="flex flex-col justify-left p-6">
@@ -67,21 +74,28 @@ export default function Coaches() {
                         <ShortDetails name="Email:" value={employee?.email} />
                         <ShortDetails name="Gender:" value={employee?.gender} />
                         <ShortDetails name="Work:" value={employee?.work} />
-                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birthDate : 0).toUTCString().slice(0, 16)} />
+                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birth_date : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
-                        <DataTable value={employee?.events} header='Events' size="small" rows={5} paginator>
-                            <Column field="id" header="ID" style={{width:'10%'}}/>
-                            <Column field="name" header="Name" style={{width:'25%'}}/>
-                            <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="maxParticipants" header="Participants" style={{width:'25%'}}/>
-                            <Column field="type" header="Type" style={{width:'25%'}} />
+                        <DataTable value={employeeEvents} header='Events' size="small" rows={5} paginator>
+                            <Column field="id" header="ID" />
+                            <Column field="name" header="Name" />
+                            <Column field="date" header="Date" />
+                            <Column field="max_participants" header="Participants" />
+                            <Column field="type" header="Type" />
                         </DataTable>
                     </div>
                     <div className="p-4">
-                        <DataTable header='Customers' size="small" rows={4} paginator/>
+                        <DataTable value={employeeCustomers} header='Customers' size="small" rows={4} paginator>
+                            <Column field="id" header="ID" />
+                            <Column field="name" header="Name" />
+                            <Column field="surname" header="Last name" />
+                            <Column field="gender" header="Gender" />
+                            <Column field="email" header="Email" />
+                            <Column field="phone_number" header="Phone" />
+                        </DataTable>
                     </div>
                 </div>
             </div>

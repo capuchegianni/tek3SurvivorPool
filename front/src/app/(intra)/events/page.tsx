@@ -21,6 +21,7 @@ export default function Events() {
     const [events, setEvents] = useState<Event[]>([])
     const [search, setSearch] = useState<string>("");
     const [addEvent, setAddEvent] = useState(false);
+    const [isCoach, setIsCoach] = useState(true)
 
     useEffect(() => {
         const getEvents = async () => {
@@ -31,7 +32,25 @@ export default function Events() {
                     error.logError()
             }
         }
-        getEvents();
+        const getMyself = async () => {
+            try {
+                const myself = await getEmployeesService.getEmployeeMe()
+                const isCoach = myself.work.toLowerCase() === 'coach'
+
+                setIsCoach(isCoach)
+                if (isCoach) {
+                    const events = await getEmployeesService.getEvents({ id: myself.id })
+
+                    setEvents(events)
+                    return
+                }
+                await getEvents()
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        getMyself()
     }, [])
 
     return (

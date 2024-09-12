@@ -1,3 +1,4 @@
+from base64 import b64encode
 from flask import Blueprint, jsonify
 from dbConnection import db
 from ...JWT_manager import jwt
@@ -25,7 +26,7 @@ def getCustomer(customer_id):
 
 @get_customers_blueprint.route('/api/customers', methods=['GET'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def getCustomers():
     customers = db.customers.find(
         {},
@@ -46,10 +47,11 @@ def getCustomerImage(customer_id):
         return jsonify({'details': 'Customer not found'}), 404
 
     image_data = fs.get(customer['image']).read()
+    base64_image = b64encode(image_data).decode('utf-8')
     if image_data is None:
         return jsonify({'details': 'Image not found'}), 404
 
-    return jsonify(image_data), 200
+    return jsonify({ 'image': base64_image }), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/payments_history/<payment_id>', methods=['GET'])
@@ -96,7 +98,13 @@ def getCustomerClothe(customer_id, clothe_id):
     if clothe is None:
         return jsonify({'details': 'Clothe not found'}), 404
 
-    return jsonify(clothe), 200
+    image_data = fs.get(customer['image']).read()
+    base64_image = b64encode(image_data).decode('utf-8')
+    return jsonify({
+        'id': clothe['id'],
+        'type': clothe['type'],
+        'image': base64_image
+    }), 200
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/clothes', methods=['GET'])
@@ -106,8 +114,16 @@ def getCustomerClothes(customer_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
-
-    return jsonify(customer.get('clothes', [])), 200
+    clothes_with_images = []
+    for clothe in customer['clothes']:
+        image_data = GridFS(db).get(clothe['image']).read()
+        base64_image = b64encode(image_data).decode('utf-8')
+        clothes_with_images.append({
+            'id': clothe['id'],
+            'type': clothe['type'],
+            'image': base64_image
+        })
+    return jsonify(clothes_with_images)
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/saved_clothes', methods=['GET'])
@@ -117,8 +133,16 @@ def getCustomerSavedClothes(customer_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:
         return jsonify({'details': 'Customer not found'}), 404
-
-    return jsonify(customer.get('saved_clothes', [])), 200
+    clothes_with_images = []
+    for clothe in customer['saved_clothes']:
+        image_data = GridFS(db).get(clothe['image']).read()
+        base64_image = b64encode(image_data).decode('utf-8')
+        clothes_with_images.append({
+            'id': clothe['id'],
+            'type': clothe['type'],
+            'image': base64_image
+        })
+    return jsonify(clothes_with_images)
 
 
 @get_customers_blueprint.route('/api/customers/<customer_id>/encounters/<encounter_id>', methods=['GET'])

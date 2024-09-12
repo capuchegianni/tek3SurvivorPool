@@ -1,51 +1,53 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { BasicEmployeeWithID } from "@/app/types/Employee";
+import { BasicEmployeeWithID, Employee } from "@/app/types/Employee";
 import GetEmployeesService from "@/app/services/employees/get-employees";
 import { useParams } from "next/navigation";
 import { DataTable } from 'primereact/datatable';
-import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import Image from 'next/image'
-import Link from 'next/link';
 import FetchError from "@/app/types/FetchErrors";
+import { Event } from "@/app/types/Event";
+import { BasicCustomerWithID } from "@/app/types/Customer";
+import GetCustomersService from "@/app/services/customers/get-customers";
+
+const getCustomersService = new GetCustomersService()
 
 const getEmployeesService = new GetEmployeesService()
 
 export default function ProfileId() {
     const { id } = useParams<{ id: string }>();
-    const [employeeData, setEmployeeData] = useState<BasicEmployeeWithID | null>(null);
+    const [employee, setEmployee] = useState<BasicEmployeeWithID | null>(null)
     const [employeeImage, setEmployeeImage] = useState<string | null>(null)
+    const [employeeEvents, setEmployeeEvents] = useState<Event[]>([])
+    const [employeeCustomers, setEmployeeCustomers] = useState<BasicCustomerWithID[]>([])
 
     useEffect(() => {
-        const fetchEmployee = async () => {
+        const getEmployee = async () => {
             try {
-            const customer = await getEmployeesService.getEmployee({ id: Number(id) }).catch(error => {
-                console.error(error);
-                return null;
-            });
+                const fetchedEmployee = await getEmployeesService.getEmployee({ id: Number(id) })
 
-            setEmployeeData(customer);
-            setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: Number(id) }));
+                setEmployee(fetchedEmployee)
+                setEmployeeImage(await getEmployeesService.getEmployeeImage({ id: fetchedEmployee.id }))
+                setEmployeeEvents(await getEmployeesService.getEvents({ id: fetchedEmployee.id }))
+
+                const customersIds = await getEmployeesService.getAssignedCustomers({ id: fetchedEmployee.id })
+                setEmployeeCustomers(await Promise.all(customersIds.map(id => getCustomersService.getCustomer({ id }))))
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
+                console.log(error)
             }
         }
 
-        fetchEmployee();
-    }, [id]);
+        getEmployee()
+    }, [id])
 
     return (
         <div className="flex flex-col m-6">
-            <div className="flex justify-between">
-                <div className="text-3xl sm:text-4xl font-bold mb-6">
-                    <p> Coach details </p>
-                </div>
-                <Link href="/coaches" >
-                    <Button label="return" icon="pi pi-arrow-left" className="h-10" />
-                </Link>
+            <div className="text-3xl sm:text-4xl font-bold mb-6">
+                <p> Employee details </p>
             </div>
             <div className="flex flex-grow h-full lg:flex-row flex-col">
                 <div className="flex-grow bg-white h-full lg:max-w-lg mr-4 border-2 rounded-md">
@@ -56,45 +58,46 @@ export default function ProfileId() {
                             width={100} height={100}
                             className="rounded-full pb-2"
                         />
-                        <p> { employeeData?.name } { employeeData?.surname } </p>
+                        <p> { employee?.name } { employee?.surname } </p>
                     </div>
                     <div className="flex flex-row justify-around items-center text-center border-b-2 p-6">
                         <div>
-                            {/* <p className="text-lg font-bold"> { encounters.length } </p> */}
-                            <p> Total </p>
-                            <p> Events </p>
+                            <p className="text-lg font-bold"> Events </p>
+                            <p> { employeeEvents.length } organized </p>
                         </div>
                         <div>
-                            {/* <p className="text-lg font-bold"> { encounters.length } </p> */}
-                            <p> Total </p>
-                            <p> Customers </p>
+                            <p className="text-lg font-bold"> Customers </p>
+                            <p> { employeeCustomers.length } </p>
                         </div>
                     </div>
                     <div className="flex flex-col justify-left p-6">
                         <p className="text-lg text-gray-400 font-bold"> Short details </p>
-                        <ShortDetails name="User ID:" value={employeeData?.id} />
-                        <ShortDetails name="Email:" value={employeeData?.email} />
-                        <ShortDetails name="Gender:" value={employeeData?.gender} />
-                        <ShortDetails name="Birth date:" value={new Date(employeeData ? employeeData.birthDate : 0).toUTCString().slice(0, 16)} />
-                        <ShortDetails name="Work:" value={employeeData?.work} />
+                        <ShortDetails name="User ID:" value={employee?.id} />
+                        <ShortDetails name="Email:" value={employee?.email} />
+                        <ShortDetails name="Gender:" value={employee?.gender} />
+                        <ShortDetails name="Work:" value={employee?.work} />
+                        <ShortDetails name="Birth date:" value={new Date(employee ? employee.birth_date : 0).toUTCString().slice(0, 16)} />
                     </div>
                 </div>
                 <div className="flex-grow bg-white h-full border-2 rounded-md">
                     <div className="p-4">
-                        <DataTable header='Events' size="small" rows={5} paginator />
-                            {/* <Column field="date" header="Date" style={{width:'10%'}}/>
-                            <Column field="rating" header="Rating" body={rating} style={{width:'10%'}}/>
-                            <Column field="comment" header="Report" style={{width:'50%'}}/>
-                            <Column field="source" header="Source" style={{width:'10%'}} />
-                        </DataTable> */}
+                        <DataTable value={employeeEvents} header='Events' size="small" rows={5} paginator>
+                            <Column field="id" header="ID" />
+                            <Column field="name" header="Name" />
+                            <Column field="date" header="Date" />
+                            <Column field="max_participants" header="Participants" />
+                            <Column field="type" header="Type" />
+                        </DataTable>
                     </div>
                     <div className="p-4">
-                        <DataTable header='Customer(s) linked' size="small" rows={4} paginator />
-                            {/* <Column field="date" header="Date" style={{width:'25%'}}/>
-                            <Column field="payment_method" header="Payment Method" style={{width:'25%'}}/>
-                            <Column field="amount" header="Amount" style={{width:'25%'}}/>
-                            <Column field="comment" header="Comment" style={{width:'40%'}}/>
-                        </DataTable> */}
+                        <DataTable value={employeeCustomers} header='Customers' size="small" rows={4} paginator>
+                            <Column field="id" header="ID" />
+                            <Column field="name" header="Name" />
+                            <Column field="surname" header="Last name" />
+                            <Column field="gender" header="Gender" />
+                            <Column field="email" header="Email" />
+                            <Column field="phone_number" header="Phone" />
+                        </DataTable>
                     </div>
                 </div>
             </div>

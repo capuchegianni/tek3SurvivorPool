@@ -7,8 +7,13 @@ import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
 import Swal from 'sweetalert2'
+import { BasicEmployee, Employee } from "@/app/types/Employee";
+import FetchError from "@/app/types/FetchErrors";
+import PostEmployeesService from "@/app/services/employees/post-employees";
 
-export default function AddEmployee({ onClose }: { onClose: () => void }) {
+const postEmployeesService = new PostEmployeesService()
+
+export default function AddEmployee({ onClose, employees, setEmployees }: { onClose: () => void, employees: Employee[], setEmployees: (value: Employee[]) => void }) {
     const [visible, setVisible] = useState<boolean>(true);
 
     const handleClose = () => {
@@ -19,13 +24,13 @@ export default function AddEmployee({ onClose }: { onClose: () => void }) {
     return (
         <div>
             <Dialog onHide={handleClose} header={`Add new coach`} visible={visible} style={{width: '50vw'}} modal >
-                <EmployeeForm handleClose={handleClose}/>
+                <EmployeeForm handleClose={handleClose} employees={employees} setEmployees={setEmployees}/>
             </Dialog>
         </div>
     )
 }
 
-function EmployeeForm({handleClose}: {handleClose: () => void}) {
+function EmployeeForm({ handleClose, employees, setEmployees }: { handleClose: () => void, employees: Employee[], setEmployees: (value: Employee[]) => void }) {
     const [name, setName] = useState<string>();
     const [surname, setSurname] = useState<string>();
     const [email, setEmail] = useState<string>();
@@ -33,7 +38,7 @@ function EmployeeForm({handleClose}: {handleClose: () => void}) {
     const [gender, setGender] = useState<string>();
     const [birthDateSave, setBirthDateSave] = useState<string>();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (!emailRegex.test(email ?? '')) {
@@ -46,22 +51,42 @@ function EmployeeForm({handleClose}: {handleClose: () => void}) {
             return;
         }
 
-        if (name === undefined || surname === undefined || email === undefined || work === undefined) {
+        if (!name || !surname || !email || !work || !gender) {
             ToasterError({message: 'Please fill all the fields'});
             return;
         }
 
-        const rightOrderBirthday = birthDateSave.split('/').reverse().join('/');
+        const birth_date = birthDateSave.split('/').reverse().join('/');
 
-        const customerData = {
-            name,
-            surname,
-            email,
-            gender,
-            rightOrderBirthday,
-            work
-        };
-        console.log(customerData);
+        try {
+            const employeeData: BasicEmployee = {
+                name,
+                surname,
+                email,
+                gender,
+                birth_date,
+                work
+            };
+
+            employees.push(await postEmployeesService.postEmployee(employeeData))
+
+            setEmployees([...employees])
+            handleClose()
+            Swal.fire({
+                title: 'Successfully added a new employee.',
+                icon: 'success',
+                timer: 5000,
+                timerProgressBar: true,
+                position: 'top-right',
+                toast: true,
+                showConfirmButton: false
+              })
+        } catch (error) {
+            if (error instanceof FetchError)
+                error.logError()
+            else
+                console.error(error)
+        }
     }
 
     return (

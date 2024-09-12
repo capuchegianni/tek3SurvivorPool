@@ -20,14 +20,24 @@ export default function Navbar() {
     const [employeeImage, setEmployeeImage] = useState<string | null>(null)
     const op = useRef<OverlayPanel>(null);
     const router = useRouter();
-    const pathName = usePathname();
+    const pathName = usePathname();const [isCoach, setIsCoach] = useState(true)
 
     useEffect(() => {
+        const getMyself = async () => {
+            try {
+                const myself = await getEmployeesService.getEmployeeMe()
+
+                setIsCoach(myself.work.toLowerCase() === 'coach')
+            } catch (error) {
+                console.error(error)
+            }
+        }
         const fetchEmployeeImage = async () => {
             const image = await getEmployeeImage();
             setEmployeeImage(image);
         };
 
+        getMyself()
         fetchEmployeeImage();
     }, []);
 
@@ -42,7 +52,7 @@ export default function Navbar() {
             <Link href="/dashboard" className={`no-underline text-inherit ${pathName === '/dashboard' ? 'border-b-2 border-blue-500 rounded' : ''}`}>
                 <Button className="p-button-text p-button-plain">Dashboard</Button>
             </Link>
-            <Link href="/coaches" className={`no-underline text-inherit ${(pathName === '/coaches' || pathName.startsWith('/profile/coach')) ? 'border-b-2 border-blue-500 rounded' : ''}`}>
+            <Link href="/coaches" className={`no-underline text-inherit ${(pathName === '/coaches' || pathName.startsWith('/profile/coach')) ? 'border-b-2 border-blue-500 rounded' : ''} ${isCoach ? 'hidden' : ''}`}>
                 <Button className="p-button-text p-button-plain">Coaches</Button>
             </Link>
             <Link href="/customers" className={`no-underline text-inherit ${(pathName === '/customers' || pathName.startsWith('/profile/customer')) ? 'border-b-2 border-blue-500 rounded' : ''}`}>

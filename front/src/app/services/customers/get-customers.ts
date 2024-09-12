@@ -72,7 +72,7 @@ export default class GetCustomersService extends CustomersService {
     if (typeof object.image !== 'string')
       throw Error(`An error happened when fetching the customer ${data.id} image.`, { cause: `Returned object doesn't correspond to the associated type.\n${JSON.stringify(object)}` })
 
-    return object
+    return object.image
   }
 
   public async getCustomerPayment(data: { id: number, payment_id: number }): Promise<Payment> {

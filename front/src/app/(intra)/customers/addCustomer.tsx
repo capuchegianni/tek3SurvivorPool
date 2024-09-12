@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { InputText } from 'primereact/inputtext';
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -9,11 +9,17 @@ import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
 import { InputTextarea } from 'primereact/inputtextarea';
 import Swal from 'sweetalert2'
 
+import PostCustomersService from "@/app/services/customers/post-customers";
+import { BasicCustomer, Customer } from "@/app/types/Customer";
+import FetchError from "@/app/types/FetchErrors";
+
+const postCustomersService = new PostCustomersService()
+
 const astrologicalSigns = [
     'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
 ];
 
-export default function AddCustomer({ onClose }: { onClose: () => void }) {
+export default function AddCustomer({ onClose, customers, setCustomers }: { onClose: () => void, customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [visible, setVisible] = useState<boolean>(true);
 
     const handleClose = () => {
@@ -24,24 +30,24 @@ export default function AddCustomer({ onClose }: { onClose: () => void }) {
     return (
         <div>
             <Dialog onHide={handleClose} header={`Add new customer`} visible={visible} style={{width: '50vw'}} modal >
-                <CustomersForm handleClose={handleClose}/>
+                <CustomersForm handleClose={handleClose} customers={customers} setCustomers={setCustomers} />
             </Dialog>
         </div>
     )
 }
 
-function CustomersForm({handleClose}: {handleClose: () => void}) {
+function CustomersForm({ handleClose, customers, setCustomers }: { handleClose: () => void, customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [name, setName] = useState<string>();
     const [surname, setSurname] = useState<string>();
     const [email, setEmail] = useState<string>();
-    const [phone, setPhone] = useState<string>();
+    const [phoneNumber, setPhone] = useState<string>();
     const [address, setAddress] = useState<string>();
     const [description, setDescription] = useState<string>();
     const [astrologicalSign, setAstrologicalSign] = useState<string>();
     const [gender, setGender] = useState<string>();
     const [birthDateSave, setBirthDateSave] = useState<string>();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         const phoneRegex = /^\d{10,15}$/;
 
@@ -49,7 +55,7 @@ function CustomersForm({handleClose}: {handleClose: () => void}) {
             ToasterError({message: 'Please enter a valid email address'});
             return;
         }
-        if (!phoneRegex.test(phone ?? '')) {
+        if (!phoneRegex.test(phoneNumber ?? '')) {
             ToasterError({message: 'Please enter a valid phone number (10 to 15 digits)'});
             return;
         }
@@ -59,25 +65,45 @@ function CustomersForm({handleClose}: {handleClose: () => void}) {
             return;
         }
 
-        if (name === undefined || surname === undefined || email === undefined || phone === undefined || address === undefined || description === undefined) {
+        if (!name || !surname || !email || !phoneNumber || !address || !description || !gender || !astrologicalSign) {
             ToasterError({message: 'Please fill all the fields'});
             return;
         }
 
-        const rightOrderBirthday = birthDateSave.split('/').reverse().join('/');
+        const birth_date = birthDateSave.split('/').reverse().join('/');
 
-        const customerData = {
-            name,
-            surname,
-            email,
-            phone,
-            address,
-            description,
-            astrologicalSign,
-            gender,
-            rightOrderBirthday
-        };
-        console.log(customerData);
+        try {
+            const customerData: BasicCustomer = {
+                name,
+                surname,
+                email,
+                gender,
+                birth_date,
+                astrological_sign: astrologicalSign,
+                address,
+                description,
+                phone_number: phoneNumber
+            };
+
+            customers.push(await postCustomersService.postCustomer(customerData))
+
+            setCustomers([...customers])
+            handleClose()
+            Swal.fire({
+                title: 'Successfully added a new customer.',
+                icon: 'success',
+                timer: 5000,
+                timerProgressBar: true,
+                position: 'top-right',
+                toast: true,
+                showConfirmButton: false
+              })
+        } catch (error) {
+            if (error instanceof FetchError)
+                error.logError()
+            else
+                console.error(error)
+        }
     }
 
     return (

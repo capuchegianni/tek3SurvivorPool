@@ -17,15 +17,12 @@ def postCustomer():
     if not data:
         return jsonify({'details': 'Invalid input'}), 400
 
-    pipeline = [
-        {'$unwind': '$customers'},
-        {'$group': {'_id': None, 'max_customer_id': {'$max': '$customers.id'}}}
-    ]
-    result = list(db.customers.aggregate(pipeline))
-    customer_id = result[0]['max_customer_id'] + 1 if result else 1
+    max_customer = db.customers.find_one(sort=[("id", -1)], projection={"id": 1})
+    customer_id = max_customer['id'] + 1 if max_customer else 1
     customer = {'id': customer_id, **data}
 
     db.customers.insert_one(customer)
+    customer.pop('_id', None)
 
     return jsonify(customer), 201
 
@@ -75,6 +72,7 @@ def postCustomerPayment(customer_id):
         {'id': int(customer_id)},
         {'$push': {'payments': payment}}
     )
+    payment.pop('_id', None)
 
     return jsonify(payment), 201
 
@@ -102,13 +100,14 @@ def postCustomerClothe(customer_id):
         {'id': int(customer_id)},
         {'$push': {'clothes': clothe}}
     )
+    clothe.pop('_id', None)
 
     return jsonify(clothe), 201
 
 
 @post_customers_blueprint.route('/api/customers/<customer_id>/saved_clothes', methods=['POST'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def postCustomerSavedClothe(customer_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:
@@ -127,7 +126,7 @@ def postCustomerSavedClothe(customer_id):
 
 @post_customers_blueprint.route('/api/customers/<customer_id>/encounters', methods=['POST'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def postCustomerEncounter(customer_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:
@@ -149,5 +148,6 @@ def postCustomerEncounter(customer_id):
         {'id': int(customer_id)},
         {'$push': {'encounters': encounter}}
     )
+    encounter.pop('_id', None)
 
     return jsonify(encounter), 201

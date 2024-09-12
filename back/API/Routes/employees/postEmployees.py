@@ -18,15 +18,12 @@ def postEmployee():
     if employee:
         return jsonify({'details': 'Employee already exists'}), 409
 
-    pipeline = [
-        {'$unwind': '$employees'},
-        {'$group': {'_id': None, 'max_employee_id': {'$max': '$employees.id'}}}
-    ]
-    result = list(db.employees.aggregate(pipeline))
-    employee_id = result[0]['max_employee_id'] + 1 if result else 1
+    max_employee = db.employees.find_one(sort=[("id", -1)], projection={"id": 1})
+    employee_id = max_employee['id'] + 1 if max_employee else 1
     employee = {'id': employee_id, **data}
 
     db.employees.insert_one(employee)
+    employee.pop('_id', None)
 
     return jsonify(employee), 201
 
@@ -98,5 +95,6 @@ def postEmployeeEvent(employee_id):
         {'id': int(employee_id)},
         {'$push': {'events': event}}
     )
+    event.pop('_id', None)
 
     return jsonify(event), 201

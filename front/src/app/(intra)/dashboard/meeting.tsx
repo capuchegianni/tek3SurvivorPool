@@ -3,129 +3,147 @@
 import React, { useState, useEffect } from "react";
 
 import { Chart } from 'primereact/chart';
-import { SelectButton } from 'primereact/selectbutton';
+import { SelectButton } from "primereact/selectbutton";
+import { subDays, format } from 'date-fns';
+
+import GetEmployeesService from "@/app/services/employees/get-employees";
+import { Event } from "@/app/types/Event";
 import FetchError from "@/app/types/FetchErrors";
+
+const getEmployeesService = new GetEmployeesService()
 
 interface JustifyOption {
     date: string;
     code: string;
 }
 
-let days7db = [
-    { Source: 'Email', 'Meetings number': 8 },
-    { Source: 'Phone', 'Meetings number': 18 },
-    { Source: 'In person', 'Meetings number': 45 },
-    { Source: 'Social media', 'Meetings number': 29 },
-    { Source: 'Other', 'Meetings number': 70 },
-];
-
-let days30db = [
-    { Source: 'Email', 'Meetings number': 34 },
-    { Source: 'Phone', 'Meetings number': 57 },
-    { Source: 'In person', 'Meetings number': 186 },
-    { Source: 'Social media', 'Meetings number': 131 },
-    { Source: 'Other', 'Meetings number': 256 },
-];
-
-let days90db = [
-    { Source: 'Email', 'Meetings number': 98 },
-    { Source: 'Phone', 'Meetings number': 173 },
-    { Source: 'In person', 'Meetings number': 273 },
-    { Source: 'Social media', 'Meetings number': 379 },
-    { Source: 'Other', 'Meetings number': 856 },
-];
-
-export default function MeetingSources({ selectedTime }: any) {
+export default function MeetingSources() {
     return (
-        <div className="w-full bg-white ml-6 mt-12 rounded-md">
+        <div className="bg-white ml-6 mt-12 rounded-md flex-grow w-full lg:w-1/4">
             <div className="text-2xl m-12">
-                <MeetingInfo selectedTime={selectedTime} />
+                <MeetingInfo />
             </div>
         </div>
     )
 }
 
-function MeetingInfo({ selectedTime }: any) {
-    const [value, setValue] = useState<JustifyOption>(selectedTime);
+const SetDate = ({ selectedTime, setSelectedTime }: { selectedTime: JustifyOption, setSelectedTime: (value: JustifyOption) => void }) => {
     const justifyOptions: JustifyOption[] = [
-        {date: '7 D', code: '7D'},
-        {date: '1 M', code: '1M'},
-        {date: '3 M', code: '3M'}
+        {date: '3 M', code: '3M'},
+        {date: '6 M', code: '6M'},
+        {date: '1 Y', code: '1Y'}
     ];
-
     const justifyTemplate = (option: JustifyOption) => {
         return <span className="text-xs">{option.date}</span>;
     }
 
-    useEffect(() => {
-        try {
-        setValue(selectedTime);
-        } catch (error) { }
-    }, [selectedTime]);
-
     return (
-        <div>
-            <div className="text-2xl flex justify-between">
-                Meetings top sources
-                <SelectButton className="" value={value} onChange={(e) => setValue(e.value)} itemTemplate={justifyTemplate} optionLabel="value" options={justifyOptions} />
-            </div>
-            <MeetingChart selectedTime={value ? value.code : '7D'} />
+        <div className="text-2xl flex justify-between">
+            <SelectButton value={selectedTime} onChange={(e) => setSelectedTime(e.value)} itemTemplate={justifyTemplate} optionLabel="value" options={justifyOptions} />
         </div>
     )
 }
 
-function getDatabase(selectedTime: string) {
-    switch (selectedTime) {
-        case '7D':
-            return days7db;
-        case '1M':
-            return days30db;
+const convertTimelapsedToDays = (timelapsed: string) => {
+    switch(timelapsed) {
         case '3M':
-            return days90db;
+            return 90;
+        case '6M':
+            return 180;
+        case '1Y':
+            return 365;
         default:
-            return [];
+            return 90;
     }
 }
 
-function MeetingChart({selectedTime}: {selectedTime: string}) {
+function MeetingInfo() {
+    const [value, setValue] = useState<JustifyOption>({ date: '1 Y', code: '1Y' });
+    const [events, setEvents] = useState<Event[]>([])
+
+    useEffect(() => {
+        const getEvents = async () => {
+            try {
+                const events = await getEmployeesService.getAllEvents()
+
+                setEvents(events)
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+                else
+                    console.error(error)
+            }
+        }
+        getEvents()
+    }, []);
+
+    const filterEventsInTimelapse = (timelapse: string) => {
+        const days = convertTimelapsedToDays(timelapse);
+        const cutoffDate = subDays(new Date(), days);
+        return events.filter(event => new Date(event.date) >= cutoffDate);
+    };
+
+    const filteredEvents = filterEventsInTimelapse(value.code);
+
+    return (
+        <div>
+            <div className="flex flex-col sm:flex-row justify-between">
+                <div className="flex flex-col">
+                    <div className="text-2xl"> Meetings types </div>
+                    <div className="text-gray-500 text-sm"> The types of meetings people go to. </div>
+                </div>
+                <SetDate selectedTime={value} setSelectedTime={setValue} />
+            </div>
+            <MeetingChart events={filteredEvents} />
+        </div>
+    )
+}
+
+function MeetingChart({ events }: { events: Event[] }) {
     const [chartData, setChartData] = useState({});
 
     useEffect(() => {
-        try {
-            const documentStyle = getComputedStyle(document.documentElement);
-            const db = getDatabase(selectedTime);
-            const labels = db.map(item => item.Source);
-            const data = db.map(item => item['Meetings number']);
+        const documentStyle = getComputedStyle(document.documentElement);
+        const sortedEvents = [...events].sort((a, b) => b.max_participants - a.max_participants)
+        const biggestEvents = sortedEvents.slice(0, 15);
+        const labels = biggestEvents.map(event => event.type);
+        const data = biggestEvents.map(event => event.max_participants);
 
-            const chartData = {
-                labels: labels,
-                datasets: [
-                    {
-                        data: data,
-                        backgroundColor: [
-                            documentStyle.getPropertyValue('--blue-500'),
-                            documentStyle.getPropertyValue('--blue-200'),
-                            documentStyle.getPropertyValue('--green-400'),
-                            documentStyle.getPropertyValue('--green-600'),
-                            documentStyle.getPropertyValue('--blue-800')
-                        ],
-                        hoverBackgroundColor: [
-                            documentStyle.getPropertyValue('--blue-400'),
-                            documentStyle.getPropertyValue('--blue-100'),
-                            documentStyle.getPropertyValue('--green-200'),
-                            documentStyle.getPropertyValue('--green-400'),
-                            documentStyle.getPropertyValue('--blue-600')
-                        ]
-                    }
-                ]
-            };
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    data: data,
+                    backgroundColor: [
+                        documentStyle.getPropertyValue('--blue-600'),
+                        documentStyle.getPropertyValue('--blue-200'),
+                        documentStyle.getPropertyValue('--green-600'),
+                        documentStyle.getPropertyValue('--green-200'),
+                        documentStyle.getPropertyValue('--blue-600'),
+                        documentStyle.getPropertyValue('--blue-200'),
+                        documentStyle.getPropertyValue('--red-600'),
+                        documentStyle.getPropertyValue('--red-200'),
+                        documentStyle.getPropertyValue('--yellow-600'),
+                        documentStyle.getPropertyValue('--yellow-200')
+                    ],
+                    hoverBackgroundColor: [
+                        documentStyle.getPropertyValue('--blue-500'),
+                        documentStyle.getPropertyValue('--blue-100'),
+                        documentStyle.getPropertyValue('--green-500'),
+                        documentStyle.getPropertyValue('--green-100'),
+                        documentStyle.getPropertyValue('--blue-500'),
+                        documentStyle.getPropertyValue('--blue-100'),
+                        documentStyle.getPropertyValue('--red-500'),
+                        documentStyle.getPropertyValue('--red-100'),
+                        documentStyle.getPropertyValue('--yellow-500'),
+                        documentStyle.getPropertyValue('--yellow-100')
+                    ]
+                }
+            ]
+        };
 
-            setChartData(chartData);
-        } catch (error) {
-            if (error instanceof FetchError)
-                error.logError()
-        }
-    }, [selectedTime]);
+        setChartData(chartData);
+    }, [events]);
 
     const chartOptions = {
         responsive: true,
@@ -134,7 +152,7 @@ function MeetingChart({selectedTime}: {selectedTime: string}) {
 
     return (
         <div className="pt-7 flex justify-center">
-            <Chart type="doughnut" data={chartData} options={chartOptions} style={{ height: 440 }}/>
+            <Chart type="doughnut" data={chartData} options={chartOptions} style={{ height: '50vh' }} />
         </div>
     )
 }

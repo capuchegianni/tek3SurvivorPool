@@ -27,6 +27,7 @@ def putCustomer(customer_id):
         {'$set': data},
         return_document=ReturnDocument.AFTER
     )
+    updated_customer.pop('_id', None)
 
     return jsonify(updated_customer), 200
 
@@ -77,6 +78,7 @@ def putCustomerPayment(customer_id, payment_id):
         {'$set': data},
         return_document=ReturnDocument.AFTER
     )
+    updated_payment.pop('_id', None)
 
     return jsonify(updated_payment), 200
 
@@ -102,6 +104,7 @@ def putCustomerClothe(customer_id, clothe_id):
         {'$set': data},
         return_document=ReturnDocument.AFTER
     )
+    updated_clothe.pop('_id', None)
 
     return jsonify(updated_clothe), 200
 
@@ -127,5 +130,6 @@ def putCustomerEncounter(customer_id, encounter_id):
         {'$set': data},
         return_document=ReturnDocument.AFTER
     )
+    updated_encounter.pop('_id', None)
 
     return jsonify(updated_encounter), 200

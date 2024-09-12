@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { Chart } from 'primereact/chart';
 
 import GetCustomersService from '../../services/customers/get-customers';
-import { CustomerDTO } from '../../types/Customer'
+import { Customer } from '../../types/Customer'
 import FetchError from "@/app/types/FetchErrors";
 
 const getCustomerService = new GetCustomersService()
@@ -17,7 +17,7 @@ interface StatisticsProps {
 
 export default function CustomersOverview() {
     return (
-        <div className="bg-white ml-6 mt-12 rounded w-full">
+        <div className="bg-white ml-6 mt-12 rounded flex-grow w-full lg:w-1/4">
             <div className="m-12">
                 <CustomersInfo />
             </div>
@@ -26,51 +26,19 @@ export default function CustomersOverview() {
 }
 
 function CustomersInfo() {
-    const [customers, setCustomers] = useState<CustomerDTO[]>([])
+    const [customers, setCustomers] = useState<Customer[]>([])
+    const [chartData, setChartData] = useState({});
 
     useEffect(() => {
         const getCustomers = async () => {
             try {
-                setCustomers(await getCustomerService.getCustomers())
-            } catch (error) { }
-        }
-        getCustomers()
-    }, []);
-
-    return (
-        <div>
-            <div className="text-2xl flex justify-between">
-                Customers Overview
-            </div>
-            <div className="text-gray-500 text-sm"> Statistics about all the clients. </div>
-            <div className="flex justify-center pt-12">
-                <Statistics title="Total customers" number={customers.length} />
-            </div>
-            <StatisticsGraph customers={customers}/>
-        </div>
-    )
-}
-
-function StatisticsGraph({ customers }: { customers: CustomerDTO[] }) {
-    const [chartData, setChartData] = useState({});
-
-    useEffect(() => {
-        const fetchCustomers = async () => {
-            try {
                 const genders = { Male: 0, Female: 0, Other: 0 };
+                const fetchedCustomers = await getCustomerService.getCustomers()
 
-                const promises = customers.map(customer =>
-                    getCustomerService.getCustomer({ id: customer.id }).catch(error => {
-                        console.error(error);
-                        return null;
-                    })
-                );
-
-                const results = await Promise.all(promises);
-
-                for (let result of results)
-                    if (result && result.gender in genders)
-                        genders[result.gender as 'Male' | 'Female' | 'Other']++;
+                setCustomers(fetchedCustomers)
+                for (const customer of fetchedCustomers)
+                    if (customer.gender in genders)
+                        genders[customer.gender as 'Male' | 'Female' | 'Other']++;
 
                 const data = {
                     labels: Object.keys(genders),
@@ -92,16 +60,32 @@ function StatisticsGraph({ customers }: { customers: CustomerDTO[] }) {
                         }
                     ]
                 };
-                setChartData(data);
+                setChartData(data)
             } catch (error) {
                 if (error instanceof FetchError)
-                    error.logError()
+                    error.logError
+                else
+                    console.error(error)
             }
-        };
+        }
+        getCustomers()
+    }, []);
 
-        fetchCustomers();
-    }, [customers]);
+    return (
+        <div>
+            <div className="text-2xl flex justify-between">
+                Customers Overview
+            </div>
+            <div className="text-gray-500 text-sm"> Statistics about all the clients. </div>
+            <div className="flex justify-center pt-12">
+                <Statistics title="Total customers" number={customers.length} />
+            </div>
+            <StatisticsGraph chartData={chartData}/>
+        </div>
+    )
+}
 
+function StatisticsGraph({ chartData }: { chartData: {} }) {
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -109,7 +93,7 @@ function StatisticsGraph({ customers }: { customers: CustomerDTO[] }) {
 
     return (
         <div>
-            <Chart type="bar" data={chartData} options={chartOptions} style={{ height: 440 }} />
+            <Chart type="bar" data={chartData} options={chartOptions} style={{ height: '40vh' }} />
         </div>
     );
 }

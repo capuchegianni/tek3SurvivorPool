@@ -27,6 +27,7 @@ def putEmployee(employee_id):
         {'$set': data},
         return_document=ReturnDocument.AFTER
     )
+    updated_employee.pop('_id', None)
 
     return jsonify(updated_employee), 200
 
@@ -77,5 +78,6 @@ def putEmployeeEvent(employee_id, event_id):
         {'$set': data},
         return_document=ReturnDocument.AFTER
     )
+    updated_event.pop('_id', 'None')
 
     return jsonify(updated_event), 200

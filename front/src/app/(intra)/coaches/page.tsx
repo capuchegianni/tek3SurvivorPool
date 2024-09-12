@@ -3,22 +3,24 @@
 import React, { useState, useEffect } from "react";
 
 import GetEmployeesService from "@/app/services/employees/get-employees";
-import { EmployeeDTO } from "@/app/types/Employee";
+import { Employee } from "@/app/types/Employee";
 import EmployeesTable from "@/app/(intra)/coaches/table";
 import FetchError from "@/app/types/FetchErrors";
 
 const getEmployeesService = new GetEmployeesService()
 
 export default function Coaches() {
-    const [employee, setEmployee] = useState<EmployeeDTO[]>([])
+    const [employees, setEmployees] = useState<Employee[]>([])
 
     useEffect(() => {
         const getCustomers = async () => {
             try {
-                setEmployee(await getEmployeesService.getEmployees())
+                setEmployees(await getEmployeesService.getEmployees())
             } catch (error) {
                 if (error instanceof FetchError)
                     error.logError()
+                else
+                    console.error(error)
             }
         }
         getCustomers()
@@ -27,8 +29,8 @@ export default function Coaches() {
     return (
         <div>
             <div className="text-4xl font-light mt-6 ml-6"> Coaches List </div>
-            <div className="text-gray-500 text-l font-light ml-6"> There is a total of {employee.length} coaches </div>
-            <EmployeesTable employees={employee} />
+            <div className="text-gray-500 text-l font-light ml-6"> There is a total of {employees.length} coaches </div>
+            <EmployeesTable employees={employees} setEmployees={setEmployees} />
         </div>
     )
 }

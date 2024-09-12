@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { EmployeeDTO, Employee } from "@/app/types/Employee";
-import GetEmployeesService from "@/app/services/employees/get-employees";
+import React, { useState } from "react";
+import { Employee } from "@/app/types/Employee";
+import DelEmployeesService from "@/app/services/employees/del-employees";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
@@ -12,33 +12,13 @@ import EditEmployee from "./edit";
 import AddEmployee from "./addCoach";
 import FetchError from "@/app/types/FetchErrors";
 
-const getEmployeesService = new GetEmployeesService()
+const delEmployeesService = new DelEmployeesService()
 
-export default function EmployeesTable({ employees }: { employees?: EmployeeDTO[] }) {
-    const [employeesData, setEmployeesData] = useState<Employee[]>([]);
+export default function EmployeesTable({ employees, setEmployees }: { employees: Employee[], setEmployees: (value: Employee[]) => void }) {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [showAddEmployees, setShowAddEmployees] = useState(false);
 
-    useEffect(() => {
-        const fetchEmployees = async () => {
-            try {
-                const promises = (employees ?? []).map(customer =>
-                    getEmployeesService.getEmployee({ id: customer.id }).catch(error => {
-                        console.error(error);
-                        return null;
-                    })
-                );
-                const results = await Promise.all(promises);
-                setEmployeesData(results.filter(result => result !== null) as Employee[]);
-            } catch (error) {
-                if (error instanceof FetchError)
-                    error.logError()
-            }
-        }
-        fetchEmployees();
-    }, [employees]);
-
-    const filteredEmployees = employeesData.filter((employee) => {
+    const filteredEmployees = employees.filter((employee) => {
         return employee.name.toLowerCase().includes(searchTerm.toLowerCase()) || employee.surname.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
@@ -53,13 +33,13 @@ export default function EmployeesTable({ employees }: { employees?: EmployeeDTO[
 
     return (
         <div className="p-6 border-0">
-            <DisplayAllCustomers employees={filteredEmployees} inputText={inputText}/>
-            {showAddEmployees && <AddEmployee onClose={() => setShowAddEmployees(false)} />}
+            <DisplayAllCustomers employees={filteredEmployees} setEmployees={setEmployees} inputText={inputText}/>
+            {showAddEmployees && <AddEmployee onClose={() => setShowAddEmployees(false)} employees={employees} setEmployees={setEmployees} />}
         </div>
     )
 }
 
-function DisplayAllCustomers({ employees, inputText }: { employees: Employee[], inputText?: () => JSX.Element }) {
+function DisplayAllCustomers({ employees, setEmployees, inputText }: { employees: Employee[], setEmployees: (value: Employee[]) => void, inputText?: () => JSX.Element }) {
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
     const employeeTemplate = (rowData: Employee) => {
@@ -71,8 +51,8 @@ function DisplayAllCustomers({ employees, inputText }: { employees: Employee[], 
     };
 
     const employeeActions = (rowData: Employee) => {
-        const handleDelete = () => {
-            Swal.fire({
+        const handleDelete = async () => {
+            const result = await Swal.fire({
                 title: 'Delete: ' + rowData.name + ' ' + rowData.surname,
                 text: "Are you sure you want to delete this?",
                 icon: 'warning',
@@ -81,11 +61,19 @@ function DisplayAllCustomers({ employees, inputText }: { employees: Employee[], 
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes',
                 cancelButtonText: 'No'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log('Deleted coach: ', rowData.id);
-                }
             })
+
+            try {
+                if (result.isConfirmed) {
+                    await delEmployeesService.delEmployee({ id: rowData.id })
+                    setEmployees(employees.filter(employee => employee.id !== rowData.id))
+                }
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+                else
+                    console.error(error)
+            }
         }
 
         return(
@@ -99,12 +87,12 @@ function DisplayAllCustomers({ employees, inputText }: { employees: Employee[], 
     return (
         <div>
             <DataTable value={employees} onRowClick={(e) => window.location.href = `/profile/coach/${e.data.id}`} className="cursor-pointer" rows={8} paginator header={inputText}>
-                <Column body={employeeTemplate} header="Coach" style={{width:'30%'}}/>
-                <Column field="email" header="Email" style={{width:'30%'}}/>
-                <Column field="work" header="Work" style={{width:'30%'}}/>
-                <Column body={employeeActions} header="Actions" style={{width:'10%'}}/>
+                <Column body={employeeTemplate} header="Coach" />
+                <Column field="email" header="Email" />
+                <Column field="work" header="Work" />
+                <Column className="flex justify-end" body={employeeActions} header="Actions" />
             </DataTable>
-            {selectedEmployee && <EditEmployee employee={selectedEmployee} onClose={() => setSelectedEmployee(null)} />}
+            {selectedEmployee && <EditEmployee employee={selectedEmployee} onClose={() => setSelectedEmployee(null)} employees={employees} setEmployees={setEmployees} />}
         </div>
     )
 }

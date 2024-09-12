@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { CustomerDTO, Customer } from "@/app/types/Customer";
-import GetCustomersService from "@/app/services/customers/get-customers";
+import React, { useEffect, useState } from "react";
+import { Customer } from "@/app/types/Customer";
+import DelCustomersService from "@/app/services/customers/del-customers";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
@@ -11,36 +11,38 @@ import Swal from 'sweetalert2'
 import EditCustomers from "./edit";
 import AddCustomer from "./addCustomer";
 import FetchError from "@/app/types/FetchErrors";
+import GetEmployeesService from "@/app/services/employees/get-employees";
 
-const getCustomerService = new GetCustomersService()
+const delCustomerService = new DelCustomersService()
+const getEmployeesService = new GetEmployeesService()
 
-export default function CustomersTable({ customers }: { customers?: CustomerDTO[] }) {
-    const [customersData, setCustomersData] = useState<Customer[]>([]);
+export default function CustomersTable({ customers, setCustomers }: { customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [showAddCustomer, setShowAddCustomer] = useState(false);
+    const [isCoach, setIsCoach] = useState(true)
+    const [assignedCustomers, setAssignedCustomers] = useState<number[]>([])
 
     useEffect(() => {
-        const fetchCustomers = async () => {
+        const getMyself = async () => {
             try {
-                const promises = (customers ?? []).map(customer =>
-                    getCustomerService.getCustomer({ id: customer.id }).catch(error => {
-                        console.error(error);
-                        return null;
-                    })
-                );
+                const myself = await getEmployeesService.getEmployeeMe()
+                const assignedCustomers = await getEmployeesService.getAssignedCustomers({ id: myself.id })
 
-                const results = await Promise.all(promises);
-                setCustomersData(results.filter(result => result !== null) as Customer[]);
+                setIsCoach(myself.work.toLowerCase() === 'coach')
+                setAssignedCustomers(assignedCustomers)
             } catch (error) {
-                if (error instanceof FetchError)
-                    error.logError()
+                console.error(error)
             }
         }
+        getMyself()
+    }, [])
 
-        fetchCustomers();
-    }, [customers]);
-
-    const filteredCustomers = customersData.filter((customer) => {
+    const filteredCustomers = customers.filter((customer) => {
+        if (isCoach) {
+            if (assignedCustomers.includes(customer.id))
+                return true
+            return false
+        }
         return customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.surname.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
@@ -48,20 +50,23 @@ export default function CustomersTable({ customers }: { customers?: CustomerDTO[
         return (
             <div className="flex justify-between">
                 <InputText value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search..." />
-                <Button label="Add new customers" className="mr-6" icon="pi pi-plus" onClick={() => setShowAddCustomer(true)}/>
+                <div>
+                    <Button label="Assign a customer to a coach" className="mr-2" icon="pi pi-plus" disabled={true}/>
+                    <Button label="Add new customers" className="mr-6" icon="pi pi-plus" onClick={() => setShowAddCustomer(true)} disabled={isCoach}/>
+                </div>
             </div>
         )
     }
 
     return (
         <div className="p-6 border-0">
-            <DisplayAllCustomers customers={filteredCustomers} inputText={inputText}/>
-            {showAddCustomer && <AddCustomer onClose={() => setShowAddCustomer(false)} />}
+            <DisplayAllCustomers customers={filteredCustomers} inputText={inputText} setCustomers={setCustomers}/>
+            {showAddCustomer && <AddCustomer onClose={() => setShowAddCustomer(false)} customers={customers} setCustomers={setCustomers} />}
         </div>
     )
 }
 
-function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], inputText?: () => JSX.Element }) {
+function DisplayAllCustomers({ customers, inputText, setCustomers }: { customers: Customer[], inputText?: () => JSX.Element, setCustomers: (value: Customer[]) => void }) {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
     const customerTemplate = (rowData: Customer) => {
@@ -73,8 +78,8 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
     };
 
     const customersActions = (rowData: Customer) => {
-        const handleDelete = () => {
-            Swal.fire({
+        const handleDelete = async () => {
+            const result = await Swal.fire({
                 title: 'Delete: ' + rowData.name + ' ' + rowData.surname,
                 text: "Are you sure you want to delete this?",
                 icon: 'warning',
@@ -83,11 +88,19 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes',
                 cancelButtonText: 'No'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log('Deleted customer: ', rowData.id);
-                }
             })
+
+            try {
+                if (result.isConfirmed) {
+                    await delCustomerService.delCustomer({ id: rowData.id })
+                    setCustomers(customers.filter(customer => customer.id !== rowData.id))
+                }
+            } catch (error) {
+                if (error instanceof FetchError)
+                    error.logError()
+                else
+                    console.error(error)
+            }
         }
 
         return(
@@ -101,12 +114,12 @@ function DisplayAllCustomers({ customers, inputText }: { customers: Customer[], 
     return (
         <div>
             <DataTable value={customers} onRowClick={(e) => window.location.href = `/profile/customer/${e.data.id}`} className="cursor-pointer" rows={8} paginator header={inputText}>
-                <Column body={customerTemplate} header="Customer" style={{width:'30%'}}/>
-                <Column field="email" header="Email" style={{width:'30%'}}/>
-                <Column field="phoneNumber" header="Phone Number" style={{width:'30%'}}/>
-                <Column body={customersActions} header="Actions" style={{width:'10%'}}/>
+                <Column body={customerTemplate} header="Customer" />
+                <Column field="email" header="Email" />
+                <Column field="phone_number" header="Phone Number" />
+                <Column body={customersActions} header="Actions" className="flex justify-end"/>
             </DataTable>
-            {selectedCustomer && <EditCustomers customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />}
+            {selectedCustomer && <EditCustomers customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} customers={customers} setCustomers={setCustomers} />}
         </div>
     )
 }
