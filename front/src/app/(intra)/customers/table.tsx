@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Customer } from "@/app/types/Customer";
 import DelCustomersService from "@/app/services/customers/del-customers";
 import { DataTable } from 'primereact/datatable';
@@ -11,14 +11,38 @@ import Swal from 'sweetalert2'
 import EditCustomers from "./edit";
 import AddCustomer from "./addCustomer";
 import FetchError from "@/app/types/FetchErrors";
+import GetEmployeesService from "@/app/services/employees/get-employees";
 
 const delCustomerService = new DelCustomersService()
+const getEmployeesService = new GetEmployeesService()
 
 export default function CustomersTable({ customers, setCustomers }: { customers: Customer[], setCustomers: (value: Customer[]) => void }) {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [showAddCustomer, setShowAddCustomer] = useState(false);
+    const [isCoach, setIsCoach] = useState(true)
+    const [assignedCustomers, setAssignedCustomers] = useState<number[]>([])
+
+    useEffect(() => {
+        const getMyself = async () => {
+            try {
+                const myself = await getEmployeesService.getEmployeeMe()
+                const assignedCustomers = await getEmployeesService.getAssignedCustomers({ id: myself.id })
+
+                setIsCoach(myself.work.toLowerCase() === 'coach')
+                setAssignedCustomers(assignedCustomers)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        getMyself()
+    }, [])
 
     const filteredCustomers = customers.filter((customer) => {
+        if (isCoach) {
+            if (assignedCustomers.includes(customer.id))
+                return true
+            return false
+        }
         return customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.surname.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
@@ -26,7 +50,10 @@ export default function CustomersTable({ customers, setCustomers }: { customers:
         return (
             <div className="flex justify-between">
                 <InputText value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search..." />
-                <Button label="Add new customers" className="mr-6" icon="pi pi-plus" onClick={() => setShowAddCustomer(true)}/>
+                <div>
+                    <Button label="Assign a customer to a coach" className="mr-2" icon="pi pi-plus" disabled={true}/>
+                    <Button label="Add new customers" className="mr-6" icon="pi pi-plus" onClick={() => setShowAddCustomer(true)} disabled={isCoach}/>
+                </div>
             </div>
         )
     }
