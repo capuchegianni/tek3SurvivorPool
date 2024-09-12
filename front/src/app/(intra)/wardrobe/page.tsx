@@ -9,16 +9,19 @@ import { Button } from "primereact/button";
 
 import { Clothe } from "@/app/types/Clothe";
 import GetCustomersService from "@/app/services/customers/get-customers";
-import { CustomerDTO } from "@/app/types/Customer";
+import PostCustomersService from "@/app/services/customers/post-customers";
+import { Customer } from "@/app/types/Customer";
 import FetchError from "@/app/types/FetchErrors";
 
 const getCustomersService = new GetCustomersService()
+const postCustomersService = new PostCustomersService()
 
 export default function Wardrobe() {
-    const [customers, setCustomers] = useState<CustomerDTO[]>([])
+    const [customers, setCustomers] = useState<Customer[]>([])
     const [saveState, setSaveState] = useState(true)
     const [clothes, setClothes] = useState<Clothe[]>([])
     const [selectedClothes, setSelectedClothes] = useState<Clothe[]>([])
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
 
     useEffect(() => {
         const getCustomers = async () => {
@@ -36,8 +39,8 @@ export default function Wardrobe() {
         return clothes.filter(clothe => clothe.type === type)
     }
 
-    const onClick = () => {
-        console.log(selectedClothes)
+    const onClick = async () => {
+        // Not implemented
     }
 
     return (
@@ -49,6 +52,8 @@ export default function Wardrobe() {
                         customers={customers}
                         setSaveState={setSaveState}
                         setClothes={setClothes}
+                        selectedCustomer={selectedCustomer}
+                        setSelectedCustomer={setSelectedCustomer}
                     />
                     <Button
                         className="flex-row"
@@ -72,9 +77,7 @@ export default function Wardrobe() {
     )
 }
 
-const GetCustomerClothes = ({ customers, setSaveState, setClothes }: { customers: CustomerDTO[], setSaveState: (value: boolean) => void, setClothes: (value: Clothe[]) => void }) => {
-    const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null)
-
+const GetCustomerClothes = ({ customers, setSaveState, setClothes, selectedCustomer, setSelectedCustomer }: { customers: Customer[], setSaveState: (value: boolean) => void, setClothes: (value: Clothe[]) => void, selectedCustomer: Customer | null, setSelectedCustomer: (value: Customer | null) => void }) => {
     useEffect(() => {
         const getCustomerClothes = async () => {
             if (!selectedCustomer || !selectedCustomer.id) {
@@ -93,13 +96,13 @@ const GetCustomerClothes = ({ customers, setSaveState, setClothes }: { customers
         getCustomerClothes()
     }, [selectedCustomer, setSaveState, setClothes])
 
-    const itemTemplate = (item: CustomerDTO) => (
+    const itemTemplate = (item: Customer) => (
         <div>
             {item.id} - {item.name} {item.surname}
         </div>
     )
 
-    const valueTemplate = (item: CustomerDTO | null | undefined) => {
+    const valueTemplate = (item: Customer | null | undefined) => {
         if (item)
             return (
                 <div>
