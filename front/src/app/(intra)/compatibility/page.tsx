@@ -8,7 +8,7 @@ import { Button } from 'primereact/button';
 import Image from 'next/image';
 
 import GetCustomersService from '../../services/customers/get-customers';
-import { BasicCustomerWithID, Customer, CustomerDTO } from '../../types/Customer'
+import { BasicCustomerWithID, Customer } from '../../types/Customer'
 
 const getCustomerService = new GetCustomersService()
 
@@ -30,16 +30,16 @@ const astroSigns = [
 interface ClientAstrologicalProps {
     onSignSelected: (sign: string, index: number) => void;
     index: number;
-    customers: CustomerDTO[];
-    selectedCustomers: { [key: number]: CustomerDTO | null };
-    onCustomerSelect: (customer: CustomerDTO | null, index: number) => void;
+    customers: Customer[];
+    selectedCustomers: { [key: number]: Customer | null };
+    onCustomerSelect: (customer: Customer | null, index: number) => void;
 }
 
 export default function Compatibility() {
     const [selectedSigns, setSelectedSigns] = useState<{ sign1?: string, sign2?: string }>({});
     const [totalValue, setTotalValue] = useState<number>(0);
-    const [customers, setCustomers] = useState<CustomerDTO[]>([])
-    const [selectedCustomers, setSelectedCustomers] = useState<{ [key: number]: CustomerDTO | null }>({ 1: null, 2: null });
+    const [customers, setCustomers] = useState<Customer[]>([])
+    const [selectedCustomers, setSelectedCustomers] = useState<{ [key: number]: Customer | null }>({ 1: null, 2: null });
 
     useEffect(() => {
         const getCustomers = async () => {
@@ -60,7 +60,7 @@ export default function Compatibility() {
         setTotalValue(sign1Value + sign2Value);
     }
 
-    const handleCustomerSelect = (customer: CustomerDTO | null, index: number) => {
+    const handleCustomerSelect = (customer: Customer | null, index: number) => {
         setSelectedCustomers(prev => ({ ...prev, [index]: customer }))
     }
 
@@ -109,12 +109,12 @@ function ClientAstrological({
     selectedCustomers,
     onCustomerSelect
 }: ClientAstrologicalProps) {
-    const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null);
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [selectedFullCustomer, setSelectedFullCustomer] = useState<BasicCustomerWithID | null>(null)
     const [customerImage, setCustomerImage] = useState<string | null>(null)
-    const [filteredCustomers, setFilteredCustomers] = useState<CustomerDTO[]>([]);
+    const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
     const hasFetched = useRef<boolean>(false)
-    const [oldSelectedCustomer, setOldSelectedCustomer] = useState<CustomerDTO | null>(null)
+    const [oldSelectedCustomer, setOldSelectedCustomer] = useState<Customer | null>(null)
 
     useEffect(() => {
         const getCustomer = async () => {
@@ -125,7 +125,7 @@ function ClientAstrological({
                 const image = await getCustomerService.getCustomerImage({ id: selectedCustomer!.id })
 
                 setCustomerImage(image ? `data:image/jpeg;base64,${image}` : null)
-                onSignSelected(customer.astrologicalSign, index);
+                onSignSelected(customer.astrological_sign, index);
                 getCustomerService.getCustomer({ id: selectedCustomer!.id })
                 setSelectedFullCustomer(customer)
                 hasFetched.current = true
@@ -155,7 +155,7 @@ function ClientAstrological({
         setFilteredCustomers(correspondingCustomers);
     }
 
-    const itemTemplate = (item: CustomerDTO) => {
+    const itemTemplate = (item: Customer) => {
         return (
             <div>
                 {item.id} - {item.name} {item.surname}
@@ -163,7 +163,7 @@ function ClientAstrological({
         );
     }
 
-    const image = astroSigns.find(sign => sign.name === selectedFullCustomer?.astrologicalSign.toLowerCase())?.image
+    const image = astroSigns.find(sign => sign.name === selectedFullCustomer?.astrological_sign.toLowerCase())?.image
 
     return (
         <div>
@@ -182,7 +182,7 @@ function ClientAstrological({
                 }}
             />
             <div className='text-4xl flex items-center space-x-2.5 pt-2.5 justify-around p-10%'>
-                {selectedFullCustomer?.astrologicalSign}
+                {selectedFullCustomer?.astrological_sign}
                 { image && (
                         <Image src={image} alt='sign' width={50} height={50} />
 
