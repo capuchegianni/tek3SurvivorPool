@@ -102,7 +102,7 @@ def delCustomerClothe(customer_id, clothe_id):
 
 @del_customers_blueprint.route('/api/customers/<customer_id>/saved_clothes/<clothe_id>', methods=['DELETE'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def delCustomerSavedClothe(customer_id, clothe_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:

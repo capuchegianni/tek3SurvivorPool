@@ -8,7 +8,7 @@ del_tips_blueprint = Blueprint('del_tips', __name__)
 
 @del_tips_blueprint.route('/api/tips/<tip_id>', methods=['DELETE'])
 @jwt_required()
-@role_required('Coach')
+@role_required('Admin')
 def delTip(tip_id):
     tip = db.tips.find_one({'id': int(tip_id)})
     if tip is None:

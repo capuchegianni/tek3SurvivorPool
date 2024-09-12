@@ -8,7 +8,7 @@ put_tips_blueprint = Blueprint('put_tips', __name__)
 
 @put_tips_blueprint.route('/api/tips/<tip_id>', methods=['PUT'])
 @jwt_required()
-@role_required('Coach')
+@role_required('Admin')
 def putTip(tip_id):
     data = request.get_json()
     if not data:

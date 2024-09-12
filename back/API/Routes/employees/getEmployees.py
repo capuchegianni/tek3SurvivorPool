@@ -26,7 +26,7 @@ def getEmployee(employee_id):
 
 @get_employees_blueprint.route('/api/employees', methods=['GET'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def getEmployees():
     employees = db.employees.find(
         {},
@@ -89,7 +89,11 @@ def getEvent(employee_id, event_id):
     if employee is None:
         return jsonify({'details': 'Employee not found'}), 404
 
-    event = employee.get('events')
+    events = employee.get('events')
+    if events is None:
+        return jsonify({'details': 'Event not found'}), 404
+
+    event = next((event for event in events if event['id'] == int(event_id)), None)
     if event is None:
         return jsonify({'details': 'Event not found'}), 404
 

@@ -107,7 +107,7 @@ def postCustomerClothe(customer_id):
 
 @post_customers_blueprint.route('/api/customers/<customer_id>/saved_clothes', methods=['POST'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def postCustomerSavedClothe(customer_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:
@@ -126,7 +126,7 @@ def postCustomerSavedClothe(customer_id):
 
 @post_customers_blueprint.route('/api/customers/<customer_id>/encounters', methods=['POST'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def postCustomerEncounter(customer_id):
     customer = db.customers.find_one({'id': int(customer_id)})
     if customer is None:

@@ -26,7 +26,7 @@ def getCustomer(customer_id):
 
 @get_customers_blueprint.route('/api/customers', methods=['GET'])
 @jwt_required()
-@role_required('Admin')
+@role_required('Coach')
 def getCustomers():
     customers = db.customers.find(
         {},
