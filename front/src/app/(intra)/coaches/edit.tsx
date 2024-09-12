@@ -122,7 +122,12 @@ function GenderRadio({initialGender, setGender}: {initialGender: string, setGend
     const [gender, setLocalGender] = useState<string>(initialGender);
 
     useEffect(() => {
-        setGender(gender);
+        try {
+            setGender(gender);
+        } catch (error) {
+            if (error instanceof FetchError)
+                error.logError()
+        }
     }, [gender, setGender]);
 
     return (
